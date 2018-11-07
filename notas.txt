@@ -1,0 +1,12 @@
+-modulo jts-app contém a gui
+- modulo test contem o test runner (um programa que permite carregar fihceiros .wkt e apresentar a geometria neles definida
+- modulo example contém exemplos de código para criação de formas (polyline, polygon...) 
+e operações com as mesmas (interseção,...)
+- modulo app contem o testBuilder, uma gui mais completa que permite fazer operações com geometrias 2D
+- no modulo app, package org.locationtech.jttest.testbuilder a classe JTSTstBuilder permite correr o testBuilder com a gui.
+No entanto, a classe que carrega os icones a apresentar na gui verifica o diretório de resources no /modules/app/target/classes/,
+no entanto sem o goal resources:resources estes não são copiados do diretório /modules/app/source/main/resources/ 
+para o /modules/app/target/classes/
+
+- IMPORTANTE! o projeto maven que contém todos os modulos deve ser ser compilados com:
+mvn clean:clean resources:resources compiler:compile jar:jar install:install -DskipTest:true

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-jts</actionName>
+            <displayName>jts</displayName>
+            <goals>
+                <goal>clean:clean</goal>
+                <goal>resources:resources</goal>
+                <goal>compiler:compile</goal>
+                <goal>jar:jar</goal>
+                <goal>install:install</goal>
+            </goals>
+            <properties>
+                <Env.JAVA_HOME>C:\Program Files (x86)\Java\jdk1.8.0_144</Env.JAVA_HOME>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
+        <action>
+            <actionName>clean</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>clean:clean</goal>
+                <goal>compiler:compile</goal>
+                <goal>jar:jar</goal>
+                <goal>install:install</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
+    </actions>
