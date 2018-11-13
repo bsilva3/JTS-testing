@@ -10,3 +10,20 @@ para o /modules/app/target/classes/
 
 - IMPORTANTE! o projeto maven que contém todos os modulos deve ser ser compilados com:
 mvn clean:clean resources:resources compiler:compile jar:jar install:install -DskipTest:true
+
+
+-JTSTestBuilderFrame: carrega os componentes da janela
+
+
+Alterações
+- Apresentada uma janela de escolha de ficheiros quando se corre o programa (usado para escolher uma imagem). Alteração 
+feita no main da classe JTSTestBuilder do package "testbuilder", do modulo "app"
+- GeometryEditPanel: colocada imagem como fundo de ecrã (metodo paintComponent e repaintComponent para atualizar em eventos)
+- GridRenderer: atributo isEnabled colocado a false para nao apresentar grelha
+- RenderManager: metodo initImage, comentado a chamada a funçao erase, que desenha um quadrado branco por cima da imagem,
+atualizando assim as linhas que se vao desenhando ou movendo. Problema: se se mover o ponto, é apresentado no painel todas
+as alteraçoes as linhas e polygons.
+
+---> todo:
+-adicionar botão para ter a grid ou nao (GridRenderer, atributo isEnabled a false não mostra grids)
+-desenhar polygons em cima da geometria usando o ficheiro de correspondencias

@@ -24,8 +24,16 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -58,6 +66,8 @@ public class GeometryEditPanel extends JPanel
   
   private DrawingGrid grid = new DrawingGrid();
   private GridRenderer gridRenderer;
+  
+  private Image backgroundImage;
 
   boolean stateAddingPoints = false;
 
@@ -71,13 +81,18 @@ public class GeometryEditPanel extends JPanel
   private RenderManager renderMgr;
   //private OperationMonitorManager opMonitor;
   
+  //added
+  private File backgroundImageFile;
+  
   //----------------------------------------
   BorderLayout borderLayout1 = new BorderLayout();
   
   GeometryPopupMenu menu = new GeometryPopupMenu();
+  
 
   public GeometryEditPanel() {
     gridRenderer = new GridRenderer(viewport, grid);
+    this.setBackgroundImage(AppImage.getBackgroundImageFile());
     try {
       initUI();
     } catch (Exception ex) {
@@ -94,7 +109,8 @@ public class GeometryEditPanel extends JPanel
         this_componentResized(e);
       }
     });
-    this.setBackground(Color.white);
+    
+    //this.setBackground(Color.white);
     this.setBorder(BorderFactory.createLoweredBevelBorder());
     this.setLayout(borderLayout1);
     
@@ -104,6 +120,7 @@ public class GeometryEditPanel extends JPanel
     // deactivate for now, since it interferes with right-click zoom-out
     //addMouseListener(new PopupClickListener());
   }
+  
 
   class PopupClickListener extends MouseAdapter
   {
@@ -139,6 +156,14 @@ public class GeometryEditPanel extends JPanel
   public void setGridEnabled(boolean isEnabled) {
     gridRenderer.setEnabled(isEnabled);
   }
+  
+  public void setBackgroundImage(File backgroundImageFile){
+      try {
+            this.backgroundImage = ImageIO.read(backgroundImageFile);
+        } catch (IOException | NullPointerException ex) {
+            Logger.getLogger(GeometryEditPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+  }
 
   public Viewport getViewport() { return viewport; }
 
@@ -149,12 +174,19 @@ public class GeometryEditPanel extends JPanel
   }
   
   public void forceRepaint() {
-    renderMgr.setDirty(true);
-
-    Component source = SwingUtilities.windowForComponent(this);
-    if (source == null)
-      source = this;
-    source.repaint();
+        renderMgr.setDirty(true);
+        //this.getGraphics().drawImage(backgroundImage, 0, 0, (int) viewport.getWidthInView(), (int) viewport.getHeightInView(), null);
+        try{
+            this.getGraphics().drawImage(backgroundImage, 0, 0, (int) Math.round(viewport.getWidthInView()), 
+                    (int) Math.round(viewport.getHeightInView()), null);
+            
+        } catch(NullPointerException e){
+            System.err.println(e);
+        }
+        Component source = SwingUtilities.windowForComponent(this);
+        if (source == null)
+          source = this;
+        source.repaint();
   }
 
   private LayerList getLayerList()
@@ -205,7 +237,7 @@ public class GeometryEditPanel extends JPanel
   public void updateGeom()
   {
   	renderMgr.setDirty(true);
-    getGeomModel().geomChanged();
+        getGeomModel().geomChanged();
   }
   
   public String getToolTipText(MouseEvent event) {
@@ -236,10 +268,11 @@ public class GeometryEditPanel extends JPanel
     return grid.getGridSize();
   }
 
+  @Override
   public void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    renderMgr.render();
-    renderMgr.copyImage(g);
+        g.drawImage(backgroundImage, 0, 0, (int) viewport.getWidthInView(), (int)viewport.getHeightInView(), null);
+        renderMgr.render();
+        renderMgr.copyImage(g);
   }
   
   /*
@@ -548,30 +581,30 @@ public class GeometryEditPanel extends JPanel
   	
     public void render(Graphics2D g)
     {
-      Graphics2D g2 = g;
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-          RenderingHints.VALUE_ANTIALIAS_ON);
-      
-      if (isMagnifyingTopology) {
-        if (isRenderingStretchVertices) {
-          //renderMagnifiedVertexShadows(g2);
-          renderMagnifiedVertexMask(g2);
+        Graphics2D g2 = g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
+
+        if (isMagnifyingTopology) {
+          if (isRenderingStretchVertices) {
+            //renderMagnifiedVertexShadows(g2);
+            renderMagnifiedVertexMask(g2);
+          }
+          else {
+            // render indicator that shows stretched view is non-performant
+            renderMagnifyWarning(g2);
+          }
         }
-        else {
-          // render indicator that shows stretched view is non-performant
-          renderMagnifyWarning(g2);
+
+        gridRenderer.paint(g2);
+
+        renderLayers(g2);
+
+        if (isMagnifyingTopology && isRenderingStretchVertices) {
+          renderMagnifiedVertices(g2);
         }
-      }
-      
-      gridRenderer.paint(g2);
-      
-      renderLayers(g2);
-      
-      if (isMagnifyingTopology && isRenderingStretchVertices) {
-      	renderMagnifiedVertices(g2);
-      }
-      
-      drawMark(g2);
+
+        drawMark(g2);
       
     }
     

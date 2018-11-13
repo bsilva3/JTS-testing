@@ -13,14 +13,19 @@ package org.locationtech.jtstest.testbuilder;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import javax.swing.JFileChooser;
 
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 import org.locationtech.jts.geom.*;
 import org.locationtech.jtstest.command.*;
 import org.locationtech.jtstest.function.*;
 import org.locationtech.jtstest.geomfunction.GeometryFunctionRegistry;
+import static org.locationtech.jtstest.testbuilder.AppImage.setBackgroundImageFile;
 import org.locationtech.jtstest.testbuilder.model.*;
 
 
@@ -116,14 +121,29 @@ public class JTSTestBuilder
   public static void main(String[] args)
   {
     try {
+        //file chooser window to select an image
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        jfc.setDialogTitle("Choose an image: ");
+        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        jfc.setMultiSelectionEnabled(false);
+        jfc.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("png, gif, jpg, bmp or tiff images", "png", "gif", "jpg", "bmp", "tiff");
+        jfc.addChoosableFileFilter(filter);
+        int returnValue = jfc.showOpenDialog(null);
+        File selectedFile = null;
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+             selectedFile = jfc.getSelectedFile();
+        }
+        //set this file as a background image to be used in the edit panel
+        AppImage.setBackgroundImageFile(selectedFile);
     	readArgs(args);
     	setLookAndFeel();
-      app = new JTSTestBuilder();
-      app.initFrame();
-      
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+        app = new JTSTestBuilder();
+        app.initFrame();
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
   }
 
   /**

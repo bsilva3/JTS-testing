@@ -17,6 +17,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -86,7 +91,7 @@ public class RenderManager
 	private void initImage()
 	{
 		if (image != null) {
-			erase(image);
+			//erase(image);
 			return;
 		}
 		image = createPanelImage(panel);
@@ -103,23 +108,22 @@ public class RenderManager
 		
 		Graphics2D g = (Graphics2D) image.getGraphics();
 		g.setColor(Color.white);
-
 		Rectangle2D.Double r = new Rectangle2D.Double(0, 0, width, height);
 		g.fill(r);
 	}
 
 	public void copyImage(Graphics g)
 	{
-    if (image == null) {
-      return;
-    }
-    g.drawImage(image, 0, 0, null);
-	}
-  
-	private void paintPanel()
-	{
-    copyImage(panel.getGraphics());
-	}
+            if (image == null) {
+                return;
+            }
+            g.drawImage(image, 0, 0, null);
+            }
+            
+            private void paintPanel()
+            {
+                copyImage(panel.getGraphics());
+            }
 }
 
 class RendererSwingWorker extends SwingWorker

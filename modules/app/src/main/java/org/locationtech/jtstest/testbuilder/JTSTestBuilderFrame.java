@@ -22,14 +22,18 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -227,7 +231,7 @@ public class JTSTestBuilderFrame extends JFrame
   
   public void setModel(TestBuilderModel model)
   {
-  	tbModel = model;
+    tbModel = model;
     testCasePanel.setModel(tbModel);
     wktPanel.setModel(model);
     inspectPanel.setModel(model);
@@ -730,9 +734,11 @@ public class JTSTestBuilderFrame extends JFrame
     
     jSplitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
     jSplitPane1.setPreferredSize(new Dimension(601, 690));
+    //top panel (top half of window)
     jPanel1.setLayout(borderLayout2);
     jPanel1.setMinimumSize(new Dimension(431, 0));
     contentPane.setPreferredSize(new Dimension(601, 690));
+    //panel with statistics and the buttons to swith statistics
     inputTabbedPane.setTabPlacement(JTabbedPane.LEFT);
     jPanel2.setLayout(borderLayout3);
     wktPanel.setMinimumSize(new Dimension(111, 0));
@@ -770,6 +776,7 @@ public class JTSTestBuilderFrame extends JFrame
     this.setJMenuBar(tbMenuBar.getMenuBar());
     //contentPane.add(tbToolBar.getToolBar(), BorderLayout.NORTH);
   }
+  
 
   public JTSTestBuilderToolBar getToolbar()
   {

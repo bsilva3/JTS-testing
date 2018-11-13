@@ -35,7 +35,7 @@ public class GridRenderer {
 
   private DrawingGrid grid;
 
-  private boolean isEnabled = true;
+  private boolean isEnabled = false;
   
   private NumberFormat gridSizeFormat;
 

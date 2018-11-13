@@ -170,7 +170,7 @@ public class GeometryFunctionTreePanel extends JPanel {
 			eventListeners = v;
 		}
 	}
-
+        //fired on single click on a function on the "Geometry functions" tab
 	protected void fireFunctionSelected(GeometryFunctionEvent e) {
 		if (eventListeners != null) {
 			Vector listeners = eventListeners;
@@ -180,7 +180,7 @@ public class GeometryFunctionTreePanel extends JPanel {
 			}
 		}
 	}
-
+        //fired on double click on a function on the "Geometry functions" tab
 	protected void fireFunctionInvoked(GeometryFunctionEvent e) {
 		if (eventListeners != null) {
 			Vector listeners = eventListeners;
