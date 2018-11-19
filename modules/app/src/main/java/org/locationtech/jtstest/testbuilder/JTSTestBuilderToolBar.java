@@ -52,6 +52,7 @@ public class JTSTestBuilderToolBar {
   JToggleButton infoButton = new JToggleButton();
   JToggleButton panButton = new JToggleButton();
   JToggleButton btnEditVertex = new JToggleButton();
+  JToggleButton btnShowHideGrid = new JToggleButton();
   JToggleButton extractComponentButton;
   ButtonGroup toolButtonGroup = new ButtonGroup();
 
@@ -79,6 +80,7 @@ public class JTSTestBuilderToolBar {
   private final ImageIcon selectIcon = new ImageIcon(this.getClass().getResource("Select.gif"));
   private final ImageIcon moveVertexIcon = new ImageIcon(this.getClass().getResource("MoveVertex.png"));
   private final ImageIcon panIcon = new ImageIcon(this.getClass().getResource("Hand.gif"));
+  private final ImageIcon showHideGridIcon = new ImageIcon(this.getClass().getResource("gridIcon.png"));
 
 
   public JTSTestBuilderToolBar(JTSTestBuilderFrame tbFrame) 
@@ -421,6 +423,18 @@ public class JTSTestBuilderToolBar {
           tbFrame.btnEditVertex_actionPerformed(e);
         }
       });
+      
+      btnShowHideGrid.setMaximumSize(new Dimension(30, 30));
+      btnShowHideGrid.setMinimumSize(new Dimension(30, 30));
+      btnShowHideGrid.setToolTipText(AppStrings.TIP_MOVE_VERTEX);
+      btnShowHideGrid.setIcon(showHideGridIcon);
+      btnShowHideGrid.setMargin(new Insets(0, 0, 0, 0));
+      btnShowHideGrid.setMnemonic('0');
+      btnShowHideGrid.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          tbFrame.btnShowHideGrid_actionPerformed(e);
+        }
+      });
 
       extractComponentButton = createToggleButton(AppStrings.TIP_EXTRACT_COMPONENTS,
           new ImageIcon(this.getClass().getResource("ExtractComponent.png")), 
@@ -448,6 +462,7 @@ public class JTSTestBuilderToolBar {
       toolButtonGroup.add(zoomButton);
       toolButtonGroup.add(btnEditVertex);
       toolButtonGroup.add(deleteVertexButton);
+      toolButtonGroup.add(btnShowHideGrid);
       toolButtonGroup.add(infoButton);
       toolButtonGroup.add(extractComponentButton);
 
@@ -488,7 +503,8 @@ public class JTSTestBuilderToolBar {
       jToolBar1.add(drawPointButton, null);
       jToolBar1.add(btnEditVertex, null);
       jToolBar1.add(deleteVertexButton, null);
-
+      jToolBar1.add(btnShowHideGrid, null);
+      
       return jToolBar1;
   }
   

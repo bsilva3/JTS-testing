@@ -122,7 +122,7 @@ public class JTSTestBuilder
   {
     try {
         //file chooser window to select an image
-        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        /*JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose an image: ");
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jfc.setMultiSelectionEnabled(false);
@@ -134,8 +134,13 @@ public class JTSTestBuilder
         if (returnValue == JFileChooser.APPROVE_OPTION) {
              selectedFile = jfc.getSelectedFile();
         }
+        else{
+            //no valid image selected, end the program
+            return;
+        }
         //set this file as a background image to be used in the edit panel
-        AppImage.setBackgroundImageFile(selectedFile);
+        AppImage.setBackgroundImageFile(selectedFile);*/
+        AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
     	readArgs(args);
     	setLookAndFeel();
         app = new JTSTestBuilder();

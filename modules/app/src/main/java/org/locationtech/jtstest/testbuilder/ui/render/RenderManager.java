@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import org.locationtech.jtstest.testbuilder.AppImage;
 
 import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.ui.*;
@@ -32,7 +33,7 @@ import org.locationtech.jtstest.testbuilder.ui.*;
 public class RenderManager 
 {
 	private GeometryEditPanel panel;
-  private RendererSwingWorker worker = null;
+        private RendererSwingWorker worker = null;
 	private Image image = null;
 	private boolean isDirty = true;
 	
@@ -91,7 +92,7 @@ public class RenderManager
 	private void initImage()
 	{
 		if (image != null) {
-			//erase(image);
+			erase(image);
 			return;
 		}
 		image = createPanelImage(panel);
@@ -106,10 +107,13 @@ public class RenderManager
 		int width = image.getWidth(null);
 		int height = image.getHeight(null);
 		
+                //redraw the background image on top of the lines/polygons, updating the edit panel
 		Graphics2D g = (Graphics2D) image.getGraphics();
-		g.setColor(Color.white);
+                panel.paintComponent(g);
+
+		/*g.setColor(Color.white);
 		Rectangle2D.Double r = new Rectangle2D.Double(0, 0, width, height);
-		g.fill(r);
+		g.fill(r);*/
 	}
 
 	public void copyImage(Graphics g)

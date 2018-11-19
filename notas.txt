@@ -19,11 +19,14 @@ Alterações
 - Apresentada uma janela de escolha de ficheiros quando se corre o programa (usado para escolher uma imagem). Alteração 
 feita no main da classe JTSTestBuilder do package "testbuilder", do modulo "app"
 - GeometryEditPanel: colocada imagem como fundo de ecrã (metodo paintComponent e repaintComponent para atualizar em eventos)
+- AppImage: classe que tem a imagem de fundo e métodos estaticos que permite manter o seu aspect ratio
+- A imagem mantem agora o seu aspect ratio quando a janela é resized
 - GridRenderer: atributo isEnabled colocado a false para nao apresentar grelha
-- RenderManager: metodo initImage, comentado a chamada a funçao erase, que desenha um quadrado branco por cima da imagem,
-atualizando assim as linhas que se vao desenhando ou movendo. Problema: se se mover o ponto, é apresentado no painel todas
-as alteraçoes as linhas e polygons.
+- RenderManager: metodo erase, usado para atualizar o que é apresentado no edit panel. Agora é chamada a função "paintComponent"
+do GeometryEditPanel, que redesenha a imagem por cima.
+- adicionado botao que mostra/esconde a grid. classe JTSTestBuilderToolbar tem o botao btnShowHideGrid, com o evento de clique
+"btnShowHideGrid_actionPerformed" na classe JTSTestBuilderFrame.
 
 ---> todo:
--adicionar botão para ter a grid ou nao (GridRenderer, atributo isEnabled a false não mostra grids)
 -desenhar polygons em cima da geometria usando o ficheiro de correspondencias
+

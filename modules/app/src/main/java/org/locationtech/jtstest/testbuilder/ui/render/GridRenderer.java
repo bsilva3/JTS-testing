@@ -50,6 +50,10 @@ public class GridRenderer {
   public void setEnabled(boolean isEnabled) {
     this.isEnabled = isEnabled;
   }
+  
+  public void swithEnabled() {
+    this.isEnabled = !isEnabled;
+  }
 
   public void paint(Graphics2D g) {
     if (! isEnabled)

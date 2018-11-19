@@ -21,6 +21,7 @@ import java.awt.geom.Point2D;
 import javax.swing.SwingUtilities;
 
 import org.locationtech.jtstest.testbuilder.AppConstants;
+import org.locationtech.jtstest.testbuilder.AppImage;
 import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.JTSTestBuilderFrame;
 
@@ -68,6 +69,10 @@ public class ZoomTool extends BasicTool
     }
     // no key -> do Zoom
     panel().zoom(toModel(mouseStart), toModel(mouseEnd));
+    /*
+    AppImage.setImageHeight( (int) Math.round(AppImage.getImageHeight() * zoomFactor));
+    AppImage.setImageWidth( (int) Math.round(AppImage.getImageWidth() * zoomFactor));
+    */
   }
 
   private static boolean isPanGesture(MouseEvent e) {

@@ -92,7 +92,7 @@ public class GeometryEditPanel extends JPanel
 
   public GeometryEditPanel() {
     gridRenderer = new GridRenderer(viewport, grid);
-    this.setBackgroundImage(AppImage.getBackgroundImageFile());
+    
     try {
       initUI();
     } catch (Exception ex) {
@@ -156,14 +156,7 @@ public class GeometryEditPanel extends JPanel
   public void setGridEnabled(boolean isEnabled) {
     gridRenderer.setEnabled(isEnabled);
   }
-  
-  public void setBackgroundImage(File backgroundImageFile){
-      try {
-            this.backgroundImage = ImageIO.read(backgroundImageFile);
-        } catch (IOException | NullPointerException ex) {
-            Logger.getLogger(GeometryEditPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-  }
+
 
   public Viewport getViewport() { return viewport; }
 
@@ -175,10 +168,8 @@ public class GeometryEditPanel extends JPanel
   
   public void forceRepaint() {
         renderMgr.setDirty(true);
-        //this.getGraphics().drawImage(backgroundImage, 0, 0, (int) viewport.getWidthInView(), (int) viewport.getHeightInView(), null);
         try{
-            this.getGraphics().drawImage(backgroundImage, 0, 0, (int) Math.round(viewport.getWidthInView()), 
-                    (int) Math.round(viewport.getHeightInView()), null);
+            AppImage.keepAspectRatioAndDrawImage(this.getGraphics(),(int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
             
         } catch(NullPointerException e){
             System.err.println(e);
@@ -270,7 +261,7 @@ public class GeometryEditPanel extends JPanel
 
   @Override
   public void paintComponent(Graphics g) {
-        g.drawImage(backgroundImage, 0, 0, (int) viewport.getWidthInView(), (int)viewport.getHeightInView(), null);
+        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
         renderMgr.render();
         renderMgr.copyImage(g);
   }
@@ -708,6 +699,10 @@ public class GeometryEditPanel extends JPanel
   			currentRenderer.cancel();
   	}
 
+  }
+  
+  public GridRenderer getGridRenderer(){
+      return gridRenderer;
   }
 }
 

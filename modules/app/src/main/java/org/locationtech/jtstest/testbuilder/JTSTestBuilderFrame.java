@@ -21,6 +21,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -753,6 +755,7 @@ public class JTSTestBuilderFrame extends JFrame
     jPanel1.add(testCasePanel, BorderLayout.CENTER);
     jSplitPane1.add(jPanel2, JSplitPane.BOTTOM);
     jPanel2.add(tbToolBar.getToolBar(), BorderLayout.NORTH);
+    //jPanel2 contains the results and other statistics (bottom)
     jPanel2.add(inputTabbedPane, BorderLayout.CENTER);
     jSplitPane1.setBorder(new EmptyBorder(2,2,2,2));
     jSplitPane1.setResizeWeight(0.5);
@@ -776,6 +779,7 @@ public class JTSTestBuilderFrame extends JFrame
     this.setJMenuBar(tbMenuBar.getMenuBar());
     //contentPane.add(tbToolBar.getToolBar(), BorderLayout.NORTH);
   }
+  
   
 
   public JTSTestBuilderToolBar getToolbar()
@@ -864,6 +868,13 @@ public class JTSTestBuilderFrame extends JFrame
 
   void btnEditVertex_actionPerformed(ActionEvent e) {
     testCasePanel.getGeometryEditPanel().setCurrentTool(EditVertexTool.getInstance());
+  }
+  
+  void btnShowHideGrid_actionPerformed(ActionEvent e) {
+      //show or hide the grid
+    getGeometryEditPanel().getGridRenderer().swithEnabled();
+    //update ui
+    getGeometryEditPanel().forceRepaint();
   }
 
   private Coordinate pickOffset(Geometry a, Geometry b) {
