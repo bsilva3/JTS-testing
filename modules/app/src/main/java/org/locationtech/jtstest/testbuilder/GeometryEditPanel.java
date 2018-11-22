@@ -27,6 +27,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -38,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.util.Assert;
@@ -45,7 +47,10 @@ import org.locationtech.jtstest.testbuilder.model.*;
 import org.locationtech.jtstest.testbuilder.ui.*;
 import org.locationtech.jtstest.testbuilder.ui.render.*;
 import org.locationtech.jtstest.testbuilder.ui.style.AWTUtil;
+import org.locationtech.jtstest.testbuilder.ui.style.BasicStyle;
+import org.locationtech.jtstest.testbuilder.ui.style.Style;
 import org.locationtech.jtstest.testbuilder.ui.tools.*;
+import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 
 
 /**
@@ -79,6 +84,8 @@ public class GeometryEditPanel extends JPanel
   private Viewport viewport = new Viewport(this);
 
   private RenderManager renderMgr;
+  
+  private CorrToGeometryUtils corrToGeomUtils;
   //private OperationMonitorManager opMonitor;
   
   //added
@@ -92,7 +99,7 @@ public class GeometryEditPanel extends JPanel
 
   public GeometryEditPanel() {
     gridRenderer = new GridRenderer(viewport, grid);
-    
+    corrToGeomUtils = new CorrToGeometryUtils(AppFiles.getCorrFile());
     try {
       initUI();
     } catch (Exception ex) {
@@ -259,13 +266,43 @@ public class GeometryEditPanel extends JPanel
     return grid.getGridSize();
   }
 
-  @Override
-  public void paintComponent(Graphics g) {
+    @Override
+    public void paintComponent(Graphics g) {
         AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
         renderMgr.render();
         renderMgr.copyImage(g);
+        //Geometry p = drawAndTransformGeometryPoints();
+        //GeometryPainter.paint(p, viewport, (Graphics2D) g, Color.GREEN, Color.ORANGE);
+        //esta constantemente a adicionar....
+        List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile());
+        /*coord.add(new Coordinate(150, 200));
+        coord.add(new Coordinate(160, 260));
+        coord.add(new Coordinate(180, 280));
+        coord.add(new Coordinate(150, 200));*/
+        //System.out.println("hb");
+        JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+        JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
+        //this.updateGeom();
+    }
+  
+  //may not need this
+  public org.locationtech.jts.geom.Polygon drawAndTransformGeometryPoints(){
+      //Coordinate[] coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile());
+      Coordinate[] coord = {new Coordinate(150, 200), new Coordinate (160, 260), new Coordinate(100, 200)};
+      return corrToGeomUtils.createPolygonFromCoords(coord);
   }
   
+    private List<Coordinate>correctCoordinates(Coordinate[] coord){
+        List<Coordinate> transformedCoords = new ArrayList<>();
+        CoordinateUtils coordUtils;
+        for (Coordinate c : coord){
+            coordUtils = new CoordinateUtils(c.getX(), c.getY());
+            transformedCoords.add(coordUtils.transform(AppImage.getImageWidth(), AppImage.getImageHeight(),
+                    viewport.getWidthInView(), viewport.getHeightInView()));
+            //System.out.println(transformedCoords[i]);
+        }
+        return transformedCoords;
+    }
   /*
    // MD - obsolete
   public void render(Graphics g)

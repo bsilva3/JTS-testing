@@ -19,7 +19,6 @@
 
     <modules>
         <module>core</module>
-        <module>io</module>
     </modules>
 
     <profiles>

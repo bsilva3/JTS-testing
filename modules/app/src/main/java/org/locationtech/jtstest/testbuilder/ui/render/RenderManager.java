@@ -24,110 +24,113 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jtstest.testbuilder.AppImage;
 
 import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.ui.*;
+import org.locationtech.jtstest.testbuilder.ui.style.BasicStyle;
+import org.locationtech.jtstest.testbuilder.ui.style.Style;
 
 
 public class RenderManager 
 {
-	private GeometryEditPanel panel;
-        private RendererSwingWorker worker = null;
-	private Image image = null;
-	private boolean isDirty = true;
-	
-	private Timer repaintTimer = new Timer(100, new ActionListener() 
-	{
-		public void actionPerformed(ActionEvent e) {
-			if (worker.isRendering()) {
-				paintPanel();
-				return;
-			}
-			repaintTimer.stop();
-			paintPanel();
-		}
-	});
+    private GeometryEditPanel panel;
+    private RendererSwingWorker worker = null;
+    private Image image = null;
+    private boolean isDirty = true;
 
-	public RenderManager(GeometryEditPanel panel)
-	{
-		this.panel = panel;
-		// start with a short time cycle to give better appearance
-		repaintTimer.setInitialDelay(100);
-	}
-
-	public void setDirty(boolean isDirty)
-	{
-		this.isDirty = isDirty;
-	}
-		
-	public void componentResized()
-	{
-		image = null;
-		isDirty = true;
-	}
-	
-	public void render()
-	{
-		if (image != null && ! isDirty) return;
-		
-		/*
-		 * Clear dirty flag at start of rendering, so that subsequent paints will newly rendered image.
-		 * Another way to think of this is that once rendering has been initiated,
-		 * from the perspective of the client panel the image is up-to-date 
-		 * (although possibly not yet fully rendered)
-		 */ 
-		isDirty = false;
-
-		repaintTimer.stop();
-	
-		if (worker != null)
-			worker.cancel();
-		initImage();
-		worker = new RendererSwingWorker(panel.getRenderer(), image);
-		worker.start();
-		repaintTimer.start();
-	}
-	
-	private void initImage()
-	{
-		if (image != null) {
-			erase(image);
-			return;
-		}
-		image = createPanelImage(panel);
-	}
-	
-  private Image createPanelImage(JPanel panel) {
-    return new BufferedImage(panel.getWidth(), panel.getHeight(),
-        BufferedImage.TYPE_INT_ARGB);
-  }
-  
-	public void erase(Image image) {
-		int width = image.getWidth(null);
-		int height = image.getHeight(null);
-		
-                //redraw the background image on top of the lines/polygons, updating the edit panel
-		Graphics2D g = (Graphics2D) image.getGraphics();
-                panel.paintComponent(g);
-
-		/*g.setColor(Color.white);
-		Rectangle2D.Double r = new Rectangle2D.Double(0, 0, width, height);
-		g.fill(r);*/
-	}
-
-	public void copyImage(Graphics g)
-	{
-            if (image == null) {
-                return;
+    private Timer repaintTimer = new Timer(100, new ActionListener() 
+    {
+            public void actionPerformed(ActionEvent e) {
+                    if (worker.isRendering()) {
+                            paintPanel();
+                            return;
+                    }
+                    repaintTimer.stop();
+                    paintPanel();
             }
-            g.drawImage(image, 0, 0, null);
+    });
+
+    public RenderManager(GeometryEditPanel panel)
+    {
+            this.panel = panel;
+            // start with a short time cycle to give better appearance
+            repaintTimer.setInitialDelay(100);
+    }
+
+    public void setDirty(boolean isDirty)
+    {
+            this.isDirty = isDirty;
+    }
+
+    public void componentResized()
+    {
+            image = null;
+            isDirty = true;
+    }
+
+    public void render()
+    {
+            if (image != null && ! isDirty) return;
+
+            /*
+             * Clear dirty flag at start of rendering, so that subsequent paints will newly rendered image.
+             * Another way to think of this is that once rendering has been initiated,
+             * from the perspective of the client panel the image is up-to-date 
+             * (although possibly not yet fully rendered)
+             */ 
+            isDirty = false;
+
+            repaintTimer.stop();
+
+            if (worker != null)
+                    worker.cancel();
+            initImage();
+            worker = new RendererSwingWorker(panel.getRenderer(), image);
+            worker.start();
+            repaintTimer.start();
+    }
+
+    private void initImage()
+    {
+            if (image != null) {
+                    erase(image);
+                    return;
             }
-            
-            private void paintPanel()
-            {
-                copyImage(panel.getGraphics());
-            }
+            image = createPanelImage(panel);
+    }
+	
+    private Image createPanelImage(JPanel panel) {
+        return new BufferedImage(panel.getWidth(), panel.getHeight(),
+            BufferedImage.TYPE_INT_ARGB);
+    }
+
+    public void erase(Image image) {
+            /*int width = image.getWidth(null);
+            int height = image.getHeight(null);*/
+
+            //redraw the background image on top of the lines/polygons, updating the edit panel
+            Graphics2D g = (Graphics2D) image.getGraphics();
+            panel.paintComponent(g);
+
+            /*g.setColor(Color.white);
+            Rectangle2D.Double r = new Rectangle2D.Double(0, 0, width, height);
+            g.fill(r);*/
+    }
+
+    public void copyImage(Graphics g)
+    {
+        if (image == null) {
+            return;
+        }
+        g.drawImage(image, 0, 0, null);
+    }
+
+    private void paintPanel()
+    {
+        copyImage(panel.getGraphics());
+    }
 }
 
 class RendererSwingWorker extends SwingWorker
@@ -146,8 +149,8 @@ class RendererSwingWorker extends SwingWorker
   public Object construct()
   {
   	isRendering = true;
-		Graphics2D gr = (Graphics2D) image.getGraphics();
-    renderer.render(gr);
+	Graphics2D gr = (Graphics2D) image.getGraphics();
+        renderer.render(gr);
   	isRendering = false;
     return new Boolean(true);
   }

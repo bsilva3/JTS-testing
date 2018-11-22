@@ -35,8 +35,8 @@ import org.locationtech.jts.geom.Geometry;
 public class WKTFileReader 
 {
 	private File file = null;
-  private Reader reader;
-//  private Reader fileReader = new FileReader(file);
+        private Reader reader;
+        //  private Reader fileReader = new FileReader(file);
 	private WKTReader wktReader;
 	private int count = 0;
 	private int limit = -1;
@@ -52,7 +52,7 @@ public class WKTFileReader
 	public WKTFileReader(File file, WKTReader wktReader)
 	{
 		this.file = file;
-    this.wktReader = wktReader;
+                this.wktReader = wktReader;
 	}
 	
   /**

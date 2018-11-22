@@ -141,6 +141,7 @@ public class JTSTestBuilder
         //set this file as a background image to be used in the edit panel
         AppImage.setBackgroundImageFile(selectedFile);*/
         AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
+        AppFiles.setCorrFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\corr\\ice1_0_1.corr"));
     	readArgs(args);
     	setLookAndFeel();
         app = new JTSTestBuilder();

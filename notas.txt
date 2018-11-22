@@ -1,4 +1,7 @@
--modulo jts-app contém a gui
+- IMPORTANTE! o projeto maven que contém todos os modulos deve ser ser compilados com:
+mvn clean:clean resources:resources compiler:compile jar:jar install:install -DskipTest:true
+
+- modulo jts-app contém a gui
 - modulo test contem o test runner (um programa que permite carregar fihceiros .wkt e apresentar a geometria neles definida
 - modulo example contém exemplos de código para criação de formas (polyline, polygon...) 
 e operações com as mesmas (interseção,...)
@@ -7,10 +10,10 @@ e operações com as mesmas (interseção,...)
 No entanto, a classe que carrega os icones a apresentar na gui verifica o diretório de resources no /modules/app/target/classes/,
 no entanto sem o goal resources:resources estes não são copiados do diretório /modules/app/source/main/resources/ 
 para o /modules/app/target/classes/
-
-- IMPORTANTE! o projeto maven que contém todos os modulos deve ser ser compilados com:
-mvn clean:clean resources:resources compiler:compile jar:jar install:install -DskipTest:true
-
+- projeto "app" package "render" contem a classe GeomtryPaint metodo paint, que pega num objeto Geometry e o desenha na gui
+- projeto "app" package "ui.style" tem a classe basic style, que permite definir a cor da linha e do preenchimento da 
+geometria e desenhá-la
+- gesture finished.., classe rectangle tool
 
 -JTSTestBuilderFrame: carrega os componentes da janela
 
@@ -26,6 +29,17 @@ feita no main da classe JTSTestBuilder do package "testbuilder", do modulo "app"
 do GeometryEditPanel, que redesenha a imagem por cima.
 - adicionado botao que mostra/esconde a grid. classe JTSTestBuilderToolbar tem o botao btnShowHideGrid, com o evento de clique
 "btnShowHideGrid_actionPerformed" na classe JTSTestBuilderFrame.
+
+-adicionado classe PointUtils e CoordUtils, no projeto "core", package "geometry", com a transformada de pontos e coordenadas
+ respetivamente...
+- criada classe no projeto "core", package "io", chamada CorrReader, que faz o parsing dos ficheiros de .corr
+para um array de Coordenate.
+- no projeto "app", package "util.io", foi criada classe CorrToGeometries, que permite converter um polygon a partir de um
+Coordinate[]. Caso o Coordinate[] não seja fechado (ultimas coordenadas iguais ás primeiras, existe um metodo que irá fechar
+as coordenadas).
+-  GeometryEditPanel, adicionado metodo drawAndTransformGeometryPoints, que recebe o conjunto de coordenadas de um ficheiro
+chama métodos para transformar as coordenadas da imagem original para o tamanho da janela, e desenhar esse poligono
+/////descubrir como desenhar os polygons no edit panel.
 
 ---> todo:
 -desenhar polygons em cima da geometria usando o ficheiro de correspondencias

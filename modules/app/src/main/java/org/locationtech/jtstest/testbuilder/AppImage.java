@@ -41,9 +41,11 @@ public class AppImage {
             Logger.getLogger(AppImage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public static int getImageWidth() {
-        return imageWidth;
+        if (backgroundImage != null)
+            return backgroundImage.getWidth(null);
+        return 0;
     }
 
     public static void setImageWidth(int imageWidth) {
@@ -51,7 +53,9 @@ public class AppImage {
     }
 
     public static int getImageHeight() {
-        return imageHeight;
+        if (backgroundImage != null)
+            return backgroundImage.getHeight(null);
+        return 0;
     }
 
     public static void setImageHeight(int imageHeight) {

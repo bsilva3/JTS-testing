@@ -62,7 +62,7 @@ public class Point
     init(coordinates);
   }
 
-  private void init(CoordinateSequence coordinates)
+  protected void init(CoordinateSequence coordinates)
   {
     if (coordinates == null) {
       coordinates = getFactory().getCoordinateSequenceFactory().create(new Coordinate[]{});
