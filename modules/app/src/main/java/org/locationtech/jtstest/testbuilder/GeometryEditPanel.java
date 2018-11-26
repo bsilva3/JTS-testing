@@ -271,6 +271,9 @@ public class GeometryEditPanel extends JPanel
         AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
         renderMgr.render();
         renderMgr.copyImage(g);
+    }
+    
+    public void drawGeometry(){
         //Geometry p = drawAndTransformGeometryPoints();
         //GeometryPainter.paint(p, viewport, (Graphics2D) g, Color.GREEN, Color.ORANGE);
         //esta constantemente a adicionar....
@@ -282,7 +285,7 @@ public class GeometryEditPanel extends JPanel
         //System.out.println("hb");
         JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
-        //this.updateGeom();
+        this.updateGeom();
     }
   
   //may not need this

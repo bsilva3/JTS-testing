@@ -146,6 +146,8 @@ public class JTSTestBuilder
     	setLookAndFeel();
         app = new JTSTestBuilder();
         app.initFrame();
+        //now that the frame has been initialized, draw the geometry
+        JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
 
       } catch (Exception e) {
         e.printStackTrace();
