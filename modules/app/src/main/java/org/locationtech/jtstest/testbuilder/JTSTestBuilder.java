@@ -147,7 +147,8 @@ public class JTSTestBuilder
         app = new JTSTestBuilder();
         app.initFrame();
         //now that the frame has been initialized, draw the geometry
-        JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
+        //now called on the event "window resized"
+        //JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
 
       } catch (Exception e) {
         e.printStackTrace();

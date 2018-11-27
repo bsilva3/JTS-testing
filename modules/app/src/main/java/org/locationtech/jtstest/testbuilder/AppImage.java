@@ -25,6 +25,10 @@ public class AppImage {
     private static int imageWidth;
     
     private static int imageHeight;
+    
+    private static int imageWidthInPanel;
+    
+    private static int imageHeightInPanel;
 
     public static Image getBackgroundImage() {
         return backgroundImage;
@@ -62,13 +66,21 @@ public class AppImage {
         AppImage.imageHeight = imageHeight;
     }
     
-    //keeps the 1:1 aspect ration of the image and draws it
-    public static void keepAspectRatioAndDrawImage(Graphics g, int panelWidth, int panelHeight){
+    //resizes a dimension to fit a boundary dimension, while maintaining the aspect ratio
+    public static Dimension resizeImageDimension(int panelWidth, int panelHeight){
         Dimension windowDimension = new Dimension(panelWidth, panelHeight);
       
         Dimension d = getScaledDimension(new Dimension((int) AppImage.getBackgroundImage().getWidth(null), 
         (int) AppImage.getBackgroundImage().getHeight(null)), windowDimension );
-      
+        AppImage.setImageHeightInPanel(d.height);
+        AppImage.setImageWidthInPanel(d.width);
+        return d;
+    }
+    
+    //keeps the 1:1 aspect ration of the image and draws it
+    public static void keepAspectRatioAndDrawImage(Graphics g, int panelWidth, int panelHeight){
+        Dimension d = AppImage.resizeImageDimension(panelWidth, panelHeight);
+        //Dimension scaledDimension = getScaledDimension(d, windowDimension);
         g.drawImage(AppImage.getBackgroundImage(), 0, 0, d.width, d.height, null);
     }
   
@@ -78,6 +90,22 @@ public class AppImage {
         double ratio = Math.min(widthRatio, heightRatio);
 
         return new Dimension((int) (imageSize.width * ratio), (int) (imageSize.height * ratio));
+    }
+
+    public static int getImageWidthInPanel() {
+        return imageWidthInPanel;
+    }
+
+    public static void setImageWidthInPanel(int imageWidthInPanel) {
+        AppImage.imageWidthInPanel = imageWidthInPanel;
+    }
+
+    public static int getImageHeightInPanel() {
+        return imageHeightInPanel;
+    }
+
+    public static void setImageHeightInPanel(int imageHeightInPanel) {
+        AppImage.imageHeightInPanel = imageHeightInPanel;
     }
     
     

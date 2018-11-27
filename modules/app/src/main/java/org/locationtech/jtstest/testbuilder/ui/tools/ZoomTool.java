@@ -32,7 +32,7 @@ import org.locationtech.jtstest.testbuilder.JTSTestBuilderFrame;
  */
 public class ZoomTool extends BasicTool 
 {
-  private double zoomFactor = 2;
+  private double zoomFactor = 1.5;
   private Point mouseStart = null;
   private Point mouseEnd = null;
   private Point2D panStart;
@@ -112,9 +112,9 @@ public class ZoomTool extends BasicTool
 
   public void mouseWheelMoved(MouseWheelEvent e) {
     double notches = e.getPreciseWheelRotation();
-    double zoomFactor = Math.abs(notches) * 2;
-    if (notches > 0 && zoomFactor > 0) zoomFactor = 1.0 / zoomFactor;
-    panel().zoom(toModel(e.getPoint()), zoomFactor);
+    double zoom = Math.abs(notches) * this.zoomFactor;
+    if (notches > 0 && zoom > 0) zoom = 1.0 / zoom;
+    panel().zoom(toModel(e.getPoint()), zoom);
   }
   
   private static final int MIN_MOVEMENT = 5;

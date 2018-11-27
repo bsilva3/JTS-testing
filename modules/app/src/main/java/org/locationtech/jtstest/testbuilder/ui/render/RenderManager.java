@@ -28,6 +28,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jtstest.testbuilder.AppImage;
 
 import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
+import org.locationtech.jtstest.testbuilder.JTSTestBuilderFrame;
 import org.locationtech.jtstest.testbuilder.ui.*;
 import org.locationtech.jtstest.testbuilder.ui.style.BasicStyle;
 import org.locationtech.jtstest.testbuilder.ui.style.Style;
@@ -107,16 +108,19 @@ public class RenderManager
     }
 
     public void erase(Image image) {
-            /*int width = image.getWidth(null);
-            int height = image.getHeight(null);*/
+            int width = image.getWidth(null);
+            int height = image.getHeight(null);
 
             //redraw the background image on top of the lines/polygons, updating the edit panel
             Graphics2D g = (Graphics2D) image.getGraphics();
-            panel.paintComponent(g);
-
-            /*g.setColor(Color.white);
+            g.setColor(Color.white);
             Rectangle2D.Double r = new Rectangle2D.Double(0, 0, width, height);
-            g.fill(r);*/
+            g.fill(r);       
+            g.scale(panel.getViewport().getScale(), panel.getViewport().getScale());
+            panel.paintComponentSimple(g);
+            //JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
+            //g.drawImage(image, 0, 0, width, height, null);
+
     }
 
     public void copyImage(Graphics g)

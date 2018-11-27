@@ -36,6 +36,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -113,14 +114,15 @@ public class GeometryEditPanel extends JPanel
     this.addComponentListener(new java.awt.event.ComponentAdapter() {
 
       public void componentResized(ComponentEvent e) {
+          //redraw the geometry
         this_componentResized(e);
+        JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
       }
     });
     
     //this.setBackground(Color.white);
     this.setBorder(BorderFactory.createLoweredBevelBorder());
     this.setLayout(borderLayout1);
-    
     setToolTipText("");
     setBorder(BorderFactory.createEmptyBorder());
     
@@ -175,12 +177,12 @@ public class GeometryEditPanel extends JPanel
   
   public void forceRepaint() {
         renderMgr.setDirty(true);
-        try{
+        /*try{
             AppImage.keepAspectRatioAndDrawImage(this.getGraphics(),(int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
             
         } catch(NullPointerException e){
             System.err.println(e);
-        }
+        }*/
         Component source = SwingUtilities.windowForComponent(this);
         if (source == null)
           source = this;
@@ -265,44 +267,45 @@ public class GeometryEditPanel extends JPanel
   public double getGridSize() {
     return grid.getGridSize();
   }
+  
+    public void paintComponentSimple(Graphics g) {
+        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView() * viewport.getScale()), 
+                (int) Math.round(viewport.getHeightInView()* viewport.getScale()));
+        System.out.println(viewport.getScale());
+        //renderMgr.render();
+        //renderMgr.copyImage(g);
+    }
 
     @Override
     public void paintComponent(Graphics g) {
-        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
+        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView() * viewport.getScale()), 
+                (int) Math.round(viewport.getHeightInView()* viewport.getScale()));
+        //System.out.println(viewport.getScale());
         renderMgr.render();
         renderMgr.copyImage(g);
     }
     
+    //draws the geometry defined by the coordinates in the "corr" file. These coordinates are transformed
+    //to match the display
     public void drawGeometry(){
-        //Geometry p = drawAndTransformGeometryPoints();
-        //GeometryPainter.paint(p, viewport, (Graphics2D) g, Color.GREEN, Color.ORANGE);
-        //esta constantemente a adicionar....
+        //delete any existing geometry
+        JTSTestBuilder.model().getGeometryEditModel().clear();
         List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile());
-        /*coord.add(new Coordinate(150, 200));
-        coord.add(new Coordinate(160, 260));
-        coord.add(new Coordinate(180, 280));
-        coord.add(new Coordinate(150, 200));*/
-        //System.out.println("hb");
         JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
         this.updateGeom();
     }
   
-  //may not need this
-  public org.locationtech.jts.geom.Polygon drawAndTransformGeometryPoints(){
-      //Coordinate[] coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile());
-      Coordinate[] coord = {new Coordinate(150, 200), new Coordinate (160, 260), new Coordinate(100, 200)};
-      return corrToGeomUtils.createPolygonFromCoords(coord);
-  }
-  
     private List<Coordinate>correctCoordinates(Coordinate[] coord){
+        //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
+        AppImage.resizeImageDimension((int) Math.round(viewport.getWidthInView() * viewport.getScale()), 
+                (int) Math.round(viewport.getHeightInView()* viewport.getScale()));
         List<Coordinate> transformedCoords = new ArrayList<>();
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
             coordUtils = new CoordinateUtils(c.getX(), c.getY());
             transformedCoords.add(coordUtils.transform(AppImage.getImageWidth(), AppImage.getImageHeight(),
-                    viewport.getWidthInView(), viewport.getHeightInView()));
-            //System.out.println(transformedCoords[i]);
+                    AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel()));
         }
         return transformedCoords;
     }

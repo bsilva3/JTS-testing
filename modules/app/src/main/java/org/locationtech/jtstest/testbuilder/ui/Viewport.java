@@ -35,8 +35,8 @@ import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 public class Viewport implements PointTransformation
 {
   private static double INITIAL_SCALE = 1.0;
-  private static int INITIAL_ORIGIN_X = -10;
-  private static int INITIAL_ORIGIN_Y = -10;
+  private static int INITIAL_ORIGIN_X = 0;
+  private static int INITIAL_ORIGIN_Y = 0;
 
   private GeometryEditPanel panel;
   
