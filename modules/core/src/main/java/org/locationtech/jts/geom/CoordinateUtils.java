@@ -22,8 +22,18 @@ public class CoordinateUtils extends Coordinate{
         return new Coordinate(transformedX, transformedY);
     }
     
+    public void transformCoords (double originalWidth, double originalHeight, double panelWidth, double panelHeight){
+        this.setX(getCoordinateConversion(this.getX(), originalWidth, panelWidth));
+        this.setY(getCoordinateConversion(originalHeight - this.getY(), originalHeight, panelHeight));
+    }
+    
     private double getCoordinateConversion(double c, double original, double panel){
         return (c/original) * panel;
+    }
+    
+    public void translate(CoordinateUtils coordUtil){
+        this.x+=coordUtil.getX();
+        this.y+=coordUtil.getY();
     }
     
 }

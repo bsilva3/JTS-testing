@@ -183,7 +183,7 @@ public class JTSTestBuilderFrame extends JFrame
           revealTopo_actionPerformed();
         }
       });
-
+      //zoom factor is changed here!
       zoomTool = new ZoomTool(2, AppCursors.ZOOM);
       showGeomsTab();
       initFileDrop(testCasePanel);

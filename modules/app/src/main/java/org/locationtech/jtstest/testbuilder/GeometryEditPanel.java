@@ -303,9 +303,15 @@ public class GeometryEditPanel extends JPanel
         List<Coordinate> transformedCoords = new ArrayList<>();
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
-            coordUtils = new CoordinateUtils(c.getX(), c.getY());
-            transformedCoords.add(coordUtils.transform(AppImage.getImageWidth(), AppImage.getImageHeight(),
-                    AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel()));
+            coordUtils = new CoordinateUtils(c.getX(), c.getY() );
+            //System.out.println("image: " + (viewport.getHeightInView()-AppImage.getImageHeightInPanel()));
+            
+            coordUtils.transformCoords(AppImage.getImageWidth(), AppImage.getImageHeight(),
+                    AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel());
+            
+            //to correct the diference between the image height in the panel and the panel height
+            coordUtils.translate(new CoordinateUtils(0, viewport.getHeightInView() - AppImage.getImageHeightInPanel()));
+            transformedCoords.add(coordUtils);
         }
         return transformedCoords;
     }
