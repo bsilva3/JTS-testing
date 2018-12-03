@@ -184,7 +184,7 @@ public class JTSTestBuilderFrame extends JFrame
         }
       });
       //zoom factor is changed here!
-      zoomTool = new ZoomTool(2, AppCursors.ZOOM);
+      zoomTool = new ZoomTool(1.5, AppCursors.ZOOM);
       showGeomsTab();
       initFileDrop(testCasePanel);
       testCasePanel.getGeometryEditPanel().setCurrentTool(RectangleTool.getInstance());

@@ -14,6 +14,8 @@ para o /modules/app/target/classes/
 - projeto "app" package "ui.style" tem a classe basic style, que permite definir a cor da linha e do preenchimento da 
 geometria e desenhá-la
 - gesture finished.., classe rectangle tool
+- JTSTestBuilderFrame, pode-se alterar lá o factor de zoom.
+- Viewport: setOrigin é chamado sempre que se faz zoom, e pode ser a causa de a origem ficar desfasada
 
 -JTSTestBuilderFrame: carrega os componentes da janela
 
@@ -40,11 +42,15 @@ as coordenadas).
 -  GeometryEditPanel, adicionado metodo drawGeometry, que recebe o conjunto de coordenadas de um ficheiro e
 chama métodos para transformar as coordenadas da imagem original para o tamanho da janela, e desenhar o poligono, removendo
 primeiro quaisquer desenhos que lá existam.
-Este método é chamado no main da classe JTSTestBuilder e também no metodo componentResized, chamado sempre a janela muda
+Este método é chamado no main da classe JTSTestBuilder e também no metodo componentResized sempre a janela muda
 as suas dimensões.
+- na classe ViewPort, em setOrigin, foi adicionado um if que verifica a escala do view port.. se for 1,
+ou seja não há zoom, entao a origem será o 0,0, resolvendo assim o problema da origem (em principio..)
+- Agora a imagem é colocada nos pontos -x, e -y, correspondentes as coordenadas do painel do canto inferior esquerdo
+(para corrigir desfasamentos de geometria e imagem)
 
 
 ---> todo:
--imagem deve ser zoomed out e zoomed in
-- problema no desfazamento de geometrias
+- á medida que se faz zoom a imagem e a geometria ficam mais desfasadas, mesmo apos mover a imagem 
+de posição de acordo com o zoom aplicado
 

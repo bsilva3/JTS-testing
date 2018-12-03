@@ -88,8 +88,8 @@ public class Viewport implements PointTransformation
     return scale;
   }
 
-  private void setScaleNoUpdate(double scale) {
-    this.scale = snapScale(scale);
+  public void setScaleNoUpdate(double scale) {
+    this.scale = scale;
     scalePM = new PrecisionModel(this.scale);   
     
     scaleFormat = NumberFormat.getInstance();
@@ -102,14 +102,20 @@ public class Viewport implements PointTransformation
     scaleFormat.setGroupingUsed(false);
   }
 
-  private void setScale(double scale) {
+  public void setScale(double scale) {
     setScaleNoUpdate(scale);
     update();
   }
   
   private void setOrigin(double viewOriginX, double viewOriginY) {
-    this.originInModel = new Point2D.Double(viewOriginX, viewOriginY);
-    update();
+        //System.out.println(this.scale);
+        if (this.scale == 1.0){
+            this.originInModel = new Point2D.Double(INITIAL_ORIGIN_X, INITIAL_ORIGIN_Y);
+        }
+        else{
+         this.originInModel = new Point2D.Double(viewOriginX, viewOriginY);   
+        }
+        update();
   }
   
   public NumberFormat getScaleFormat()

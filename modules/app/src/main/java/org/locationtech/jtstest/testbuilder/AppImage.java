@@ -7,6 +7,7 @@ package org.locationtech.jtstest.testbuilder;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,6 +30,10 @@ public class AppImage {
     private static int imageWidthInPanel;
     
     private static int imageHeightInPanel;
+
+    private static int oldImageHeightInPanel;
+    
+    private static int oldImageWidthInPanel;
 
     public static Image getBackgroundImage() {
         return backgroundImage;
@@ -67,21 +72,24 @@ public class AppImage {
     }
     
     //resizes a dimension to fit a boundary dimension, while maintaining the aspect ratio
-    public static Dimension resizeImageDimension(int panelWidth, int panelHeight){
+    public static Dimension resizeImageDimension(int panelWidth, int panelHeight, double scale){
         Dimension windowDimension = new Dimension(panelWidth, panelHeight);
       
         Dimension d = getScaledDimension(new Dimension((int) AppImage.getBackgroundImage().getWidth(null), 
         (int) AppImage.getBackgroundImage().getHeight(null)), windowDimension );
-        AppImage.setImageHeightInPanel(d.height);
-        AppImage.setImageWidthInPanel(d.width);
+        AppImage.setImageHeightInPanel((int) Math.round(d.height * scale));
+        AppImage.setImageWidthInPanel((int) Math.round(d.width * scale));
         return d;
     }
     
     //keeps the 1:1 aspect ration of the image and draws it
-    public static void keepAspectRatioAndDrawImage(Graphics g, int panelWidth, int panelHeight){
-        Dimension d = AppImage.resizeImageDimension(panelWidth, panelHeight);
-        //Dimension scaledDimension = getScaledDimension(d, windowDimension);
-        g.drawImage(AppImage.getBackgroundImage(), 0, 0, d.width, d.height, null);
+    public static void keepAspectRatioAndDrawImage(Graphics g, int panelWidth, int panelHeight, 
+            int cornerX, int cornerY, double scale){
+        Dimension d = AppImage.resizeImageDimension(panelWidth, panelHeight, scale);
+        Graphics2D g2 = (Graphics2D) g;
+        //g2.scale(scale, scale);
+        
+        g2.drawImage(AppImage.getBackgroundImage(), -cornerX, -cornerY, d.width, d.height, null);
     }
   
     private static Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {
@@ -106,6 +114,22 @@ public class AppImage {
 
     public static void setImageHeightInPanel(int imageHeightInPanel) {
         AppImage.imageHeightInPanel = imageHeightInPanel;
+    }
+
+    public static int getOldImageHeightInPanel() {
+        return oldImageHeightInPanel;
+    }
+
+    public static void setOldImageHeightInPanel(int oldImageHeightInPanel) {
+        AppImage.oldImageHeightInPanel = oldImageHeightInPanel;
+    }
+
+    public static int getOldImageWidthInPanel() {
+        return oldImageWidthInPanel;
+    }
+
+    public static void setOldImageWidthInPanel(int oldImageWidthInPanel) {
+        AppImage.oldImageWidthInPanel = oldImageWidthInPanel;
     }
     
     

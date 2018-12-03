@@ -110,7 +110,6 @@ public class RenderManager
     public void erase(Image image) {
             int width = image.getWidth(null);
             int height = image.getHeight(null);
-
             //redraw the background image on top of the lines/polygons, updating the edit panel
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setColor(Color.white);

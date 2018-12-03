@@ -82,11 +82,11 @@ public class GridRenderer {
     // draw XY axes
     g.setColor(AppConstants.AXIS_CLR);
     g.setStroke(new BasicStroke(AppConstants.AXIS_WIDTH));
-
+    
     Point2D viewOrigin = viewport.toView(MODEL_ORIGIN);
     double vOriginX = viewOrigin.getX();
     double vOriginY = viewOrigin.getY();
-
+    //draw the axes of the origin
     if (vOriginX >= 0.0 && vOriginX <= viewport.getWidthInView()) {
       g.draw(new Line2D.Double(vOriginX, 0, vOriginX, viewport
               .getHeightInView()));

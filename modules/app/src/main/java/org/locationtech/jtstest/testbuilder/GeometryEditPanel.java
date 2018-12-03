@@ -16,8 +16,11 @@ import java.util.List;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
@@ -37,6 +40,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -61,8 +65,7 @@ import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
  * 
  * @version 1.7
  */
-public class GeometryEditPanel extends JPanel 
-{	
+public class GeometryEditPanel extends JPanel implements MouseWheelListener {	
 	/*
   private static Color[] selectedPointColor = { new Color(0, 64, 128, 255),
       new Color(170, 64, 0, 255) };
@@ -92,6 +95,8 @@ public class GeometryEditPanel extends JPanel
   //added
   private File backgroundImageFile;
   
+  private JScrollPane scrollPane;
+  
   //----------------------------------------
   BorderLayout borderLayout1 = new BorderLayout();
   
@@ -116,7 +121,7 @@ public class GeometryEditPanel extends JPanel
       public void componentResized(ComponentEvent e) {
           //redraw the geometry
         this_componentResized(e);
-        JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
+        drawGeometry();
       }
     });
     
@@ -126,9 +131,52 @@ public class GeometryEditPanel extends JPanel
     setToolTipText("");
     setBorder(BorderFactory.createEmptyBorder());
     
+    /*scrollPane = new JScrollPane();
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    scrollPane.setPreferredSize(new Dimension(20, 20));
+    
+    add(scrollPane, BorderLayout.EAST);*/
+    
+    this.addMouseWheelListener(this);
+    
+    
     // deactivate for now, since it interferes with right-click zoom-out
     //addMouseListener(new PopupClickListener());
   }
+  
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        /*if (e.getWheelRotation() > 0) {
+            //zoom out
+            viewport.setScaleNoUpdate(viewport.getScale()/1.5);
+        }
+        else {
+            //zoom in
+            viewport.setScaleNoUpdate(viewport.getScale()*1.5);
+        }
+        this.forceRepaint();
+        drawGeometry();*/
+        /*String message;
+        String newline = "\n";
+        int notches = e.getWheelRotation();
+        if (notches < 0) {
+          message = "Mouse wheel moved UP " + -notches + " notch(es)" + newline;
+        } else {
+          message = "Mouse wheel moved DOWN " + notches + " notch(es)" + newline;
+        }
+        if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+          message += "    Scroll type: WHEEL_UNIT_SCROLL" + newline;
+          message += "    Scroll amount: " + e.getScrollAmount() + " unit increments per notch\n";
+          message += "    Units to scroll: " + e.getUnitsToScroll() + " unit increments" + newline;
+          message += "    Vertical unit increment: "
+              + scrollPane.getVerticalScrollBar().getUnitIncrement(1) + " pixels" + newline;
+        } else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+          message += "    Scroll type: WHEEL_BLOCK_SCROLL" + newline;
+          message += "    Vertical block increment: "
+              + scrollPane.getVerticalScrollBar().getBlockIncrement(1) + " pixels" + newline;
+        }
+        System.out.println(message);*/
+    }
   
 
   class PopupClickListener extends MouseAdapter
@@ -238,6 +286,7 @@ public class GeometryEditPanel extends JPanel
   {
   	renderMgr.setDirty(true);
         getGeomModel().geomChanged();
+        
   }
   
   public String getToolTipText(MouseEvent event) {
@@ -268,19 +317,27 @@ public class GeometryEditPanel extends JPanel
     return grid.getGridSize();
   }
   
+    public void drawBackgroundImage(Graphics g){
+        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView()), 
+                (int) Math.round(viewport.getHeightInView()), (int) Math.round(viewport.getLowerLeftCornerInModel().getX()), 
+                (int) Math.round(viewport.getLowerLeftCornerInModel().getY()), viewport.getScale());
+
+    }
     public void paintComponentSimple(Graphics g) {
-        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView() * viewport.getScale()), 
-                (int) Math.round(viewport.getHeightInView()* viewport.getScale()));
-        System.out.println(viewport.getScale());
+        drawBackgroundImage(g);
+        System.out.println("left corner x: " +viewport.getLowerLeftCornerInModel().getX());
+        System.out.println("left corner y: " +viewport.getLowerLeftCornerInModel().getY());
+        //System.out.println(viewport.getScale());
         //renderMgr.render();
         //renderMgr.copyImage(g);
     }
 
     @Override
     public void paintComponent(Graphics g) {
-        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView() * viewport.getScale()), 
-                (int) Math.round(viewport.getHeightInView()* viewport.getScale()));
-        //System.out.println(viewport.getScale());
+        drawBackgroundImage(g);
+
+        //System.out.println("scale: "+viewport.getScale());
+        
         renderMgr.render();
         renderMgr.copyImage(g);
     }
@@ -294,12 +351,25 @@ public class GeometryEditPanel extends JPanel
         JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
         this.updateGeom();
+        /////for test purposes!
+        /*JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+        List<Coordinate> c = new ArrayList<>();
+        c.add(new Coordinate(1, 0));
+        c.add(new Coordinate(1, 60));
+        c.add(new Coordinate(1, 80));
+        c.add(new Coordinate(1, 0));
+        JTSTestBuilder.model().getGeometryEditModel().addComponent(c);
+        this.updateGeom();*/
     }
   
     private List<Coordinate>correctCoordinates(Coordinate[] coord){
-        //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
-        AppImage.resizeImageDimension((int) Math.round(viewport.getWidthInView() * viewport.getScale()), 
-                (int) Math.round(viewport.getHeightInView()* viewport.getScale()));
+        //call this just to make sure that the variables with the image dimensions in the panel are not null or zero7
+        if (AppImage.getImageHeightInPanel() == 0.0 && AppImage.getImageWidthInPanel() == 0.0){
+            AppImage.resizeImageDimension((int) Math.round(viewport.getWidthInView()), 
+                (int) Math.round(viewport.getHeightInView()), viewport.getScale());
+        }
+        
+        System.out.println(AppImage.getImageHeightInPanel());
         List<Coordinate> transformedCoords = new ArrayList<>();
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
@@ -456,7 +526,6 @@ public class GeometryEditPanel extends JPanel
   private void drawMagnifyMask(Graphics2D g) {
     double viewWidth = viewport.getWidthInView();
     double viewHeight = viewport.getHeightInView();
-    
     float minExtent = (float) Math.min(viewWidth, viewHeight);
     float maskWidth = (float) (minExtent * AppConstants.MASK_WIDTH_FRAC / 2);
     
