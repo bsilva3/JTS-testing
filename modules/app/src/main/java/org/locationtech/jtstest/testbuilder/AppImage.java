@@ -9,12 +9,14 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  *
@@ -71,9 +73,10 @@ public class AppImage {
         AppImage.imageHeight = imageHeight;
     }
     
+        
     //resizes a dimension to fit a boundary dimension, while maintaining the aspect ratio
-    public static Dimension resizeImageDimension(int panelWidth, int panelHeight, double scale){
-        Dimension windowDimension = new Dimension(panelWidth, panelHeight);
+    public static Dimension resizeImageDimension(Dimension windowDimension, double scale){
+        //Dimension windowDimension = new Dimension(panelWidth, panelHeight);
       
         Dimension d = getScaledDimension(new Dimension((int) AppImage.getBackgroundImage().getWidth(null), 
         (int) AppImage.getBackgroundImage().getHeight(null)), windowDimension );
@@ -83,15 +86,20 @@ public class AppImage {
     }
     
     //keeps the 1:1 aspect ration of the image and draws it
-    public static void keepAspectRatioAndDrawImage(Graphics g, int panelWidth, int panelHeight, 
+    public static void keepAspectRatioAndDrawImage(Graphics g, Dimension panelDim, 
             int cornerX, int cornerY, double scale){
-        Dimension d = AppImage.resizeImageDimension(panelWidth, panelHeight, scale);
+        Dimension d = AppImage.resizeImageDimension(panelDim, scale);
         Graphics2D g2 = (Graphics2D) g;
         //g2.scale(scale, scale);
-        
-        g2.drawImage(AppImage.getBackgroundImage(), -cornerX, -cornerY, d.width, d.height, null);
+        Point2D viewOrigin = JTSTestBuilderFrame.getGeometryEditPanel().getViewport().toView(new Coordinate(0, 0));
+        double vOriginX = viewOrigin.getX();
+        double vOriginY = viewOrigin.getY();
+        int viewPortHeight = (int) Math.round(JTSTestBuilderFrame.getGeometryEditPanel().getViewport().getHeightInView());
+
+        g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vOriginX), 
+                -viewPortHeight+(int) Math.round(vOriginY), d.width, d.height, null);
     }
-  
+      
     private static Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {
         double widthRatio = boundary.getWidth() / imageSize.getWidth();
         double heightRatio = boundary.getHeight() / imageSize.getHeight();

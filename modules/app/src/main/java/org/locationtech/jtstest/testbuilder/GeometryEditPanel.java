@@ -25,6 +25,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -119,9 +120,7 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
     this.addComponentListener(new java.awt.event.ComponentAdapter() {
 
       public void componentResized(ComponentEvent e) {
-          //redraw the geometry
         this_componentResized(e);
-        drawGeometry();
       }
     });
     
@@ -318,15 +317,31 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
   }
   
     public void drawBackgroundImage(Graphics g){
-        AppImage.keepAspectRatioAndDrawImage(g, (int) Math.round(viewport.getWidthInView()), 
-                (int) Math.round(viewport.getHeightInView()), (int) Math.round(viewport.getLowerLeftCornerInModel().getX()), 
+        AppImage.keepAspectRatioAndDrawImage(g, this.getSize(), (int) Math.round(viewport.getLowerLeftCornerInModel().getX()), 
                 (int) Math.round(viewport.getLowerLeftCornerInModel().getY()), viewport.getScale());
 
     }
     public void paintComponentSimple(Graphics g) {
         drawBackgroundImage(g);
-        System.out.println("left corner x: " +viewport.getLowerLeftCornerInModel().getX());
-        System.out.println("left corner y: " +viewport.getLowerLeftCornerInModel().getY());
+        Graphics2D g2 = (Graphics2D) g;
+        //just for test!
+        g2.setColor(Color.RED);
+        g2.setStroke(new BasicStroke(AppConstants.AXIS_WIDTH));
+
+        Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
+        double vOriginX = viewOrigin.getX();
+        double vOriginY = viewOrigin.getY();
+        //draw the axes of the origin
+        if (vOriginX >= 0.0 && vOriginX <= viewport.getWidthInView()) {
+          g2.draw(new Line2D.Double(vOriginX, 0, vOriginX, viewport
+                  .getHeightInView()));
+        }
+
+        if (vOriginY >= 0.0 && vOriginY <= viewport.getHeightInView()) {
+          g2.draw(new Line2D.Double(0, vOriginY, viewport.getWidthInView(), vOriginY));
+       
+        }
+        
         //System.out.println(viewport.getScale());
         //renderMgr.render();
         //renderMgr.copyImage(g);
@@ -335,8 +350,7 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
     @Override
     public void paintComponent(Graphics g) {
         drawBackgroundImage(g);
-
-        //System.out.println("scale: "+viewport.getScale());
+        //System.out.println("viewport width: "+viewport.getWidthInView() +", viewport height: " + viewport.getHeightInView());
         
         renderMgr.render();
         renderMgr.copyImage(g);
@@ -351,25 +365,14 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
         JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
         this.updateGeom();
-        /////for test purposes!
-        /*JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
-        List<Coordinate> c = new ArrayList<>();
-        c.add(new Coordinate(1, 0));
-        c.add(new Coordinate(1, 60));
-        c.add(new Coordinate(1, 80));
-        c.add(new Coordinate(1, 0));
-        JTSTestBuilder.model().getGeometryEditModel().addComponent(c);
-        this.updateGeom();*/
     }
   
     private List<Coordinate>correctCoordinates(Coordinate[] coord){
-        //call this just to make sure that the variables with the image dimensions in the panel are not null or zero7
+        //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
         if (AppImage.getImageHeightInPanel() == 0.0 && AppImage.getImageWidthInPanel() == 0.0){
-            AppImage.resizeImageDimension((int) Math.round(viewport.getWidthInView()), 
-                (int) Math.round(viewport.getHeightInView()), viewport.getScale());
+            AppImage.resizeImageDimension(this.getSize(), viewport.getScale());
         }
         
-        System.out.println(AppImage.getImageHeightInPanel());
         List<Coordinate> transformedCoords = new ArrayList<>();
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
@@ -380,7 +383,7 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
                     AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel());
             
             //to correct the diference between the image height in the panel and the panel height
-            coordUtils.translate(new CoordinateUtils(0, viewport.getHeightInView() - AppImage.getImageHeightInPanel()));
+            coordUtils.translate(new CoordinateUtils(0, (int) Math.round(this.getSize().getHeight() - AppImage.getImageHeightInPanel())));
             transformedCoords.add(coordUtils);
         }
         return transformedCoords;
@@ -578,7 +581,9 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
 
   void this_componentResized(ComponentEvent e) {
   	renderMgr.componentResized();
-    viewport.update(this.getSize());
+        viewport.update(this.getSize());
+        //redraw the geometry
+        drawGeometry();
   }
 
   /**
@@ -624,6 +629,7 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
   }
   
   public void zoom(Envelope zoomEnv) {
+    drawGeometry();
     if (zoomEnv == null)
       return;
 

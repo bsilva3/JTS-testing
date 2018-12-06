@@ -17,13 +17,16 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -777,7 +780,7 @@ public class JTSTestBuilderFrame extends JFrame
     
     jSplitPane1.setDividerLocation(500);
     this.setJMenuBar(tbMenuBar.getMenuBar());
-    //contentPane.add(tbToolBar.getToolBar(), BorderLayout.NORTH);
+    //contentPane.add(tbToolBar.getToolBar(), BorderLayout.NORTH);    
   }
   
   

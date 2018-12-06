@@ -51,6 +51,11 @@ ou seja não há zoom, entao a origem será o 0,0, resolvendo assim o problema da o
 
 
 ---> todo:
+- componentResized n é invocado se clicar no botao de maximizar janela e a forma n é devidamente atualizada!
 - á medida que se faz zoom a imagem e a geometria ficam mais desfasadas, mesmo apos mover a imagem 
 de posição de acordo com o zoom aplicado
+
+
+(pode ser util)
+https://community.oracle.com/thread/1263955
 
