@@ -118,6 +118,7 @@ public class Viewport implements PointTransformation
         update();
   }
   
+  
   public NumberFormat getScaleFormat()
   {
     return scaleFormat;
@@ -310,6 +311,7 @@ public class Viewport implements PointTransformation
    * @param zoomPt
    * @param zoomFactor
    */
+  //changed! origin set to 0, 0 always when zooming
   public void zoom(Point2D zoomPt, double zoomScale) {
     double originOffsetX = zoomPt.getX() - originInModel.getX();
     double originOffsetY = zoomPt.getY() - originInModel.getY();
@@ -321,7 +323,7 @@ public class Viewport implements PointTransformation
     double actualZoomFactor = getScale() / scalePrev;
     double zoomOriginX = zoomPt.getX() - originOffsetX / actualZoomFactor;
     double zoomOriginY = zoomPt.getY() - originOffsetY / actualZoomFactor;
-    setOrigin(zoomOriginX,  zoomOriginY);
+    setOrigin(0, 0);
   }
 
   private double getWidthInModel() {
@@ -411,5 +413,9 @@ public class Viewport implements PointTransformation
   public double getGridSizeModel()
   {
     return Math.pow(10, gridMagnitudeModel());
+  }
+  
+  public Point2D getOriginInModel(){
+      return originInModel;
   }
 }

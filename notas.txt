@@ -48,12 +48,18 @@ as suas dimensões.
 ou seja não há zoom, entao a origem será o 0,0, resolvendo assim o problema da origem (em principio..)
 - Agora a imagem é colocada nos pontos -x, e -y, correspondentes as coordenadas do painel do canto inferior esquerdo
 (para corrigir desfasamentos de geometria e imagem)
-
+- corrigido problema em que a geometria não era desenhada no sitio correto da imagem se a janela fosse maximizada
+ou minimizada. O tamanho do painel de edição não é atualizado a tempo se usar os metodos viewport.getHeightInView
+e viewport.getWidthInView. Agora é usado o metodo getSize dentro da classe GeometryEditPanel.
+- na classe Viewport, metodo zoom, a escala muda, mas a origem mantém-se sempre 0,0 indepentemente do zoom. 
+Assim a imagem e a geometria não ficam desalinhadas (solução encontrada para fazer o zoom ... poderá haver solução melhor...)
+- classe AppImage, metodo keepAspectRatioAndDrawImage, a imagem é colocada no canto inferior esquerdo do painel
+- classe GeometryEditPanel, metodo correctCoordinates, é adicionado a diferença entre a altura do painel e da imagem
+á geometria de modo a bater certo com a alteração anterior.
 
 ---> todo:
-- componentResized n é invocado se clicar no botao de maximizar janela e a forma n é devidamente atualizada!
 - á medida que se faz zoom a imagem e a geometria ficam mais desfasadas, mesmo apos mover a imagem 
-de posição de acordo com o zoom aplicado
+de posição de acordo com o zoom aplicado. É aplicado um pan quando se faz zoom e isto deve originar o problema...
 
 
 (pode ser util)

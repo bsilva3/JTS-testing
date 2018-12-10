@@ -94,10 +94,16 @@ public class AppImage {
         Point2D viewOrigin = JTSTestBuilderFrame.getGeometryEditPanel().getViewport().toView(new Coordinate(0, 0));
         double vOriginX = viewOrigin.getX();
         double vOriginY = viewOrigin.getY();
+
         int viewPortHeight = (int) Math.round(JTSTestBuilderFrame.getGeometryEditPanel().getViewport().getHeightInView());
 
+        /*g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vOriginX * scale), 
+                (int) Math.round((viewPortHeight - vOriginY) *scale), d.width, d.height, null);*/
         g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vOriginX), 
-                -viewPortHeight+(int) Math.round(vOriginY), d.width, d.height, null);
+                (int) Math.round(panelDim.getHeight()/scale - AppImage.getImageHeightInPanel()/scale), d.width, d.height, null);
+        //System.out.println((int) Math.round(vOriginX * scale));
+        //System.out.println((int) Math.round((viewPortHeight - vOriginY) *scale));
+        
     }
       
     private static Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {

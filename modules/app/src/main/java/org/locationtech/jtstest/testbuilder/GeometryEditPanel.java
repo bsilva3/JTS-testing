@@ -319,8 +319,8 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
     public void drawBackgroundImage(Graphics g){
         AppImage.keepAspectRatioAndDrawImage(g, this.getSize(), (int) Math.round(viewport.getLowerLeftCornerInModel().getX()), 
                 (int) Math.round(viewport.getLowerLeftCornerInModel().getY()), viewport.getScale());
-
     }
+    
     public void paintComponentSimple(Graphics g) {
         drawBackgroundImage(g);
         Graphics2D g2 = (Graphics2D) g;
@@ -331,6 +331,8 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
         Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
         double vOriginX = viewOrigin.getX();
         double vOriginY = viewOrigin.getY();
+              
+        //System.out.println("view origin: " +vOriginX +", "+ vOriginY );
         //draw the axes of the origin
         if (vOriginX >= 0.0 && vOriginX <= viewport.getWidthInView()) {
           g2.draw(new Line2D.Double(vOriginX, 0, vOriginX, viewport
@@ -339,7 +341,6 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
 
         if (vOriginY >= 0.0 && vOriginY <= viewport.getHeightInView()) {
           g2.draw(new Line2D.Double(0, vOriginY, viewport.getWidthInView(), vOriginY));
-       
         }
         
         //System.out.println(viewport.getScale());
@@ -350,6 +351,25 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
     @Override
     public void paintComponent(Graphics g) {
         drawBackgroundImage(g);
+        Graphics2D g2 = (Graphics2D) g;
+        //just for test!
+        g2.setColor(Color.RED);
+        g2.setStroke(new BasicStroke(AppConstants.AXIS_WIDTH));
+
+        Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
+        double vOriginX = viewOrigin.getX();
+        double vOriginY = viewOrigin.getY();
+        //System.out.println("image top diff: " + (getSize().getHeight() - AppImage.getImageHeightInPanel()));
+        //System.out.println("view origin: " +vOriginX +", "+ vOriginY );
+        //draw the axes of the origin
+        if (vOriginX >= 0.0 && vOriginX <= viewport.getWidthInView()) {
+          g2.draw(new Line2D.Double(vOriginX, 0, vOriginX, viewport
+                  .getHeightInView()));
+        }
+
+        if (vOriginY >= 0.0 && vOriginY <= viewport.getHeightInView()) {
+          g2.draw(new Line2D.Double(0, vOriginY, viewport.getWidthInView(), vOriginY));
+        }
         //System.out.println("viewport width: "+viewport.getWidthInView() +", viewport height: " + viewport.getHeightInView());
         
         renderMgr.render();
@@ -367,23 +387,33 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
         this.updateGeom();
     }
   
-    private List<Coordinate>correctCoordinates(Coordinate[] coord){
+    private List<Coordinate> correctCoordinates(Coordinate[] coord){
         //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
         if (AppImage.getImageHeightInPanel() == 0.0 && AppImage.getImageWidthInPanel() == 0.0){
             AppImage.resizeImageDimension(this.getSize(), viewport.getScale());
         }
+        /*System.out.println("image size in panel -> width: " + AppImage.getImageWidthInPanel() + 
+                ", height: " + AppImage.getImageHeightInPanel());*/
+        
+        Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
+        double vOriginX = viewOrigin.getX();
+        double vOriginY = viewOrigin.getY();
         
         List<Coordinate> transformedCoords = new ArrayList<>();
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
             coordUtils = new CoordinateUtils(c.getX(), c.getY() );
-            //System.out.println("image: " + (viewport.getHeightInView()-AppImage.getImageHeightInPanel()));
-            
+            //
             coordUtils.transformCoords(AppImage.getImageWidth(), AppImage.getImageHeight(),
                     AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel());
             
             //to correct the diference between the image height in the panel and the panel height
-            coordUtils.translate(new CoordinateUtils(0, (int) Math.round(this.getSize().getHeight() - AppImage.getImageHeightInPanel())));
+            //coordUtils.translate(new CoordinateUtils(vOriginX, (int) Math.round(getSize().getHeight() - AppImage.getImageHeightInPanel())));
+            
+            //add the diference of the top of the panel and the image 
+            coordUtils.translate(new CoordinateUtils(vOriginX, (getSize().getHeight() - AppImage.getImageHeightInPanel()) - 
+                    (getSize().getHeight() - AppImage.getImageHeightInPanel()) ));
+            
             transformedCoords.add(coordUtils);
         }
         return transformedCoords;
@@ -628,8 +658,9 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
     zoom(zoomEnv);
   }
   
+  //called only when zooming by clicking, dragging the mouse to select an area to zoom in and releasing
+  //not called when clicking or moving mouse wheel to zoom..
   public void zoom(Envelope zoomEnv) {
-    drawGeometry();
     if (zoomEnv == null)
       return;
 
@@ -653,10 +684,12 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
    * @param zoomFactor
    */
   public void zoom(Point2D zoomPt, double zoomFactor) {
+      
     double zoomScale = getViewport().getScale() * zoomFactor;
     viewport.zoom(zoomPt, zoomScale);
   }
   
+  //paning while viewport is zoomed (in or out)
   public void zoomPan(double dx, double dy) {
     getViewport().zoomPan(dx, dy);
   }
