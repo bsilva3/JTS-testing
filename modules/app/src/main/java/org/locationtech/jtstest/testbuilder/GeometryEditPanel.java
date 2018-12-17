@@ -93,11 +93,12 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
   private CorrToGeometryUtils corrToGeomUtils;
   //private OperationMonitorManager opMonitor;
   
-  //added
-  private File backgroundImageFile;
-  
-  private JScrollPane scrollPane;
-  
+    //added
+  //used to indentify the geometry that contains the object represented in a corr file
+    private static final int OBJECT_GEOMETRY_INDEX = 0;
+    //index for the geometry that is used to place the image
+    private static final int BACKGROUND_IMAGE_GEOMETRY_INDEX = 1;
+    private static final int OTHER_GEOMETRY_INDEX = 2;
   //----------------------------------------
   BorderLayout borderLayout1 = new BorderLayout();
   
@@ -321,36 +322,10 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
                 (int) Math.round(viewport.getLowerLeftCornerInModel().getY()), viewport.getScale());
     }
     
-    public void paintComponentSimple(Graphics g) {
-        drawBackgroundImage(g);
-        Graphics2D g2 = (Graphics2D) g;
-        //just for test!
-        g2.setColor(Color.RED);
-        g2.setStroke(new BasicStroke(AppConstants.AXIS_WIDTH));
-
-        Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
-        double vOriginX = viewOrigin.getX();
-        double vOriginY = viewOrigin.getY();
-              
-        //System.out.println("view origin: " +vOriginX +", "+ vOriginY );
-        //draw the axes of the origin
-        if (vOriginX >= 0.0 && vOriginX <= viewport.getWidthInView()) {
-          g2.draw(new Line2D.Double(vOriginX, 0, vOriginX, viewport
-                  .getHeightInView()));
-        }
-
-        if (vOriginY >= 0.0 && vOriginY <= viewport.getHeightInView()) {
-          g2.draw(new Line2D.Double(0, vOriginY, viewport.getWidthInView(), vOriginY));
-        }
-        
-        //System.out.println(viewport.getScale());
-        //renderMgr.render();
-        //renderMgr.copyImage(g);
-    }
-
+   
     @Override
     public void paintComponent(Graphics g) {
-        drawBackgroundImage(g);
+        //drawBackgroundImage(g);
         Graphics2D g2 = (Graphics2D) g;
         //just for test!
         g2.setColor(Color.RED);
@@ -379,19 +354,53 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
     //draws the geometry defined by the coordinates in the "corr" file. These coordinates are transformed
     //to match the display
     public void drawGeometry(){
+        //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
+        AppImage.resizeImageDimension(this.getSize());
+        
+        drawImagePolygon();
         //delete any existing geometry
-        JTSTestBuilder.model().getGeometryEditModel().clear();
         List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile());
         JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+        JTSTestBuilder.model().getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+        JTSTestBuilder.model().getGeometryEditModel().clear();
+        JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
+        //this.getGeomModel().getGeometry().getBoundary().get
+        this.updateGeom();        
+        //set an index for any other geometry drawn by the user
+        JTSTestBuilder.model().getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+
+    }
+    
+    //draw a square whose size is the same as the background image in the panel
+    public void drawImagePolygon(){
+        List<Coordinate> coord = new ArrayList<>();
+        coord.add( new Coordinate(0, 0));
+        coord.add( new Coordinate(AppImage.getImageWidthInPanel(), 0));
+        coord.add( new Coordinate(AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel()));
+        coord.add( new Coordinate(0, AppImage.getImageHeightInPanel()));
+        
+        // clear the current square and update (to be accordingly with the size of the panel)
+        JTSTestBuilder.model().getGeometryEditModel().clear(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+
+        JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+        JTSTestBuilder.model().getGeometryEditModel().setEditGeomIndex(BACKGROUND_IMAGE_GEOMETRY_INDEX);
         JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
         this.updateGeom();
+        
+        JTSTestBuilder.model().getGeometryEditModel().getGeometry(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+        System.out.println(JTSTestBuilder.model().getLayers().getLayer(1).getGeometry().getNumPoints());
+        
+        getImageGeometryCoords();
+    }
+    
+    public Coordinate[] getImageGeometryCoords(){
+        Coordinate[] coordinates = JTSTestBuilder.model().getGeometryEditModel().getGeometry(BACKGROUND_IMAGE_GEOMETRY_INDEX).getCoordinates();
+        for (Coordinate c : coordinates)
+            System.out.println(c.getX() + ", " + c.getY());
+        return coordinates;
     }
   
-    private List<Coordinate> correctCoordinates(Coordinate[] coord){
-        //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
-        if (AppImage.getImageHeightInPanel() == 0.0 && AppImage.getImageWidthInPanel() == 0.0){
-            AppImage.resizeImageDimension(this.getSize(), viewport.getScale());
-        }
+    private List<Coordinate>correctCoordinates(Coordinate[] coord){
         /*System.out.println("image size in panel -> width: " + AppImage.getImageWidthInPanel() + 
                 ", height: " + AppImage.getImageHeightInPanel());*/
         

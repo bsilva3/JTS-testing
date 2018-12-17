@@ -104,31 +104,27 @@ public class RenderManager
 	
     private Image createPanelImage(JPanel panel) {
         return new BufferedImage(panel.getWidth(), panel.getHeight(),
-            BufferedImage.TYPE_INT_ARGB);
+        BufferedImage.TYPE_INT_ARGB);
     }
-
+  
     public void erase(Image image) {
-            int width = image.getWidth(null);
-            int height = image.getHeight(null);
-            //redraw the background image on top of the lines/polygons, updating the edit panel
-            Graphics2D g = (Graphics2D) image.getGraphics();
-            g.setColor(Color.white);
-            Rectangle2D.Double r = new Rectangle2D.Double(0, 0, width, height);
-            g.fill(r);       
-            g.scale(panel.getViewport().getScale(), panel.getViewport().getScale());
-            panel.paintComponentSimple(g);
-            //JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
-            //g.drawImage(image, 0, 0, width, height, null);
+	int width = image.getWidth(null);
+	int height = image.getHeight(null);
+		
+	Graphics2D g = (Graphics2D) image.getGraphics();
+	g.setColor(Color.white);
 
+	Rectangle2D.Double r = new Rectangle2D.Double(0, 0, width, height);
+	g.fill(r);
     }
 
-    public void copyImage(Graphics g)
-    {
-        if (image == null) {
-            return;
-        }
-        g.drawImage(image, 0, 0, null);
-    }
+	public void copyImage(Graphics g){
+            if (image == null) {
+                return;
+            }
+            g.drawImage(image, 0, 0, null);
+	}
+  
 
     private void paintPanel()
     {

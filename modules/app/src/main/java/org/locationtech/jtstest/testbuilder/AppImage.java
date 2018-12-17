@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jtstest.testbuilder.ui.Viewport;
 
 /**
  *
@@ -85,6 +86,17 @@ public class AppImage {
         return d;
     }
     
+    //resizes a dimension to fit a boundary dimension, while maintaining the aspect ratio
+    public static Dimension resizeImageDimension(Dimension windowDimension){
+        //Dimension windowDimension = new Dimension(panelWidth, panelHeight);
+      
+        Dimension d = getScaledDimension(new Dimension((int) AppImage.getBackgroundImage().getWidth(null), 
+        (int) AppImage.getBackgroundImage().getHeight(null)), windowDimension );
+        AppImage.setImageHeightInPanel((int) Math.round(d.height));
+        AppImage.setImageWidthInPanel((int) Math.round(d.width));
+        return d;
+    }
+    
     //keeps the 1:1 aspect ration of the image and draws it
     public static void keepAspectRatioAndDrawImage(Graphics g, Dimension panelDim, 
             int cornerX, int cornerY, double scale){
@@ -95,15 +107,27 @@ public class AppImage {
         double vOriginX = viewOrigin.getX();
         double vOriginY = viewOrigin.getY();
 
-        int viewPortHeight = (int) Math.round(JTSTestBuilderFrame.getGeometryEditPanel().getViewport().getHeightInView());
+        Viewport vp = JTSTestBuilderFrame.getGeometryEditPanel().getViewport();
 
-        /*g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vOriginX * scale), 
-                (int) Math.round((viewPortHeight - vOriginY) *scale), d.width, d.height, null);*/
-        g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vOriginX), 
+              /*g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round( -vp.getOriginOffsetX()), 
+                (int) Math.round((panelDim.getHeight()/scale - AppImage.getImageHeightInPanel()/scale) +vp.getOriginOffsetY() ),
+                d.width, d.height, null);*/
+
+        g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vp.getOriginOffsetX()), 
+                (int) Math.round((vp.getHeightInView() - AppImage.getImageHeightInPanel()) + vp.getOriginOffsetY()),
+                d.width, d.height, null);
+        /*g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vOriginX), 
                 (int) Math.round(panelDim.getHeight()/scale - AppImage.getImageHeightInPanel()/scale), d.width, d.height, null);
+        */        
         //System.out.println((int) Math.round(vOriginX * scale));
         //System.out.println((int) Math.round((viewPortHeight - vOriginY) *scale));
         
+    }
+    
+     //keeps the 1:1 aspect ration of the image and draws it
+    public static void keepAspectRatioAndDrawImage(Graphics2D g, Dimension panelDim){
+        Dimension d = AppImage.resizeImageDimension(panelDim);
+        g.drawImage(AppImage.getBackgroundImage(), 0, 0, d.width, d.height, null);
     }
       
     private static Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {

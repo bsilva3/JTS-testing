@@ -1,6 +1,9 @@
 - IMPORTANTE! o projeto maven que contém todos os modulos deve ser ser compilados com:
 mvn clean:clean resources:resources compiler:compile jar:jar install:install -DskipTest:true
 
+-------------------------------Isto é um relatório ordenado do trabalho feito, os pontos mais em baixo é o que foi feito
+mais recentemente ---------------------------------------------------------------
+
 - modulo jts-app contém a gui
 - modulo test contem o test runner (um programa que permite carregar fihceiros .wkt e apresentar a geometria neles definida
 - modulo example contém exemplos de código para criação de formas (polyline, polygon...) 
@@ -57,9 +60,19 @@ Assim a imagem e a geometria não ficam desalinhadas (solução encontrada para faz
 - classe GeometryEditPanel, metodo correctCoordinates, é adicionado a diferença entre a altura do painel e da imagem
 á geometria de modo a bater certo com a alteração anterior.
 
+
+--- Mudou-se a forma como a imagem é desenhada. Agora cria-se um segundo poligono, e idealmente, a imagem 
+seria colocada como preenchimento desse poligono.
+- o Poligono que representa o objeto está na geometria de indice 1. O retangulo que contem a imagem esta no indice 1.
+- criada classe CostumBasicStyle (package ui.style) com o intuito de colocar a imagem no fundo do poligono desenhado.
+- no geometry edit panel, feitas alterações para este novo método, incluindo uma função que cria os vertices do
+poligono com o tamanho da imagem do painel
+- package ui.render, classe GeometryPainter, criado metodo paintCostum que é igual ao paint, mas que desenha a imagem no fundo
+do poligono! -> esta nova forma de desenhar a imagem resolve o problema do zoom
+
 ---> todo:
-- á medida que se faz zoom a imagem e a geometria ficam mais desfasadas, mesmo apos mover a imagem 
-de posição de acordo com o zoom aplicado. É aplicado um pan quando se faz zoom e isto deve originar o problema...
+- colocar poligono da imagem opaca
+- problema: o poligono com o objeto na imagem não
 
 
 (pode ser util)

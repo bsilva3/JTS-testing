@@ -24,6 +24,7 @@ import org.locationtech.jtstest.test.Testable;
 import org.locationtech.jtstest.testbuilder.AppConstants;
 import org.locationtech.jtstest.testbuilder.ui.*;
 import org.locationtech.jtstest.testbuilder.ui.style.BasicStyle;
+import org.locationtech.jtstest.testbuilder.ui.style.CostumBasicStyle;
 import org.locationtech.jtstest.testrunner.TestReader;
 import org.locationtech.jtstest.testrunner.TestRun;
 import org.locationtech.jtstest.util.*;
@@ -93,9 +94,9 @@ public class TestBuilderModel
     lyrA.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_A_LINE_CLR,
         GeometryDepiction.GEOM_A_FILL_CLR));
     
+    //using a new created model for the geometry... one that uses a background
     Layer lyrB = layerList.getLayer(LayerList.LYR_B);
-    lyrB.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_B_LINE_CLR,
-        GeometryDepiction.GEOM_B_FILL_CLR));
+    lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_B_LINE_CLR));
     
     Layer lyrR = layerList.getLayer(LayerList.LYR_RESULT);
     lyrR.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_RESULT_LINE_CLR,

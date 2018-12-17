@@ -60,6 +60,10 @@ public class Viewport implements PointTransformation
   private java.awt.geom.Point2D.Double destPt = new java.awt.geom.Point2D.Double(0, 0);
 
   private Dimension viewSize;
+  
+  //added
+  private double originOffsetX;
+  private double originOffsetY;
 
   public Viewport(GeometryEditPanel panel) {
     this.panel = panel;
@@ -190,6 +194,7 @@ public class Viewport implements PointTransformation
     return viewEnvInModel.intersects(p0, p1);
   }
   
+    //ver este metodo para colocar a imagem no sitio certo
   public Point2D toModel(Point2D viewPt) {
     srcPt.x = viewPt.getX();
     srcPt.y = viewPt.getY();
@@ -211,6 +216,8 @@ public class Viewport implements PointTransformation
     Point2D p = toModel(viewPt);
     return new Coordinate(p.getX(), p.getY());
   }
+
+    //ver este metodo para colocar a imagem no sitio certo
 
   public void transform(Coordinate modelCoordinate, Point2D point)
   {
@@ -270,6 +277,7 @@ public class Viewport implements PointTransformation
     viewUpdated();
   }
   
+    //ver este metodo para colocar a imagem no sitio certo
   private void updateModelToViewTransform() {
     modelToViewTransform = new AffineTransform();
     modelToViewTransform.translate(0, viewSize.height);
@@ -277,7 +285,8 @@ public class Viewport implements PointTransformation
     modelToViewTransform.scale(scale, scale);
     modelToViewTransform.translate(-originInModel.getX(), -originInModel.getY());
   }
-
+  
+  //ver este metodo para colocar a imagem no sitio certo
   public AffineTransform getModelToViewTransform() {
     if (modelToViewTransform == null) {
       updateModelToViewTransform();
@@ -289,6 +298,8 @@ public class Viewport implements PointTransformation
     setScale(INITIAL_SCALE);
     setOrigin(INITIAL_ORIGIN_X, INITIAL_ORIGIN_Y);
   }
+
+    // (2) ver este metodo para colocar a imagem no sitio certo
 
   public void zoom(Envelope zoomEnv) {
     double xScale = getWidthInView() / zoomEnv.getWidth();
@@ -311,11 +322,13 @@ public class Viewport implements PointTransformation
    * @param zoomPt
    * @param zoomFactor
    */
-  //changed! origin set to 0, 0 always when zooming
+  
   public void zoom(Point2D zoomPt, double zoomScale) {
-    double originOffsetX = zoomPt.getX() - originInModel.getX();
-    double originOffsetY = zoomPt.getY() - originInModel.getY();
-    
+    originOffsetX = zoomPt.getX() - originInModel.getX();
+    originOffsetY = zoomPt.getY() - originInModel.getY();
+    /*System.out.println("origin off: " +originOffsetX + ", " +originOffsetY +" previous origin:" + 
+            originInModel.getX() + ",  "+originInModel.getY()+" diff: "+(originOffsetX+originInModel.getX()) +", " +
+            (originOffsetY+originInModel.getY()));*/
     // set scale first, because it may be snapped
     double scalePrev = getScale();
     setScale(zoomScale);
@@ -323,14 +336,24 @@ public class Viewport implements PointTransformation
     double actualZoomFactor = getScale() / scalePrev;
     double zoomOriginX = zoomPt.getX() - originOffsetX / actualZoomFactor;
     double zoomOriginY = zoomPt.getY() - originOffsetY / actualZoomFactor;
-    setOrigin(0, 0);
+    setOrigin(zoomOriginX, zoomOriginY);
+    //System.out.println("new origin in model: " + originInModel.getX() +", "+originInModel.getY());
   }
 
-  private double getWidthInModel() {
+    public double getOriginOffsetX() {
+        return originOffsetX;
+    }
+
+    public double getOriginOffsetY() {
+        return originOffsetY;
+    }
+  
+
+  public double getWidthInModel() {
     return toModel(viewSize.width);
   }
 
-  private double getHeightInModel() {
+  public double getHeightInModel() {
     return toModel(viewSize.height);
   }
 

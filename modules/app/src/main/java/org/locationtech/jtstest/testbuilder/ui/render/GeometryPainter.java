@@ -28,6 +28,7 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jtstest.*;
 import org.locationtech.jtstest.testbuilder.AppConstants;
+import org.locationtech.jtstest.testbuilder.AppImage;
 import org.locationtech.jtstest.testbuilder.ui.Viewport;
 import org.locationtech.jtstest.testbuilder.ui.style.Style;
 
@@ -132,69 +133,140 @@ public class GeometryPainter
     paint(geometry, converter, g, lineColor, fillColor, null);
   }
   
-  private static void paint(Geometry geometry, ShapeWriter converter, Graphics2D g,
-      Color lineColor, Color fillColor, Stroke stroke) 
-  {
-    if (geometry == null)
-			return;
+      private static void paint(Geometry geometry, ShapeWriter converter, Graphics2D g,
+          Color lineColor, Color fillColor, Stroke stroke) 
+      {
+        if (geometry == null)
+                            return;
 
-    if (geometry instanceof GeometryCollection) {
-      GeometryCollection gc = (GeometryCollection) geometry;
-      /**
-       * Render each element separately.
-       * Otherwise it is not possible to render both filled and non-filled
-       * (1D) elements correctly
-       */
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
-        paint(gc.getGeometryN(i), converter, g, lineColor, fillColor, stroke);
-      }
-      return;
+        if (geometry instanceof GeometryCollection) {
+          GeometryCollection gc = (GeometryCollection) geometry;
+          /**
+           * Render each element separately.
+           * Otherwise it is not possible to render both filled and non-filled
+           * (1D) elements correctly
+           */
+          for (int i = 0; i < gc.getNumGeometries(); i++) {
+            paint(gc.getGeometryN(i), converter, g, lineColor, fillColor, stroke);
+          }
+          return;
+        }
+
+        Shape shape = converter.toShape(geometry);
+            // handle points in a special way for appearance and speed
+        if (geometry instanceof Point) {
+            g.setStroke(POINT_STROKE);
+            g.setColor(lineColor);
+            g.draw(shape);
+            return;
+        }
+
+            if (stroke == null)
+              g.setStroke(GEOMETRY_STROKE);
+            else
+              g.setStroke(stroke);
+
+    // Test for a polygonal shape and fill it if required
+            if (geometry instanceof Polygon && fillColor != null) {
+              // if (!(shape instanceof GeneralPath) && fillColor != null) {
+                    g.setPaint(fillColor);
+                    g.fill(shape);
+            }
+
+            if (lineColor != null) {
+              g.setColor(lineColor);
+              try {
+                g.draw(shape);
+
+                            // draw polygon boundaries twice, to discriminate them
+                // MD - this isn't very obvious.  Perhaps a dashed line instead?
+                /*
+                            if (geometry instanceof Polygon) {
+                                    Shape polyShell = converter.toShape( ((Polygon)geometry).getExteriorRing());
+                                    g.setStroke(new BasicStroke(2));
+                                    g.draw(polyShell);
+                            }
+    */
+              } 
+              catch (Throwable ex) {
+                System.out.println(ex);
+                // eat it!
+              }
+            }
     }
 
-		Shape shape = converter.toShape(geometry);
-    
-		// handle points in a special way for appearance and speed
-		if (geometry instanceof Point) {
-			g.setStroke(POINT_STROKE);
-		  g.setColor(lineColor);
-	    g.draw(shape);
-			return;
-		}
+    public static void paintCostum(Geometry geometry, Viewport viewport, Graphics2D g,
+        Color lineColor, Color fillColor) {
+          ShapeWriter converter = getConverter(viewport);
+          //ShapeWriter converter = new ShapeWriter(viewport);
+          paintCostum(geometry, converter, g, lineColor, fillColor, null);
+        }
+       
+    private static void paintCostum(Geometry geometry, ShapeWriter converter, Graphics2D g,
+          Color lineColor, Color fillColor, Stroke stroke) {
+        
+        if (geometry == null)
+                            return;
 
-		if (stroke == null)
-		  g.setStroke(GEOMETRY_STROKE);
-		else
-		  g.setStroke(stroke);
-		
+        if (geometry instanceof GeometryCollection) {
+          GeometryCollection gc = (GeometryCollection) geometry;
+          /**
+           * Render each element separately.
+           * Otherwise it is not possible to render both filled and non-filled
+           * (1D) elements correctly
+           */
+          for (int i = 0; i < gc.getNumGeometries(); i++) {
+            paintCostum(gc.getGeometryN(i), converter, g, lineColor, fillColor, stroke);
+          }
+          return;
+        }
+
+        Shape shape = converter.toShape(geometry);
+        System.out.println(shape.getBounds().x);
+        g.drawImage(AppImage.getBackgroundImage(), shape.getBounds().x, shape.getBounds().y, shape.getBounds().width, shape.getBounds().height, null);
+
+
+            // handle points in a special way for appearance and speed
+        if (geometry instanceof Point) {
+            g.setStroke(POINT_STROKE);
+            g.setColor(lineColor);
+            g.draw(shape);
+            return;
+        }
+
+            if (stroke == null)
+              g.setStroke(GEOMETRY_STROKE);
+            else
+              g.setStroke(stroke);
+
     // Test for a polygonal shape and fill it if required
-		if (geometry instanceof Polygon && fillColor != null) {
-		  // if (!(shape instanceof GeneralPath) && fillColor != null) {
-			g.setPaint(fillColor);
-			g.fill(shape);
-		}
-		
-		if (lineColor != null) {
-		  g.setColor(lineColor);
-		  try {
-		    g.draw(shape);
-		    
-				// draw polygon boundaries twice, to discriminate them
-		    // MD - this isn't very obvious.  Perhaps a dashed line instead?
-		    /*
-				if (geometry instanceof Polygon) {
-					Shape polyShell = converter.toShape( ((Polygon)geometry).getExteriorRing());
-					g.setStroke(new BasicStroke(2));
-					g.draw(polyShell);
-				}
-*/
-		  } 
-		  catch (Throwable ex) {
-		    System.out.println(ex);
-		    // eat it!
-		  }
-		}
-	}
+            if (geometry instanceof Polygon && fillColor != null) {
+              // if (!(shape instanceof GeneralPath) && fillColor != null) {
+                    g.setPaint(fillColor);
+                    g.fill(shape);
+            }
 
+            if (lineColor != null) {
+              g.setColor(lineColor);
+              try {
+                g.draw(shape);
+
+                            // draw polygon boundaries twice, to discriminate them
+                // MD - this isn't very obvious.  Perhaps a dashed line instead?
+                /*
+                            if (geometry instanceof Polygon) {
+                                    Shape polyShell = converter.toShape( ((Polygon)geometry).getExteriorRing());
+                                    g.setStroke(new BasicStroke(2));
+                                    g.draw(polyShell);
+                            }
+    */
+              } 
+              catch (Throwable ex) {
+                System.out.println(ex);
+                // eat it!
+              }
+            }
+    }
 
 
 }
