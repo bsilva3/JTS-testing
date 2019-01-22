@@ -66,7 +66,7 @@ import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
  * 
  * @version 1.7
  */
-public class GeometryEditPanel extends JPanel implements MouseWheelListener {	
+public class GeometryEditPanel extends JPanel {	
 	/*
   private static Color[] selectedPointColor = { new Color(0, 64, 128, 255),
       new Color(170, 64, 0, 255) };
@@ -129,55 +129,8 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
     this.setBorder(BorderFactory.createLoweredBevelBorder());
     this.setLayout(borderLayout1);
     setToolTipText("");
-    setBorder(BorderFactory.createEmptyBorder());
-    
-    /*scrollPane = new JScrollPane();
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    scrollPane.setPreferredSize(new Dimension(20, 20));
-    
-    add(scrollPane, BorderLayout.EAST);*/
-    
-    this.addMouseWheelListener(this);
-    
-    
-    // deactivate for now, since it interferes with right-click zoom-out
-    //addMouseListener(new PopupClickListener());
-  }
-  
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        /*if (e.getWheelRotation() > 0) {
-            //zoom out
-            viewport.setScaleNoUpdate(viewport.getScale()/1.5);
-        }
-        else {
-            //zoom in
-            viewport.setScaleNoUpdate(viewport.getScale()*1.5);
-        }
-        this.forceRepaint();
-        drawGeometry();*/
-        /*String message;
-        String newline = "\n";
-        int notches = e.getWheelRotation();
-        if (notches < 0) {
-          message = "Mouse wheel moved UP " + -notches + " notch(es)" + newline;
-        } else {
-          message = "Mouse wheel moved DOWN " + notches + " notch(es)" + newline;
-        }
-        if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-          message += "    Scroll type: WHEEL_UNIT_SCROLL" + newline;
-          message += "    Scroll amount: " + e.getScrollAmount() + " unit increments per notch\n";
-          message += "    Units to scroll: " + e.getUnitsToScroll() + " unit increments" + newline;
-          message += "    Vertical unit increment: "
-              + scrollPane.getVerticalScrollBar().getUnitIncrement(1) + " pixels" + newline;
-        } else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
-          message += "    Scroll type: WHEEL_BLOCK_SCROLL" + newline;
-          message += "    Vertical block increment: "
-              + scrollPane.getVerticalScrollBar().getBlockIncrement(1) + " pixels" + newline;
-        }
-        System.out.println(message);*/
-    }
-  
+    setBorder(BorderFactory.createEmptyBorder()); 
+  }  
 
   class PopupClickListener extends MouseAdapter
   {
@@ -316,12 +269,7 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
   public double getGridSize() {
     return grid.getGridSize();
   }
-  
-    public void drawBackgroundImage(Graphics g){
-        AppImage.keepAspectRatioAndDrawImage(g, this.getSize(), (int) Math.round(viewport.getLowerLeftCornerInModel().getX()), 
-                (int) Math.round(viewport.getLowerLeftCornerInModel().getY()), viewport.getScale());
-    }
-    
+     
    
     @Override
     public void paintComponent(Graphics g) {
@@ -331,22 +279,6 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
         g2.setColor(Color.RED);
         g2.setStroke(new BasicStroke(AppConstants.AXIS_WIDTH));
 
-        Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
-        double vOriginX = viewOrigin.getX();
-        double vOriginY = viewOrigin.getY();
-        //System.out.println("image top diff: " + (getSize().getHeight() - AppImage.getImageHeightInPanel()));
-        //System.out.println("view origin: " +vOriginX +", "+ vOriginY );
-        //draw the axes of the origin
-        if (vOriginX >= 0.0 && vOriginX <= viewport.getWidthInView()) {
-          g2.draw(new Line2D.Double(vOriginX, 0, vOriginX, viewport
-                  .getHeightInView()));
-        }
-
-        if (vOriginY >= 0.0 && vOriginY <= viewport.getHeightInView()) {
-          g2.draw(new Line2D.Double(0, vOriginY, viewport.getWidthInView(), vOriginY));
-        }
-        //System.out.println("viewport width: "+viewport.getWidthInView() +", viewport height: " + viewport.getHeightInView());
-        
         renderMgr.render();
         renderMgr.copyImage(g);
     }
@@ -388,21 +320,11 @@ public class GeometryEditPanel extends JPanel implements MouseWheelListener {
         this.updateGeom();
         
         JTSTestBuilder.model().getGeometryEditModel().getGeometry(BACKGROUND_IMAGE_GEOMETRY_INDEX);
-        System.out.println(JTSTestBuilder.model().getLayers().getLayer(1).getGeometry().getNumPoints());
         
-        getImageGeometryCoords();
     }
     
-    public Coordinate[] getImageGeometryCoords(){
-        Coordinate[] coordinates = JTSTestBuilder.model().getGeometryEditModel().getGeometry(BACKGROUND_IMAGE_GEOMETRY_INDEX).getCoordinates();
-        for (Coordinate c : coordinates)
-            System.out.println(c.getX() + ", " + c.getY());
-        return coordinates;
-    }
   
     private List<Coordinate>correctCoordinates(Coordinate[] coord){
-        /*System.out.println("image size in panel -> width: " + AppImage.getImageWidthInPanel() + 
-                ", height: " + AppImage.getImageHeightInPanel());*/
         
         Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
         double vOriginX = viewOrigin.getX();

@@ -95,8 +95,9 @@ public class TestBuilderModel
         GeometryDepiction.GEOM_A_FILL_CLR));
     
     //using a new created model for the geometry... one that uses a background
+    //the lines and the fill of the geometry is transparent
     Layer lyrB = layerList.getLayer(LayerList.LYR_B);
-    lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_B_LINE_CLR));
+    lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_TRANSPARENT));
     
     Layer lyrR = layerList.getLayer(LayerList.LYR_RESULT);
     lyrR.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_RESULT_LINE_CLR,

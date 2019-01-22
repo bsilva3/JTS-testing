@@ -69,10 +69,12 @@ seria colocada como preenchimento desse poligono.
 poligono com o tamanho da imagem do painel
 - package ui.render, classe GeometryPainter, criado metodo paintCostum que é igual ao paint, mas que desenha a imagem no fundo
 do poligono! -> esta nova forma de desenhar a imagem resolve o problema do zoom
+- o poligono que tem a imagem tem contorno e cor de preenchimento transparente.
+- Foi trocada a ordem das camadas A e B. A tem a geometria, B tem a imagem. Queremos que B aparece atrás de A, isto é
+que a geometria fica em cima da imagem
 
 ---> todo:
-- colocar poligono da imagem opaca
-- problema: o poligono com o objeto na imagem não
+...
 
 
 (pode ser util)

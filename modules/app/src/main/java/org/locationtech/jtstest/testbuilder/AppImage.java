@@ -96,34 +96,7 @@ public class AppImage {
         AppImage.setImageWidthInPanel((int) Math.round(d.width));
         return d;
     }
-    
-    //keeps the 1:1 aspect ration of the image and draws it
-    public static void keepAspectRatioAndDrawImage(Graphics g, Dimension panelDim, 
-            int cornerX, int cornerY, double scale){
-        Dimension d = AppImage.resizeImageDimension(panelDim, scale);
-        Graphics2D g2 = (Graphics2D) g;
-        //g2.scale(scale, scale);
-        Point2D viewOrigin = JTSTestBuilderFrame.getGeometryEditPanel().getViewport().toView(new Coordinate(0, 0));
-        double vOriginX = viewOrigin.getX();
-        double vOriginY = viewOrigin.getY();
-
-        Viewport vp = JTSTestBuilderFrame.getGeometryEditPanel().getViewport();
-
-              /*g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round( -vp.getOriginOffsetX()), 
-                (int) Math.round((panelDim.getHeight()/scale - AppImage.getImageHeightInPanel()/scale) +vp.getOriginOffsetY() ),
-                d.width, d.height, null);*/
-
-        g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vp.getOriginOffsetX()), 
-                (int) Math.round((vp.getHeightInView() - AppImage.getImageHeightInPanel()) + vp.getOriginOffsetY()),
-                d.width, d.height, null);
-        /*g2.drawImage(AppImage.getBackgroundImage(), (int) Math.round(vOriginX), 
-                (int) Math.round(panelDim.getHeight()/scale - AppImage.getImageHeightInPanel()/scale), d.width, d.height, null);
-        */        
-        //System.out.println((int) Math.round(vOriginX * scale));
-        //System.out.println((int) Math.round((viewPortHeight - vOriginY) *scale));
-        
-    }
-    
+       
      //keeps the 1:1 aspect ration of the image and draws it
     public static void keepAspectRatioAndDrawImage(Graphics2D g, Dimension panelDim){
         Dimension d = AppImage.resizeImageDimension(panelDim);

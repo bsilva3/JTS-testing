@@ -99,8 +99,6 @@ public class Viewport implements PointTransformation
     scaleFormat = NumberFormat.getInstance();
     int fracDigits = (int) (MathUtil.log10(this.scale));
     if (fracDigits < 0) fracDigits = 0;
-    //System.out.println("scale = " + this.scale);
-    //System.out.println("fracdigits = " + fracDigits);
     scaleFormat.setMaximumFractionDigits(fracDigits);
     // don't show commas
     scaleFormat.setGroupingUsed(false);
@@ -112,7 +110,6 @@ public class Viewport implements PointTransformation
   }
   
   private void setOrigin(double viewOriginX, double viewOriginY) {
-        //System.out.println(this.scale);
         if (this.scale == 1.0){
             this.originInModel = new Point2D.Double(INITIAL_ORIGIN_X, INITIAL_ORIGIN_Y);
         }
@@ -154,7 +151,6 @@ public class Viewport implements PointTransformation
     int scaleDigit = (int) (scaleRaw / nearestLowerPow10);
     double scale = scaleDigit * nearestLowerPow10;
     
-    //System.out.println("requested scale = " + scaleRaw + " scale = " + scale  + "   Pow10 = " + pow10);
     return scale;
   }
   
@@ -180,7 +176,6 @@ public class Viewport implements PointTransformation
       scale = 2 * scaleRoundedToPow10;
     //*/
     
-    //System.out.println("requested scale = " + scaleRaw + " scale = " + scale  + "   Pow10 = " + pow10);
     return scale;
   }
   
@@ -326,10 +321,6 @@ public class Viewport implements PointTransformation
   public void zoom(Point2D zoomPt, double zoomScale) {
     originOffsetX = zoomPt.getX() - originInModel.getX();
     originOffsetY = zoomPt.getY() - originInModel.getY();
-    /*System.out.println("origin off: " +originOffsetX + ", " +originOffsetY +" previous origin:" + 
-            originInModel.getX() + ",  "+originInModel.getY()+" diff: "+(originOffsetX+originInModel.getX()) +", " +
-            (originOffsetY+originInModel.getY()));*/
-    // set scale first, because it may be snapped
     double scalePrev = getScale();
     setScale(zoomScale);
     
@@ -337,7 +328,6 @@ public class Viewport implements PointTransformation
     double zoomOriginX = zoomPt.getX() - originOffsetX / actualZoomFactor;
     double zoomOriginY = zoomPt.getY() - originOffsetY / actualZoomFactor;
     setOrigin(zoomOriginX, zoomOriginY);
-    //System.out.println("new origin in model: " + originInModel.getX() +", "+originInModel.getY());
   }
 
     public double getOriginOffsetX() {
@@ -414,11 +404,9 @@ public class Viewport implements PointTransformation
   	 */
   	double gridSizeModel = Math.pow(10, gridMag);
   	double gridSizeView = toView(gridSizeModel);
-//  	System.out.println("\ncand gridSizeView= " + gridSizeView);
   	if (gridSizeView <= MIN_GRID_RESOLUTION_PIXELS )
   		gridMag += 1;
   	
-//  	System.out.println("pixelSize= " + pixelSize + "  pixelLog10= " + pixelSizeLog);
   	return gridMag;
   }
 

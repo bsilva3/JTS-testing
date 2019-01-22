@@ -25,8 +25,8 @@ import org.locationtech.jtstest.testbuilder.geom.GeometryLocation;
 
 public class LayerList 
 {
-  public static final int LYR_A = 0;
-  public static final int LYR_B = 1;
+  public static final int LYR_A = 1;
+  public static final int LYR_B = 0;
   public static final int LYR_RESULT = 2;
   
   private Layer[] layer = new Layer[3];

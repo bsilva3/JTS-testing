@@ -222,7 +222,6 @@ public class GeometryPainter
         }
 
         Shape shape = converter.toShape(geometry);
-        System.out.println(shape.getBounds().x);
         g.drawImage(AppImage.getBackgroundImage(), shape.getBounds().x, shape.getBounds().y, shape.getBounds().width, shape.getBounds().height, null);
 
 

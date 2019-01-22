@@ -122,7 +122,7 @@ public class JTSTestBuilder
   {
     try {
         //file chooser window to select an image
-        /*JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose an image: ");
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jfc.setMultiSelectionEnabled(false);
@@ -138,11 +138,33 @@ public class JTSTestBuilder
             //no valid image selected, end the program
             return;
         }
+        
+        // now ask the user to select a correspondence file
+        jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        jfc.setDialogTitle("Choose the correspondence file: ");
+        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        jfc.setMultiSelectionEnabled(false);
+        jfc.setAcceptAllFileFilterUsed(false);
+        filter = new FileNameExtensionFilter("wkt, corr", "wkt", "corr");
+        jfc.addChoosableFileFilter(filter);
+        returnValue = jfc.showOpenDialog(null);
+        File selectedCorrFile = null;
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+             selectedCorrFile = jfc.getSelectedFile();
+        }
+        else{
+            //no valid correspondence file selected, end the program
+            return;
+        }
+        
         //set this file as a background image to be used in the edit panel
-        AppImage.setBackgroundImageFile(selectedFile);*/
-        AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
-        AppFiles.setCorrFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\corr\\ice1_0_1.corr"));
-    	readArgs(args);
+        AppImage.setBackgroundImageFile(selectedFile);
+        AppFiles.setCorrFile(selectedCorrFile);
+        
+        //AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
+        //AppFiles.setCorrFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\corr\\ice1_0_1.corr"));
+    	
+        readArgs(args);
     	setLookAndFeel();
         app = new JTSTestBuilder();
         app.initFrame();

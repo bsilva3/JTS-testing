@@ -23,7 +23,7 @@ public class CostumBasicStyle extends BasicStyle{
 
     public CostumBasicStyle(Color lineColor) {
       this.lineColor = lineColor;
-      this.fillColor = new Color(255, 200, 200, 150);//transparent
+      this.fillColor = new Color(255, 200, 200, 0);//transparent
     }
 
     public CostumBasicStyle() {
