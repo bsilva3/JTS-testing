@@ -16,45 +16,29 @@ import java.util.List;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.util.Assert;
 import org.locationtech.jtstest.testbuilder.model.*;
 import org.locationtech.jtstest.testbuilder.ui.*;
 import org.locationtech.jtstest.testbuilder.ui.render.*;
 import org.locationtech.jtstest.testbuilder.ui.style.AWTUtil;
-import org.locationtech.jtstest.testbuilder.ui.style.BasicStyle;
-import org.locationtech.jtstest.testbuilder.ui.style.Style;
 import org.locationtech.jtstest.testbuilder.ui.tools.*;
 import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 
@@ -67,208 +51,203 @@ import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
  * @version 1.7
  */
 public class GeometryEditPanel extends JPanel {	
-	/*
-  private static Color[] selectedPointColor = { new Color(0, 64, 128, 255),
-      new Color(170, 64, 0, 255) };
-*/
+	
 
-  private TestBuilderModel tbModel;
-  
-  private DrawingGrid grid = new DrawingGrid();
-  private GridRenderer gridRenderer;
-  
-  private Image backgroundImage;
+    private TestBuilderModel tbModel;
 
-  boolean stateAddingPoints = false;
+    private DrawingGrid grid = new DrawingGrid();
+    private GridRenderer gridRenderer;
 
-  Coordinate markPoint;
-  Point2D lastPt = new Point2D.Double();
+    boolean stateAddingPoints = false;
 
-  private Tool currentTool = null;  //PolygonTool.getInstance();
+    Coordinate markPoint;
+    Point2D lastPt = new Point2D.Double();
 
-  private Viewport viewport = new Viewport(this);
+    private Tool currentTool = null;  //PolygonTool.getInstance();
 
-  private RenderManager renderMgr;
-  
-  private CorrToGeometryUtils corrToGeomUtils;
-  //private OperationMonitorManager opMonitor;
-  
+    private Viewport viewport = new Viewport(this);
+
+    private RenderManager renderMgr;
+
+    private CorrToGeometryUtils corrToGeomUtils;
+    //private OperationMonitorManager opMonitor;
+
     //added
-  //used to indentify the geometry that contains the object represented in a corr file
+    //used to indentify the geometry that contains the object represented in a corr file
     private static final int OBJECT_GEOMETRY_INDEX = 0;
     //index for the geometry that is used to place the image
     private static final int BACKGROUND_IMAGE_GEOMETRY_INDEX = 1;
     private static final int OTHER_GEOMETRY_INDEX = 2;
-  //----------------------------------------
-  BorderLayout borderLayout1 = new BorderLayout();
-  
-  GeometryPopupMenu menu = new GeometryPopupMenu();
-  
+    //----------------------------------------
+    BorderLayout borderLayout1 = new BorderLayout();
 
-  public GeometryEditPanel() {
-    gridRenderer = new GridRenderer(viewport, grid);
-    corrToGeomUtils = new CorrToGeometryUtils(AppFiles.getCorrFile());
-    try {
-      initUI();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
-    renderMgr = new RenderManager(this);
-    //opMonitor = new OperationMonitorManager(this, viewport);
-  }
+    GeometryPopupMenu menu = new GeometryPopupMenu();
 
-  void initUI() throws Exception {
-    this.addComponentListener(new java.awt.event.ComponentAdapter() {
 
-      public void componentResized(ComponentEvent e) {
-        this_componentResized(e);
+    public GeometryEditPanel() {
+      gridRenderer = new GridRenderer(viewport, grid);
+      corrToGeomUtils = new CorrToGeometryUtils(AppFiles.getCorrFile());
+      try {
+        initUI();
+      } catch (Exception ex) {
+        ex.printStackTrace();
       }
-    });
-    
-    //this.setBackground(Color.white);
-    this.setBorder(BorderFactory.createLoweredBevelBorder());
-    this.setLayout(borderLayout1);
-    setToolTipText("");
-    setBorder(BorderFactory.createEmptyBorder()); 
-  }  
-
-  class PopupClickListener extends MouseAdapter
-  {
-    public void mousePressed(MouseEvent e)
-    {
-      if (e.isPopupTrigger())
-        doPopUp(e);
+      renderMgr = new RenderManager(this);
+      //opMonitor = new OperationMonitorManager(this, viewport);
     }
-    public void mouseReleased(MouseEvent e)
+
+    void initUI() throws Exception {
+      this.addComponentListener(new java.awt.event.ComponentAdapter() {
+
+        public void componentResized(ComponentEvent e) {
+          this_componentResized(e);
+        }
+      });
+
+      //this.setBackground(Color.white);
+      this.setBorder(BorderFactory.createLoweredBevelBorder());
+      this.setLayout(borderLayout1);
+      setToolTipText("");
+      setBorder(BorderFactory.createEmptyBorder()); 
+    }  
+
+    class PopupClickListener extends MouseAdapter
     {
-      if (e.isPopupTrigger())
-        doPopUp(e);
+      public void mousePressed(MouseEvent e)
+      {
+        if (e.isPopupTrigger())
+          doPopUp(e);
+      }
+      public void mouseReleased(MouseEvent e)
+      {
+        if (e.isPopupTrigger())
+          doPopUp(e);
+      }
+      private void doPopUp(MouseEvent e)
+      {
+          menu.show(e.getComponent(), e.getX(), e.getY());
+      }
     }
-    private void doPopUp(MouseEvent e)
+
+
+    public void setModel(TestBuilderModel model) {
+      this.tbModel = model;
+    }
+
+    public TestBuilderModel getModel() {
+      return tbModel;
+    }
+    public GeometryEditModel getGeomModel()
     {
-        menu.show(e.getComponent(), e.getX(), e.getY());
+      return tbModel.getGeometryEditModel();
     }
-  }
+
+    public void setGridEnabled(boolean isEnabled) {
+      gridRenderer.setEnabled(isEnabled);
+    }
 
 
-  public void setModel(TestBuilderModel model) {
-    this.tbModel = model;
-  }
+    public Viewport getViewport() { return viewport; }
 
-  public TestBuilderModel getModel() {
-    return tbModel;
-  }
-  public GeometryEditModel getGeomModel()
-  {
-    return tbModel.getGeometryEditModel();
-  }
+    public void updateView()
+    {
+  //    fireGeometryChanged(new GeometryEvent(this));
+      forceRepaint();
+    }
 
-  public void setGridEnabled(boolean isEnabled) {
-    gridRenderer.setEnabled(isEnabled);
-  }
+    public void forceRepaint() {
+          renderMgr.setDirty(true);
+          /*try{
+              AppImage.keepAspectRatioAndDrawImage(this.getGraphics(),(int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
 
+          } catch(NullPointerException e){
+              System.err.println(e);
+          }*/
+          Component source = SwingUtilities.windowForComponent(this);
+          if (source == null)
+            source = this;
+          source.repaint();
+    }
 
-  public Viewport getViewport() { return viewport; }
+    private LayerList getLayerList()
+    {
+      return tbModel.getLayers();
+    }
 
-  public void updateView()
-  {
-//    fireGeometryChanged(new GeometryEvent(this));
-    forceRepaint();
-  }
-  
-  public void forceRepaint() {
-        renderMgr.setDirty(true);
-        /*try{
-            AppImage.keepAspectRatioAndDrawImage(this.getGraphics(),(int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
-            
-        } catch(NullPointerException e){
-            System.err.println(e);
-        }*/
-        Component source = SwingUtilities.windowForComponent(this);
-        if (source == null)
-          source = this;
-        source.repaint();
-  }
+    public void setShowingInput(boolean isEnabled)
+    {
+      if (tbModel == null) return;
+      getLayerList().getLayer(LayerList.LYR_A).setEnabled(isEnabled);
+      getLayerList().getLayer(LayerList.LYR_B).setEnabled(isEnabled);
+      forceRepaint();
+    }
 
-  private LayerList getLayerList()
-  {
-    return tbModel.getLayers();
-  }
-  
-  public void setShowingInput(boolean isEnabled)
-  {
-    if (tbModel == null) return;
-    getLayerList().getLayer(LayerList.LYR_A).setEnabled(isEnabled);
-    getLayerList().getLayer(LayerList.LYR_B).setEnabled(isEnabled);
-    forceRepaint();
-  }
-  
-  public void setShowingGeometryA(boolean isEnabled) {
-    if (tbModel == null) return;
-    getLayerList().getLayer(LayerList.LYR_A).setEnabled(isEnabled);
-    forceRepaint();
-  }
+    public void setShowingGeometryA(boolean isEnabled) {
+      if (tbModel == null) return;
+      getLayerList().getLayer(LayerList.LYR_A).setEnabled(isEnabled);
+      forceRepaint();
+    }
 
-  public void setShowingGeometryB(boolean isEnabled) {
-    if (tbModel == null) return;
-    getLayerList().getLayer(LayerList.LYR_B).setEnabled(isEnabled);
-    forceRepaint();
-  }
+    public void setShowingGeometryB(boolean isEnabled) {
+      if (tbModel == null) return;
+      getLayerList().getLayer(LayerList.LYR_B).setEnabled(isEnabled);
+      forceRepaint();
+    }
 
-  public void setShowingResult(boolean isEnabled) 
-  {
-    if (tbModel == null) return;
-    getLayerList().getLayer(LayerList.LYR_RESULT).setEnabled(isEnabled);
-    forceRepaint();
-  }
+    public void setShowingResult(boolean isEnabled) 
+    {
+      if (tbModel == null) return;
+      getLayerList().getLayer(LayerList.LYR_RESULT).setEnabled(isEnabled);
+      forceRepaint();
+    }
 
-  public void setGridSize(double gridSize) {
-    grid.setGridSize(gridSize);
-    forceRepaint();
-  }
+    public void setGridSize(double gridSize) {
+      grid.setGridSize(gridSize);
+      forceRepaint();
+    }
 
-  public void setHighlightPoint(Coordinate pt) {
-    markPoint = pt;
-  }
+    public void setHighlightPoint(Coordinate pt) {
+      markPoint = pt;
+    }
 
-  public boolean isAddingPoints() {
-    return stateAddingPoints;
-  }
+    public boolean isAddingPoints() {
+      return stateAddingPoints;
+    }
 
-  public void updateGeom()
-  {
-  	renderMgr.setDirty(true);
-        getGeomModel().geomChanged();
-        
-  }
-  
-  public String getToolTipText(MouseEvent event) {
-//    if (event.getPoint().x < 100) return null;
-    Coordinate pt = viewport.toModelCoordinate(event.getPoint());
-    double toleranceInModel = AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
-    // avoid wierd scale issues
-    if (toleranceInModel <= 0.0) return null;
-    return GeometryLocationsWriter.writeLocation(getLayerList(), pt, toleranceInModel);
-//    return viewport.toModel(event.getPoint()).toString();
-//    return null;
-  }
+    public void updateGeom()
+    {
+          renderMgr.setDirty(true);
+          getGeomModel().geomChanged();
 
-  public double getToleranceInModel()
-  {
-    return AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
-  }
-  
-  public String getInfo(Coordinate pt)
-  {
-    double toleranceInModel = AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
-    GeometryLocationsWriter writer = new GeometryLocationsWriter();
-    writer.setHtml(false);
-    return writer.writeLocationString(getLayerList(), pt, toleranceInModel);
-  }
+    }
 
-  public double getGridSize() {
-    return grid.getGridSize();
-  }
+    public String getToolTipText(MouseEvent event) {
+  //    if (event.getPoint().x < 100) return null;
+      Coordinate pt = viewport.toModelCoordinate(event.getPoint());
+      double toleranceInModel = AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
+      // avoid wierd scale issues
+      if (toleranceInModel <= 0.0) return null;
+      return GeometryLocationsWriter.writeLocation(getLayerList(), pt, toleranceInModel);
+  //    return viewport.toModel(event.getPoint()).toString();
+  //    return null;
+    }
+
+    public double getToleranceInModel()
+    {
+      return AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
+    }
+
+    public String getInfo(Coordinate pt)
+    {
+      double toleranceInModel = AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
+      GeometryLocationsWriter writer = new GeometryLocationsWriter();
+      writer.setHtml(false);
+      return writer.writeLocationString(getLayerList(), pt, toleranceInModel);
+    }
+
+    public double getGridSize() {
+      return grid.getGridSize();
+    }
      
    
     @Override
@@ -291,7 +270,7 @@ public class GeometryEditPanel extends JPanel {
         
         drawImagePolygon();
         //delete any existing geometry
-        List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile());
+        List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(false));
         JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         JTSTestBuilder.model().getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
         JTSTestBuilder.model().getGeometryEditModel().clear();
@@ -328,13 +307,11 @@ public class GeometryEditPanel extends JPanel {
         
         Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
         double vOriginX = viewOrigin.getX();
-        double vOriginY = viewOrigin.getY();
         
         List<Coordinate> transformedCoords = new ArrayList<>();
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
             coordUtils = new CoordinateUtils(c.getX(), c.getY() );
-            //
             coordUtils.transformCoords(AppImage.getImageWidth(), AppImage.getImageHeight(),
                     AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel());
             
@@ -349,18 +326,6 @@ public class GeometryEditPanel extends JPanel {
         }
         return transformedCoords;
     }
-  /*
-   // MD - obsolete
-  public void render(Graphics g)
-  {
-    Graphics2D g2 = (Graphics2D) g;
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
-    
-    gridRenderer.paint(g2);
-    getLayerList().paint((Graphics2D) g2, viewport);
-  }
-  */
   
   private static int VERTEX_SIZE = AppConstants.VERTEX_SIZE + 1;
   private static double VERTEX_SIZE_OVER_2 = VERTEX_SIZE / 2;

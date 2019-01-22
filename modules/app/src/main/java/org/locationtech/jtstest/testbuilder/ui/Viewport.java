@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.math.MathUtil;
-import org.locationtech.jts.util.Assert;
 import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 
 
@@ -189,7 +188,6 @@ public class Viewport implements PointTransformation
     return viewEnvInModel.intersects(p0, p1);
   }
   
-    //ver este metodo para colocar a imagem no sitio certo
   public Point2D toModel(Point2D viewPt) {
     srcPt.x = viewPt.getX();
     srcPt.y = viewPt.getY();
@@ -272,7 +270,6 @@ public class Viewport implements PointTransformation
     viewUpdated();
   }
   
-    //ver este metodo para colocar a imagem no sitio certo
   private void updateModelToViewTransform() {
     modelToViewTransform = new AffineTransform();
     modelToViewTransform.translate(0, viewSize.height);

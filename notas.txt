@@ -1,7 +1,7 @@
 - IMPORTANTE! o projeto maven que contém todos os modulos deve ser ser compilados com:
 mvn clean:clean resources:resources compiler:compile jar:jar install:install -DskipTest:true
 
--------------------------------Isto é um relatório ordenado do trabalho feito, os pontos mais em baixo é o que foi feito
+-------------------------------Isto é um relatório ordenado do trabalho feito, os pontos em baixo indicam o que foi feito
 mais recentemente ---------------------------------------------------------------
 
 - modulo jts-app contém a gui
@@ -74,7 +74,7 @@ do poligono! -> esta nova forma de desenhar a imagem resolve o problema do zoom
 que a geometria fica em cima da imagem
 
 ---> todo:
-...
+ - 2 viewports lado a lado com mesma imagem, mas 1º terá 1ª e 2ª coluna no ficheiro de corr e 2º terá 3ª e 4ª
 
 
 (pode ser util)

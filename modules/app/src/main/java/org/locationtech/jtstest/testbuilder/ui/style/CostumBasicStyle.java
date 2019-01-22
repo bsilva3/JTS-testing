@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * this is a style with a transparent color as filling, and an image as background
  */
 package org.locationtech.jtstest.testbuilder.ui.style;
 
@@ -27,18 +25,11 @@ public class CostumBasicStyle extends BasicStyle{
     }
 
     public CostumBasicStyle() {
-
     }
 
     public void paint(Geometry geom, Viewport viewport, Graphics2D g)
     {
-        //g.translate(0, viewport.getLowerLeftCornerInModel().getY());
-        //g.drawImage(AppImage.getBackgroundImage(), 0, 0, AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel(), null);
-        //g.drawImage(AppImage.getBackgroundImage(), 0, 0, AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel(), null);
         GeometryPainter.paintCostum(geom, viewport, g, lineColor, fillColor);
-        /*AppImage.keepAspectRatioAndDrawImage(g, new Dimension((int) Math.round(viewport.getWidthInView()), 
-                (int) Math.round(viewport.getWidthInView())));*/
-        
     }
 
     public Color getLineColor() {

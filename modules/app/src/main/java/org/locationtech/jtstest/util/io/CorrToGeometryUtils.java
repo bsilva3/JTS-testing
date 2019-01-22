@@ -27,8 +27,8 @@ public class CorrToGeometryUtils {
         this.corrReader = new CorrReader(new File(corrFile));
     }
     
-    public Coordinate[] getCoordsFromFile(){
-        return corrReader.readAndGetPoints();
+    public Coordinate[] getCoordsFromFile(boolean secondSetCoordinates){
+        return corrReader.readAndGetPoints(secondSetCoordinates);
     }
     
     //the coordinates read from the file are not closed, and a polygon cannot be formed. 
@@ -38,17 +38,6 @@ public class CorrToGeometryUtils {
         closedCoords = coord;
         closedCoords[closedCoords.length-1] = closedCoords[0];
         return closedCoords;
-    }
-    
-    public Polygon createPolygonFromCoords(Coordinate[] coord){
-        Polygon p = null;
-        try {
-            p = new GeometryFactory().createPolygon(corrReader.readAndGetPoints());
-        } catch (IllegalArgumentException e){
-            //coordinates are not closed
-            p = new GeometryFactory().createPolygon(closeCoordinates(corrReader.readAndGetPoints()));
-        }
-        return p;
     }
     
 }

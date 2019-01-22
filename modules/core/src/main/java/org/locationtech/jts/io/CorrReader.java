@@ -37,7 +37,7 @@ public class CorrReader {
         this.file = new File(fileName);
     }
     //reads the coordinates from file and parses the into an array of Coordinates
-    public Coordinate[] readAndGetPoints(){
+    public Coordinate[] readAndGetPoints(boolean secondCoordinates){
         StringBuilder pointsInFile = new StringBuilder();
         try(BufferedReader br = new BufferedReader(new FileReader(this.file))) {
             for(String line; (line = br.readLine()) != null; ) {
@@ -46,14 +46,23 @@ public class CorrReader {
         } catch (IOException ex) {
             Logger.getLogger(CorrReader.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return parseCorr(pointsInFile.toString());
+        return parseCorr(pointsInFile.toString(), secondCoordinates);        
     }
     
-    private Coordinate[] parseCorr(String lines){
+    // converts a string of coordinates into an array of Coordinates
+    //if secondCoordinates is false, only the first set of coordinates is considered
+    // if true, the second and the first set of coordinates are considered
+    private Coordinate[] parseCorr(String lines, boolean secondCoordinates){
+        //the string has the following format: x_value y_value x_value y_value
         List<Coordinate> coordinates = new ArrayList<>();
         String[] pointsFromFile = operatorPattern.split(lines);
-        for (int i = 2; i <pointsFromFile.length; i+=2){
-            //System.out.println(Double.parseDouble(pointsFromFile[i-1]) +", " + Double.parseDouble(pointsFromFile[i]));
+        int increment = 2;
+        //to get both sets of coordinates, iterate through all of them, else iterate every 2 coordinates, 
+        //i.e. every 4 values
+        if (!secondCoordinates){
+            increment = 4;
+        }
+        for (int i = 2; i <pointsFromFile.length; i+=increment){
             double x = Double.parseDouble(pointsFromFile[i-1]);
             double y = Double.parseDouble(pointsFromFile[i]);
             coordinates.add(new Coordinate(x, y));

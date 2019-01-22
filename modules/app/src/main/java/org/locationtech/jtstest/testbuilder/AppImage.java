@@ -6,18 +6,13 @@
 package org.locationtech.jtstest.testbuilder;
 
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jtstest.testbuilder.ui.Viewport;
 
 /**
  *
