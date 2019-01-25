@@ -90,11 +90,11 @@ public class GeometryTreePanel extends JPanel implements TreeWillExpandListener
 			  if (geom == null) return;
 			  
         if (e.getClickCount() == 2) {
-          JTSTestBuilderFrame.getGeometryEditPanel().zoom(geom.getEnvelopeInternal());
+          JTSTestBuilderFrame.getGeometryEditPanelMouseIsIn().zoom(geom.getEnvelopeInternal());
         }
         // would be nice to flash as well as zoom, but zooming drawing is too slow
         if (e.getClickCount() == 1) {
-          JTSTestBuilderFrame.getGeometryEditPanel().flash(geom);
+          JTSTestBuilderFrame.getGeometryEditPanelMouseIsIn().flash(geom);
         }
 			}
 		});

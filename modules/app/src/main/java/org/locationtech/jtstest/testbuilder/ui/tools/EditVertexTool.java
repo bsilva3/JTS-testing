@@ -22,6 +22,7 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jtstest.testbuilder.AppCursors;
 import org.locationtech.jtstest.testbuilder.IconLoader;
 import org.locationtech.jtstest.testbuilder.geom.*;
+import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 
 
 /**
@@ -73,7 +74,7 @@ extends IndicatorTool
     // finish the move of the vertex
     if (selectedVertexLocation != null) {
       Coordinate newLoc = toModelSnapped(e.getPoint());
-      geomModel().moveVertex(selectedVertexLocation, newLoc);
+      getClickedPanel().getGeomModel().moveVertex(selectedVertexLocation, newLoc);
     }
   }
 
@@ -86,23 +87,23 @@ extends IndicatorTool
   public void mouseClicked(MouseEvent e) {
     if (! SwingUtilities.isRightMouseButton(e))
       return;
-    
+    GeometryEditModel geoModel = getClickedPanel().getGeomModel();
     Coordinate mousePtModel = toModelCoordinate(e.getPoint());
     double tolModel = getModelSnapTolerance();
 
     boolean isMove = ! e.isControlDown();
     if (isMove) {
-      GeometryLocation geomLoc = geomModel().locateNonVertexPoint(mousePtModel, tolModel);
+      GeometryLocation geomLoc = geoModel.locateNonVertexPoint(mousePtModel, tolModel);
       //System.out.println("Testing: insert vertex at " + geomLoc);
       if (geomLoc != null) {
-        geomModel().setGeometry(geomLoc.insert());
+        geoModel.setGeometry(geomLoc.insert());
       }
     }
     else {  // is a delete
-      GeometryLocation geomLoc = geomModel().locateVertex(mousePtModel, tolModel);
+      GeometryLocation geomLoc = geoModel.locateVertex(mousePtModel, tolModel);
       //System.out.println("Testing: delete vertex at " + geomLoc);
       if (geomLoc != null) {
-        geomModel().setGeometry(geomLoc.delete());
+        geoModel.setGeometry(geomLoc.delete());
       }
     }
   }

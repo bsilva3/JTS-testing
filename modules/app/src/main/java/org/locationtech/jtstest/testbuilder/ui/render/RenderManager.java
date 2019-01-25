@@ -91,6 +91,7 @@ public class RenderManager
             worker = new RendererSwingWorker(panel.getRenderer(), image);
             worker.start();
             repaintTimer.start();
+            //System.out.println("render manager#render: "+panel.isSecondPanel());
     }
 
     private void initImage()

@@ -206,7 +206,7 @@ public class GeometryPainter
           Color lineColor, Color fillColor, Stroke stroke) {
         
         if (geometry == null)
-                            return;
+            return;
 
         if (geometry instanceof GeometryCollection) {
           GeometryCollection gc = (GeometryCollection) geometry;

@@ -81,22 +81,22 @@ public abstract class BasicTool implements Tool
    * 
    * If subclasses override this method they must call <tt>super.activate()</tt>.
    */
-  public void activate(GeometryEditPanel panel) 
-  {
-    this.panel = panel;
-  	gridPM = getViewport().getGridPrecisionModel();
-    this.panel.setCursor(getCursor());
-    this.panel.addMouseListener(this);
-    this.panel.addMouseMotionListener(this);
-    this.panel.addMouseWheelListener(this);
-  }
+    public void activate(GeometryEditPanel panel) 
+    {
+        this.panel = panel;
+        gridPM = getViewport().getGridPrecisionModel();
+        this.panel.setCursor(getCursor());
+        this.panel.addMouseListener(this);
+        this.panel.addMouseMotionListener(this);
+        this.panel.addMouseWheelListener(this);
+    }
  
-  public void deactivate() 
-  {
-    this.panel.removeMouseListener(this);
-    this.panel.removeMouseMotionListener(this);
-    this.panel.removeMouseWheelListener(this);
-  }
+    public void deactivate() 
+    {
+        this.panel.removeMouseListener(this);
+        this.panel.removeMouseMotionListener(this);
+        this.panel.removeMouseWheelListener(this);
+    }
 
   protected GeometryEditPanel panel()
   {
@@ -172,10 +172,10 @@ public abstract class BasicTool implements Tool
   	return pModel;
   }
   
-  protected double gridSize()
-  {
-    return getViewport().getGridSizeModel();
-  }
+    protected double gridSize()
+    {
+      return getViewport().getGridSizeModel();
+    }
   
   /*
   protected Coordinate toModelSnappedToDrawingGrid(Point2D p)
@@ -184,4 +184,8 @@ public abstract class BasicTool implements Tool
     return new Coordinate(pt.getX(), pt.getY());
   }
   */
+  
+    public static GeometryEditPanel getClickedPanel(){
+        return JTSTestBuilderFrame.getGeometryEditPanelMouseIsIn();
+    }
 }

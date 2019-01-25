@@ -73,8 +73,17 @@ do poligono! -> esta nova forma de desenhar a imagem resolve o problema do zoom
 - Foi trocada a ordem das camadas A e B. A tem a geometria, B tem a imagem. Queremos que B aparece atrás de A, isto é
 que a geometria fica em cima da imagem
 
+-Para criar 2 edit panels: foi, no JTSTBuilderFrame, criado 2 instancias do TestCasePanel, que contem o edit panel.
+ A cada uma dessas instâncias foi passado uma instancia diferente do GeometryEditModel, que entre outros dados, contém a
+informação das geometrias que são desenhadas no ecrã.
+-Na package ui.tools, nas classes Rectangle tool e zoom tool e EditVertexTool, é considerado apenas o painel em que o rato
+se encontra para fazer a ação respetiva.
+
+
 ---> todo:
  - 2 viewports lado a lado com mesma imagem, mas 1º terá 1ª e 2ª coluna no ficheiro de corr e 2º terá 3ª e 4ª
+	-existem tools que não estão a ser bem trocadas, sendo que ficam repetidas ou continuam a ser incorretamente
+	selecionadas, entre outras inconsitencias
 
 
 (pode ser util)

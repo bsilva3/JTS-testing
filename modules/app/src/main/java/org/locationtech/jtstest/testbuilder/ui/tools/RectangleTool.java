@@ -13,31 +13,31 @@
 package org.locationtech.jtstest.testbuilder.ui.tools;
 
 import java.awt.Cursor;
+import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 
 import org.locationtech.jtstest.testbuilder.model.GeometryType;
 
 
-public class RectangleTool
-extends BoxBandTool
+public class RectangleTool extends BoxBandTool
 {
-  private static RectangleTool singleton = null;
+    private static RectangleTool singleton = null;
 
-  public static RectangleTool getInstance() {
-      if (singleton == null)
-          singleton = new RectangleTool();
-      return singleton;
-  }
+    public static RectangleTool getInstance() {
+        if (singleton == null)
+            singleton = new RectangleTool();
+        return singleton;
+    }
 
-  public RectangleTool() {
-    super(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-  }
+    public RectangleTool() {
+      super(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+    }
 
-  protected void gestureFinished() 
-  {      
-    geomModel().setGeometryType(GeometryType.POLYGON);
-    geomModel().addComponent(getCoordinates());
-    panel().updateGeom();
-  }
-
+    protected void gestureFinished() 
+    { 
+        GeometryEditPanel clickedPanel = getClickedPanel();
+        clickedPanel.getGeomModel().setGeometryType(GeometryType.POLYGON);
+        clickedPanel.getGeomModel().addComponent(getCoordinates());
+        clickedPanel.updateGeom();
+    }
   
 }

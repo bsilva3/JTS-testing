@@ -34,79 +34,84 @@ import org.locationtech.jtstest.util.io.MultiFormatReader;
 
 public class TestBuilderModel 
 {
-  private PrecisionModel precisionModel = new PrecisionModel();
-  private GeometryFactory geometryFactory = null;
-	private GeometryEditModel geomEditModel;
-  private LayerList layerList = new LayerList();
-  private WKTWriter writer = new WKTWriter();
-  private Object currResult = null;
-  private String opName = "";
+    private PrecisionModel precisionModel = new PrecisionModel();
+    private GeometryFactory geometryFactory = null;
+    private GeometryEditModel geomEditModel;
+    private LayerList layerList = new LayerList();
+    private WKTWriter writer = new WKTWriter();
+    private Object currResult = null;
+    private String opName = "";
+    private boolean isSecondPanelModel = false;
 
-	public TestBuilderModel()
-	{
-		geomEditModel = new GeometryEditModel();
-    initLayers();
-    caseList.init();
-	}
+    public TestBuilderModel()
+    {
+        geomEditModel = new GeometryEditModel();
+        initLayers();
+        caseList.init();
+    }
+    public TestBuilderModel(boolean isSecondPanelModel)
+    {
+        this();
+        this.isSecondPanelModel = isSecondPanelModel;
+    }
+
+    public GeometryEditModel getGeometryEditModel() { return geomEditModel; }
+
+    public PrecisionModel getPrecisionModel() { return precisionModel; }
 	
-	public GeometryEditModel getGeometryEditModel() { return geomEditModel; }
+    public void setPrecisionModel(PrecisionModel precisionModel)
+    {
+      this.precisionModel = precisionModel;
+      geometryFactory = null;
+    }
+
+    public GeometryFactory getGeometryFactory()
+    {
+      if (geometryFactory == null)
+        geometryFactory = new GeometryFactory(getPrecisionModel());
+      return geometryFactory;
+    }
+  
+  
+    public String getResultDisplayString(Geometry g)
+    {
+        if (g == null) return "";
+        if (g.getNumPoints() > DisplayParameters.MAX_DISPLAY_POINTS)
+            return GeometryEditModel.toStringVeryLarge(g);
+	return writer.writeFormatted(g);
+    }
 	
-	public PrecisionModel getPrecisionModel() { return precisionModel; }
-	
-  public void setPrecisionModel(PrecisionModel precisionModel)
-  {
-    this.precisionModel = precisionModel;
-    geometryFactory = null;
-  }
-  
-  public GeometryFactory getGeometryFactory()
-  {
-    if (geometryFactory == null)
-      geometryFactory = new GeometryFactory(getPrecisionModel());
-    return geometryFactory;
-  }
-  
-  
-	public String getResultDisplayString(Geometry g)
-	{
-		if (g == null)
-			return "";
-    if (g.getNumPoints() > DisplayParameters.MAX_DISPLAY_POINTS)
-      return GeometryEditModel.toStringVeryLarge(g);
-		return writer.writeFormatted(g);
-	}
-	
-  public LayerList getLayers() { return layerList; }
-  
-  private void initLayers()
-  {  	
+    public LayerList getLayers() { return layerList; }
+
+    private void initLayers()
+    {  	
   	GeometryContainer geomCont0 = new IndexedGeometryContainer(geomEditModel, 0);
   	GeometryContainer geomCont1 = new IndexedGeometryContainer(geomEditModel, 1);
   	
-    layerList.getLayer(LayerList.LYR_A).setSource(geomCont0);
-    layerList.getLayer(LayerList.LYR_B).setSource(geomCont1);
-    
-    if (geomEditModel != null)
-      layerList.getLayer(LayerList.LYR_RESULT).setSource(
-          new ResultGeometryContainer(geomEditModel));
+        layerList.getLayer(LayerList.LYR_A).setSource(geomCont0);
+        layerList.getLayer(LayerList.LYR_B).setSource(geomCont1);
 
-    Layer lyrA = layerList.getLayer(LayerList.LYR_A);
-    lyrA.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_A_LINE_CLR,
-        GeometryDepiction.GEOM_A_FILL_CLR));
-    
-    //using a new created model for the geometry... one that uses a background
-    //the lines and the fill of the geometry is transparent
-    Layer lyrB = layerList.getLayer(LayerList.LYR_B);
-    lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_TRANSPARENT));
-    
-    Layer lyrR = layerList.getLayer(LayerList.LYR_RESULT);
-    lyrR.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_RESULT_LINE_CLR,
-        GeometryDepiction.GEOM_RESULT_FILL_CLR));
-  }
+        if (geomEditModel != null)
+          layerList.getLayer(LayerList.LYR_RESULT).setSource(
+              new ResultGeometryContainer(geomEditModel));
 
-  public void pasteGeometry(int geomIndex)
+        Layer lyrA = layerList.getLayer(LayerList.LYR_A);
+        lyrA.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_A_LINE_CLR,
+            GeometryDepiction.GEOM_A_FILL_CLR));
+
+        //using a new created model for the geometry... one that uses a background
+        //the lines and the fill of the geometry is transparent
+        Layer lyrB = layerList.getLayer(LayerList.LYR_B);
+        lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_TRANSPARENT));
+
+        Layer lyrR = layerList.getLayer(LayerList.LYR_RESULT);
+        lyrR.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_RESULT_LINE_CLR,
+            GeometryDepiction.GEOM_RESULT_FILL_CLR));
+    }
+
+    public void pasteGeometry(int geomIndex)
   	throws Exception
-  {
+    {
   	Object obj = SwingUtil.getFromClipboard();
   	Geometry g = null;
   	if (obj instanceof String) {
@@ -547,6 +552,10 @@ public class TestBuilderModel
     }  
   
   }
+
+    public boolean isIsSecondPanelModel() {
+        return isSecondPanelModel;
+    }
 
 
 }

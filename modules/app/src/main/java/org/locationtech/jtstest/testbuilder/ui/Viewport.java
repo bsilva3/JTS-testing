@@ -426,4 +426,9 @@ public class Viewport implements PointTransformation
   public Point2D getOriginInModel(){
       return originInModel;
   }
+
+    public GeometryEditPanel getPanel() {
+        return panel;
+    }
+  
 }

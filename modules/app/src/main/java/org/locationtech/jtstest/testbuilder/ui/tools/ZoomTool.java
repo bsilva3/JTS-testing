@@ -47,7 +47,7 @@ public class ZoomTool extends BasicTool
     // determine if zoom in (left) or zoom out (right)
     double realZoomFactor = SwingUtilities.isRightMouseButton(mouseEvent)
          ? (1d / zoomFactor) : zoomFactor;
-    panel().zoom(toModel(mouseEvent.getPoint()), realZoomFactor);
+    getClickedPanel().zoom(toModel(mouseEvent.getPoint()), realZoomFactor);
   }
 
   public void mousePressed(MouseEvent e)
@@ -68,7 +68,7 @@ public class ZoomTool extends BasicTool
       return;
     }
     // no key -> do Zoom
-    panel().zoom(toModel(mouseStart), toModel(mouseEnd));
+    getClickedPanel().zoom(toModel(mouseStart), toModel(mouseEnd));
     /*
     AppImage.setImageHeight( (int) Math.round(AppImage.getImageHeight() * zoomFactor));
     AppImage.setImageWidth( (int) Math.round(AppImage.getImageWidth() * zoomFactor));
@@ -95,7 +95,7 @@ public class ZoomTool extends BasicTool
   }
 
   private Graphics getBandGraphics() {
-    Graphics g = panel().getGraphics();
+    Graphics g = getClickedPanel().getGraphics();
   	g.setColor(AppConstants.BAND_CLR);
   	g.setXORMode(Color.white);
     return g;
@@ -114,7 +114,7 @@ public class ZoomTool extends BasicTool
     double notches = e.getPreciseWheelRotation();
     double zoom = Math.abs(notches) * this.zoomFactor;
     if (notches > 0 && zoom > 0) zoom = 1.0 / zoom;
-    panel().zoom(toModel(e.getPoint()), zoom);
+    getClickedPanel().zoom(toModel(e.getPoint()), zoom);
   }
   
   private static final int MIN_MOVEMENT = 5;

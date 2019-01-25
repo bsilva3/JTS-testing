@@ -54,7 +54,7 @@ public class GeometryEditPanel extends JPanel {
 	
 
     private TestBuilderModel tbModel;
-
+    
     private DrawingGrid grid = new DrawingGrid();
     private GridRenderer gridRenderer;
 
@@ -82,18 +82,25 @@ public class GeometryEditPanel extends JPanel {
     BorderLayout borderLayout1 = new BorderLayout();
 
     GeometryPopupMenu menu = new GeometryPopupMenu();
-
+    
+    //flag to check if this is the first(right) or second (left) panel
+    private boolean isSecondPanel = false;
+    
+    public GeometryEditPanel(boolean iSecondPanel) {
+        this();
+        this.isSecondPanel = iSecondPanel;
+    }
 
     public GeometryEditPanel() {
-      gridRenderer = new GridRenderer(viewport, grid);
-      corrToGeomUtils = new CorrToGeometryUtils(AppFiles.getCorrFile());
-      try {
-        initUI();
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-      renderMgr = new RenderManager(this);
-      //opMonitor = new OperationMonitorManager(this, viewport);
+        gridRenderer = new GridRenderer(viewport, grid);
+        corrToGeomUtils = new CorrToGeometryUtils(AppFiles.getCorrFile());
+        try {
+          initUI();
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+        renderMgr = new RenderManager(this);
+        //opMonitor = new OperationMonitorManager(this, viewport);
     }
 
     void initUI() throws Exception {
@@ -152,17 +159,12 @@ public class GeometryEditPanel extends JPanel {
     public void updateView()
     {
   //    fireGeometryChanged(new GeometryEvent(this));
-      forceRepaint();
+        forceRepaint();
     }
 
     public void forceRepaint() {
           renderMgr.setDirty(true);
-          /*try{
-              AppImage.keepAspectRatioAndDrawImage(this.getGraphics(),(int) Math.round(viewport.getWidthInView()), (int) Math.round(viewport.getHeightInView()));
-
-          } catch(NullPointerException e){
-              System.err.println(e);
-          }*/
+          
           Component source = SwingUtilities.windowForComponent(this);
           if (source == null)
             source = this;
@@ -252,14 +254,9 @@ public class GeometryEditPanel extends JPanel {
    
     @Override
     public void paintComponent(Graphics g) {
-        //drawBackgroundImage(g);
-        Graphics2D g2 = (Graphics2D) g;
-        //just for test!
-        g2.setColor(Color.RED);
-        g2.setStroke(new BasicStroke(AppConstants.AXIS_WIDTH));
-
         renderMgr.render();
         renderMgr.copyImage(g);
+        //System.out.println("paint: "+isSecondPanel());
     }
     
     //draws the geometry defined by the coordinates in the "corr" file. These coordinates are transformed
@@ -271,18 +268,19 @@ public class GeometryEditPanel extends JPanel {
         drawImagePolygon();
         //delete any existing geometry
         List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(false));
-        JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
-        JTSTestBuilder.model().getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
-        JTSTestBuilder.model().getGeometryEditModel().clear();
-        JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
+        tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().clear();
+        tbModel.getGeometryEditModel().addComponent(coord);
         //this.getGeomModel().getGeometry().getBoundary().get
         this.updateGeom();        
         //set an index for any other geometry drawn by the user
-        JTSTestBuilder.model().getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
-
+        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+        
     }
     
     //draw a square whose size is the same as the background image in the panel
+    //it will add the image as background
     public void drawImagePolygon(){
         List<Coordinate> coord = new ArrayList<>();
         coord.add( new Coordinate(0, 0));
@@ -291,14 +289,14 @@ public class GeometryEditPanel extends JPanel {
         coord.add( new Coordinate(0, AppImage.getImageHeightInPanel()));
         
         // clear the current square and update (to be accordingly with the size of the panel)
-        JTSTestBuilder.model().getGeometryEditModel().clear(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().clear(BACKGROUND_IMAGE_GEOMETRY_INDEX);
 
-        JTSTestBuilder.model().getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
-        JTSTestBuilder.model().getGeometryEditModel().setEditGeomIndex(BACKGROUND_IMAGE_GEOMETRY_INDEX);
-        JTSTestBuilder.model().getGeometryEditModel().addComponent(coord);
+        tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+        tbModel.getGeometryEditModel().setEditGeomIndex(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().addComponent(coord);
         this.updateGeom();
         
-        JTSTestBuilder.model().getGeometryEditModel().getGeometry(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().getGeometry(BACKGROUND_IMAGE_GEOMETRY_INDEX);
         
     }
     
@@ -520,6 +518,7 @@ public class GeometryEditPanel extends JPanel {
     if (currentTool != null) currentTool.deactivate();
     currentTool = newTool;
     if (currentTool != null) currentTool.activate(this);
+    System.out.println(this.isSecondPanel+": "+currentTool);
   }
 
   public void zoomToGeometry(int i) {
@@ -556,22 +555,22 @@ public class GeometryEditPanel extends JPanel {
   
   //called only when zooming by clicking, dragging the mouse to select an area to zoom in and releasing
   //not called when clicking or moving mouse wheel to zoom..
-  public void zoom(Envelope zoomEnv) {
-    if (zoomEnv == null)
-      return;
+    public void zoom(Envelope zoomEnv) {
+        if (zoomEnv == null)
+          return;
 
-    if (zoomEnv.isNull()) {
-      viewport.zoomToInitialExtent();
-      return;
+        if (zoomEnv.isNull()) {
+          viewport.zoomToInitialExtent();
+          return;
+        }
+        double averageExtent = (zoomEnv.getWidth() + zoomEnv.getHeight()) / 2d;
+        // fix to allow zooming to points
+        if (averageExtent == 0.0)
+          averageExtent = 1.0;
+        double buffer = averageExtent * 0.1;
+        zoomEnv.expandBy(buffer);
+        viewport.zoom(zoomEnv);
     }
-    double averageExtent = (zoomEnv.getWidth() + zoomEnv.getHeight()) / 2d;
-    // fix to allow zooming to points
-    if (averageExtent == 0.0)
-      averageExtent = 1.0;
-    double buffer = averageExtent * 0.1;
-    zoomEnv.expandBy(buffer);
-    viewport.zoom(zoomEnv);
-  }
 
   /**
    * Zoom to a point, ensuring that the zoom point remains in the same screen location.
@@ -757,6 +756,11 @@ public class GeometryEditPanel extends JPanel {
   public GridRenderer getGridRenderer(){
       return gridRenderer;
   }
+
+    public boolean isSecondPanel() {
+        return isSecondPanel;
+    }
+  
 }
 
 

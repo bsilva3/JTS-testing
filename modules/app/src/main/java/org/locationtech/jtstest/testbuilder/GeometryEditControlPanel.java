@@ -78,13 +78,11 @@ public class GeometryEditControlPanel extends JPanel
     public void setModel(TestBuilderModel model) {
       this.model = model;
       geomModel = model.getGeometryEditModel();
-      geomModel
-      .addGeometryListener(new org.locationtech.jtstest.testbuilder.model.GeometryListener() {
-      public void geometryChanged(GeometryEvent e) {
-          editPanel_geometryChanged(e);
-      }
-  });
-
+      /*geomModel.addGeometryListener(new org.locationtech.jtstest.testbuilder.model.GeometryListener() {
+            public void geometryChanged(GeometryEvent e) {
+                editPanel_geometryChanged(e);
+            }
+        });*/
     }
 
     /**Component initialization*/

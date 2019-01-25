@@ -145,11 +145,11 @@ public class InspectorPanel extends TestBuilderPanel  {
     JTSTestBuilderController.inspectGeometryDialog();
   }
   private void btnZoom_actionPerformed(ActionEvent e) {
-    JTSTestBuilderFrame.getGeometryEditPanel().zoom(geomTreePanel.getSelectedGeometry());
+    JTSTestBuilderFrame.getGeometryEditPanelMouseIsIn().zoom(geomTreePanel.getSelectedGeometry());
   }
   private void btnZoomNext_actionPerformed(ActionEvent e, int direction) {
     geomTreePanel.moveToNextNode(direction);
-    JTSTestBuilderFrame.getGeometryEditPanel().zoom(geomTreePanel.getSelectedGeometry());
+    JTSTestBuilderFrame.getGeometryEditPanelMouseIsIn().zoom(geomTreePanel.getSelectedGeometry());
   }
   private void btnCopy_actionPerformed(ActionEvent e) {
     boolean isFormatted = 0 != (e.getModifiers() & ActionEvent.CTRL_MASK);

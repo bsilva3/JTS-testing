@@ -70,6 +70,30 @@ public class ResultController
     runFunctionWorker(functionDesc, e.isCreateNew());
     frame.showResultWKTTab();
   }
+  
+  public void spatialFunctionPanel2_functionExecuted(SpatialFunctionPanelEvent e) 
+  {
+    SpatialFunctionPanel spatialPanel = frame.getTestCasePanel2().getSpatialFunctionPanel();
+    GeometryFunctionInvocation functionDesc = new GeometryFunctionInvocation(
+        spatialPanel.getFunction(), 
+        model.getGeometryEditModel().getGeometry(0),
+        spatialPanel.getFunctionParams());
+    model.setOpName(functionDesc.getSignature());
+    frame.getResultWKTPanel().setOpName(model.getOpName());
+    // initialize UI view
+    clearResult();
+    // don't run anything if function is null
+  	if (! frame.getTestCasePanel2().getSpatialFunctionPanel().isFunctionSelected()) {
+  		return;
+  	}
+
+    frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    frame.getTestCasePanel2().getSpatialFunctionPanel().enableExecuteControl(false);
+    startFunctionMonitor();
+    runFunctionWorker(functionDesc, e.isCreateNew());
+    frame.showResultWKTTab();
+  }
+
 
   private void clearResult()
   {
@@ -211,6 +235,25 @@ public class ResultController
     frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     Object result = frame.getTestCasePanel().getScalarFunctionPanel().getResult();
     Stopwatch timer = frame.getTestCasePanel().getScalarFunctionPanel().getTimer();
+    frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    
+    frame.getResultValuePanel().setResult(opName, timer.getTimeString(), result);
+    frame.showResultValueTab();
+  }
+  
+  public void scalarFunctionPanel2_functionExecuted(SpatialFunctionPanelEvent e) 
+  {
+    /**
+     * For now scalar functions are executed on the calling thread.
+     * They are expected to be of short duration
+     */
+    String opName = frame.getTestCasePanel2().getScalarFunctionPanel().getOpName();
+    // initialize UI view
+    frame.getResultValuePanel().setResult(opName, "", null);
+    
+    frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    Object result = frame.getTestCasePanel2().getScalarFunctionPanel().getResult();
+    Stopwatch timer = frame.getTestCasePanel2().getScalarFunctionPanel().getTimer();
     frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     
     frame.getResultValuePanel().setResult(opName, timer.getTimeString(), result);

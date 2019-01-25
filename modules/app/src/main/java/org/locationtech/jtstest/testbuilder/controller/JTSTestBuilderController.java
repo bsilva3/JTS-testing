@@ -67,16 +67,29 @@ public class JTSTestBuilderController
     JTSTestBuilderController.geometryViewChanged();
   }
   
-  public static void geometryViewChanged()
-  {
-    getGeometryEditPanel().updateView();
-    //TODO: provide autoZoom checkbox on Edit tab to control autozooming (default = on)
-  }
+    public static void geometryViewChanged()
+    {     
+        getGeometryEditPanel().updateView();
 
-  public static GeometryEditPanel getGeometryEditPanel()
-  {
-    return JTSTestBuilderFrame.getGeometryEditPanel();
-  }
+      //TODO: provide autoZoom checkbox on Edit tab to control autozooming (default = on)
+    }
+  
+    public static void geometryViewChanged2()
+    {     
+        getGeometryEditPanel2().updateView();
+
+    }
+
+    public static GeometryEditPanel getGeometryEditPanel()
+    {
+        return JTSTestBuilderFrame.getGeometryEditPanel();
+    }
+
+    public static GeometryEditPanel getGeometryEditPanel2()
+    {
+        return JTSTestBuilderFrame.getGeometryEditPanel2();
+    }
+  
 
   public static Geometry getGeometryA() {
     return JTSTestBuilder.model().getGeometryEditModel().getGeometry(0);
@@ -167,6 +180,10 @@ public class JTSTestBuilderController
   private static GeometryEditPanel editPanel() {
     return JTSTestBuilderFrame.instance().getGeometryEditPanel();
   }
+  private static GeometryEditPanel editPanel2() {
+    return JTSTestBuilderFrame.instance().getGeometryEditPanel2();
+  }
+
 
   private static JTSTestBuilderToolBar toolbar() {
     return JTSTestBuilderFrame.instance().getToolbar();

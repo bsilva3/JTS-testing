@@ -49,12 +49,20 @@ public class JTSTestBuilder
 
   private static final String OPT_GEOMFUNC = "geomfunc";
   
+  private TestBuilderModel tbModel = new TestBuilderModel();
+  
+  private TestBuilderModel tbModel2 = new TestBuilderModel(true);
+  
+  boolean packFrame = false;
+  
   public static JTSTestBuilder instance()
   {
   	return app;
   }
   
   public static TestBuilderModel model() { return instance().tbModel; }
+  
+  public static TestBuilderModel model2() { return instance().tbModel2; }
 
   private static GeometryFunctionRegistry funcRegistry = GeometryFunctionRegistry.createTestBuilderRegistry();
   private static CommandLine commandLine = createCmdLine();
@@ -81,18 +89,14 @@ public class JTSTestBuilder
     return model().getGeometryFactory();
   }
   
-  private TestBuilderModel tbModel = new TestBuilderModel();
-  
-  boolean packFrame = false;
-
-  /**Construct the application*/
+   /**Construct the application*/
   public JTSTestBuilder() {
   }
   
   private void initFrame()
   {
     JTSTestBuilderFrame frame = new JTSTestBuilderFrame();
-    frame.setModel(model());
+    frame.setModel(model(), model2());
     
     //Validate frames that have preset sizes
     //Pack frames that have useful preferred size info, e.g. from their layout
@@ -122,7 +126,7 @@ public class JTSTestBuilder
   {
     try {
         //file chooser window to select an image
-        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        /*JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose an image: ");
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jfc.setMultiSelectionEnabled(false);
@@ -159,10 +163,10 @@ public class JTSTestBuilder
         
         //set this file as a background image to be used in the edit panel
         AppImage.setBackgroundImageFile(selectedFile);
-        AppFiles.setCorrFile(selectedCorrFile);
+        AppFiles.setCorrFile(selectedCorrFile);*/
         
-        //AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
-        //AppFiles.setCorrFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\corr\\ice1_0_1.corr"));
+        AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
+        AppFiles.setCorrFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\corr\\ice1_0_1.corr"));
     	
         readArgs(args);
     	setLookAndFeel();

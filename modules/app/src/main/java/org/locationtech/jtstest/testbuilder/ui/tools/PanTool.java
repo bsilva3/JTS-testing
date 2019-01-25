@@ -54,13 +54,13 @@ public class PanTool extends BasicTool {
     if (source == null)
       return;
     Point2D destination = toModel(e.getPoint());
-    pan(panel(), source, destination);
+    pan(getClickedPanel(), source, destination);
   }
 
   public static void pan(GeometryEditPanel panel, Point2D source, Point2D destination ) {
     double xDisplacement = destination.getX() - source.getX();
     double yDisplacement = destination.getY() - source.getY();
-    panel.zoomPan(xDisplacement, yDisplacement);
+    getClickedPanel().zoomPan(xDisplacement, yDisplacement);
   }
 
 }

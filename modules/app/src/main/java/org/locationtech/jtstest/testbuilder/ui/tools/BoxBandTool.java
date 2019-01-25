@@ -54,12 +54,12 @@ public abstract class BoxBandTool extends IndicatorTool
   
   public void mouseReleased(MouseEvent e)
   {
-    clearIndicator();
+        clearIndicator();
   	// don't process this event if the mouse was clicked or dragged a very short distance
   	if (! isSignificantMouseMove())
   		return;
   	
-    gestureFinished();
+        gestureFinished();
   }
   
   public void mouseDragged(MouseEvent e)
