@@ -517,7 +517,6 @@ public class GeometryEditPanel extends JPanel {
     if (currentTool != null) currentTool.deactivate();
     currentTool = newTool;
     if (currentTool != null) currentTool.activate(this, this.isSecondPanel);
-    System.out.println(this.isSecondPanel+": "+currentTool);
   }
 
   public void zoomToGeometry(int i) {

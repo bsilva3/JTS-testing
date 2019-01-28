@@ -82,8 +82,8 @@ se encontra para fazer a ação respetiva.
 
 ---> todo:
  - 2 viewports lado a lado com mesma imagem, mas 1º terá 1ª e 2ª coluna no ficheiro de corr e 2º terá 3ª e 4ª
-	-existem tools que não estão a ser bem trocadas, sendo que ficam repetidas ou continuam a ser incorretamente
-	selecionadas, entre outras inconsitencias
+	-problemas: 	geometrias editadas/adicionadas desaparecem com resize de janela;
+			streampolygon e polygon desaparecem apos uma ação qualquer
 	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
 
 

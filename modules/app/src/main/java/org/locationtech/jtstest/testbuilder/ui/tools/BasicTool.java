@@ -114,19 +114,19 @@ public abstract class BasicTool implements Tool
         this.panel2.removeMouseWheelListener(this);
     }
 
-  protected GeometryEditPanel panel()
-  {
-    // this should probably be passed in during setup
-    //return JTSTestBuilderFrame.instance().getTestCasePanel().getGeometryEditPanel();
-    return panel;
-  }
-  
-  protected GeometryEditPanel panel2()
-  {
-    // this should probably be passed in during setup
-    //return JTSTestBuilderFrame.instance().getTestCasePanel().getGeometryEditPanel();
-    return panel2;
-  }
+    protected GeometryEditPanel panel()
+    {
+      // this should probably be passed in during setup
+      //return JTSTestBuilderFrame.instance().getTestCasePanel().getGeometryEditPanel();
+      return panel;
+    }
+
+    protected GeometryEditPanel panel2()
+    {
+      // this should probably be passed in during setup
+      //return JTSTestBuilderFrame.instance().getTestCasePanel().getGeometryEditPanel();
+      return panel2;
+    }
   
     protected GeometryEditModel geomModel()
     {
@@ -147,7 +147,7 @@ public abstract class BasicTool implements Tool
 
     Point2D toView(Coordinate modePt)
     {
-      return getViewport().toView(modePt);
+      return getClickedPanel().getViewport().toView(modePt);
     }
 
     double toView(double distance)
@@ -182,19 +182,31 @@ public abstract class BasicTool implements Tool
 
     protected Coordinate toModelSnappedToViewGrid(Point2D p)
     {
-          // snap to view grid
-          Coordinate pModel = getClickedPanel().getViewport().toModelCoordinate(p);
-          gridPM.makePrecise(pModel);
-          return pModel;
+        GeometryEditPanel editPanel = getClickedPanel();
+        Coordinate pModel = editPanel.getViewport().toModelCoordinate(p);
+        if (editPanel.equals(this.panel)){
+            gridPM.makePrecise(pModel);
+        }
+        else if(editPanel.equals(this.panel2)){
+            gridPM2.makePrecise(pModel);
+        }
+        // snap to view grid
+        return pModel;
     }
 
     protected Coordinate toModelSnappedIfCloseToViewGrid(Point2D p)
     {
+        GeometryEditPanel editPanel = getClickedPanel();
         // snap to view grid if close to view grid point
-        Coordinate pModel = getClickedPanel().getViewport().toModelCoordinate(p);
+        Coordinate pModel = editPanel.getViewport().toModelCoordinate(p);
         Coordinate pSnappedModel = new Coordinate(pModel);
-        gridPM.makePrecise(pSnappedModel);
-
+        if (editPanel.equals(this.panel)){
+            gridPM.makePrecise(pSnappedModel);
+        }
+        else if(editPanel.equals(this.panel2)){
+            gridPM2.makePrecise(pSnappedModel);
+        }
+        
         double tol = getModelSnapTolerance();
         if (pModel.distance(pSnappedModel) <= tol)
                 return pSnappedModel;

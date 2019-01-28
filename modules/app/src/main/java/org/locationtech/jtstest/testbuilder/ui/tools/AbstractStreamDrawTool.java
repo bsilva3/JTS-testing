@@ -16,8 +16,8 @@ import java.awt.event.MouseEvent;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jtstest.testbuilder.AppCursors;
+import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.model.GeometryType;
-
 
 /**
  * @version 1.7
@@ -53,25 +53,26 @@ public abstract class AbstractStreamDrawTool extends LineBandTool {
   }
 
 
-	public void mouseClicked(MouseEvent e) {
-		setBandType();
-		super.mouseClicked(e);
-	}
+    public void mouseClicked(MouseEvent e) {
+            setBandType();
+            super.mouseClicked(e);
+    }
 
-	protected void bandFinished() throws Exception {
-		setType();
-		geomModel().addComponent(getCoordinates());
-		panel().updateGeom();
-	}
+    protected void bandFinished() throws Exception {
+            setType();
+            geomModel().addComponent(getCoordinates());
+            getClickedPanel().updateGeom();
+    }
 
-	private void setType() {
-		if (panel().getModel() == null)
-			return;
-		panel().getGeomModel().setGeometryType(getGeometryType());
-	}
+    private void setType() {
+        GeometryEditPanel panel  = getClickedPanel();
+        if (panel.getModel() == null)
+            return;
+        panel.getGeomModel().setGeometryType(getGeometryType());
+    }
 
-	private void setBandType() {
-		int geomType = getGeometryType();
-		setCloseRing(geomType == GeometryType.POLYGON);
-	}
+    private void setBandType() {
+        int geomType = getGeometryType();
+        setCloseRing(geomType == GeometryType.POLYGON);
+    }
 }

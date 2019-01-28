@@ -25,26 +25,26 @@ import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
  * @version 1.7
  */
 public class PanTool extends BasicTool {
-  private static PanTool singleton = null;
+    private static PanTool singleton = null;
 
-  public static PanTool getInstance() {
-    if (singleton == null)
-      singleton = new PanTool();
-    return singleton;
-  }
+    public static PanTool getInstance() {
+      if (singleton == null)
+        singleton = new PanTool();
+      return singleton;
+    }
 
-  private Point2D source;
+    private Point2D source;
 
-  private PanTool() {
-  }
+    private PanTool() {
+    }
 
-  public Cursor getCursor() {
-    return AppCursors.HAND;
-  }
+    public Cursor getCursor() {
+      return AppCursors.HAND;
+    }
 
-  public void activate() {
-    source = null;
-  }
+    public void activate() {
+      source = null;
+    }
 
     public void mousePressed(MouseEvent e) {
         source = toModel(e.getPoint());
