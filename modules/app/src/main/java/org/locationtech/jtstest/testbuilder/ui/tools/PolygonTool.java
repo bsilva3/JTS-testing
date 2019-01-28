@@ -11,6 +11,7 @@
  */
 package org.locationtech.jtstest.testbuilder.ui.tools;
 
+import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.model.*;
 
 

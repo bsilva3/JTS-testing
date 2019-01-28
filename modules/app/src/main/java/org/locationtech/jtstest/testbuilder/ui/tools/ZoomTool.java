@@ -95,7 +95,7 @@ public class ZoomTool extends BasicTool
   }
 
   private Graphics getBandGraphics() {
-    Graphics g = getClickedPanel().getGraphics();
+        Graphics g = getClickedPanel().getGraphics();
   	g.setColor(AppConstants.BAND_CLR);
   	g.setXORMode(Color.white);
     return g;
@@ -127,17 +127,16 @@ public class ZoomTool extends BasicTool
   	return true;
   }
   
-  public static void drawRect(Graphics g, Point p0, Point p1)
-  {
-  	Point base = new Point(Math.min(p0.x, p1.x),
-  			Math.min(p0.y, p1.y));
-  	int width = Math.abs(p1.x - p0.x);
-  	int height = Math.abs(p1.y - p0.y);
-  	g.drawRect(base.x, base.y, width, height);
-  }
-  public static void drawLine(Graphics g, Point p0, Point p1)
-  {
-    g.drawLine(p0.x, p0.y, p1.x, p1.y);
-  }
+    public static void drawRect(Graphics g, Point p0, Point p1)
+    {
+        Point base = new Point(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y));
+        int width = Math.abs(p1.x - p0.x);
+        int height = Math.abs(p1.y - p0.y);
+        g.drawRect(base.x, base.y, width, height);
+    }
+    public static void drawLine(Graphics g, Point p0, Point p1)
+    {
+        g.drawLine(p0.x, p0.y, p1.x, p1.y);
+    }
 }
 

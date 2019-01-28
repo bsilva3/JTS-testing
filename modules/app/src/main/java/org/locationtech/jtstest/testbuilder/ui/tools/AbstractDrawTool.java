@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 import org.locationtech.jtstest.testbuilder.AppCursors;
+import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.model.*;
 
 //import com.vividsolutions.jtstest.testbuilder.IconLoader;
@@ -36,15 +37,16 @@ public abstract class AbstractDrawTool extends LineBandTool {
 	}
 
 	protected void bandFinished() throws Exception {
-		setType();
-		geomModel().addComponent(getCoordinates());
-		panel().updateGeom();
+            setType();
+            geomModel().addComponent(getCoordinates());
+            getClickedPanel().updateGeom();
 	}
 
 	private void setType() {
-		if (panel().getModel() == null)
-			return;
-		panel().getGeomModel().setGeometryType(getGeometryType());
+            GeometryEditPanel panel = getClickedPanel();
+            if (panel.getModel() == null)
+		return;
+            panel.getGeomModel().setGeometryType(getGeometryType());
 	}
 
 	private void setBandType() {

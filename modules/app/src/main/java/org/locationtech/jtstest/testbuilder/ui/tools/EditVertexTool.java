@@ -74,7 +74,7 @@ extends IndicatorTool
     // finish the move of the vertex
     if (selectedVertexLocation != null) {
       Coordinate newLoc = toModelSnapped(e.getPoint());
-      getClickedPanel().getGeomModel().moveVertex(selectedVertexLocation, newLoc);
+      geomModel().moveVertex(selectedVertexLocation, newLoc);
     }
   }
 
@@ -87,7 +87,7 @@ extends IndicatorTool
   public void mouseClicked(MouseEvent e) {
     if (! SwingUtilities.isRightMouseButton(e))
       return;
-    GeometryEditModel geoModel = getClickedPanel().getGeomModel();
+    GeometryEditModel geoModel = geomModel();
     Coordinate mousePtModel = toModelCoordinate(e.getPoint());
     double tolModel = getModelSnapTolerance();
 

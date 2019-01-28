@@ -46,16 +46,17 @@ public class PanTool extends BasicTool {
     source = null;
   }
 
-  public void mousePressed(MouseEvent e) {
-    source = toModel(e.getPoint());
-  }
+    public void mousePressed(MouseEvent e) {
+        source = toModel(e.getPoint());
+    }
   
-  public void mouseReleased(MouseEvent e) {
-    if (source == null)
-      return;
-    Point2D destination = toModel(e.getPoint());
-    pan(getClickedPanel(), source, destination);
-  }
+    public void mouseReleased(MouseEvent e) {
+        
+        if (source == null)
+            return;
+        Point2D destination = toModel(e.getPoint());
+        pan(getClickedPanel(), source, destination);
+    }
 
   public static void pan(GeometryEditPanel panel, Point2D source, Point2D destination ) {
     double xDisplacement = destination.getX() - source.getX();

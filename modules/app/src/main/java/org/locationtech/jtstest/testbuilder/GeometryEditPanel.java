@@ -256,7 +256,6 @@ public class GeometryEditPanel extends JPanel {
     public void paintComponent(Graphics g) {
         renderMgr.render();
         renderMgr.copyImage(g);
-        //System.out.println("paint: "+isSecondPanel());
     }
     
     //draws the geometry defined by the coordinates in the "corr" file. These coordinates are transformed
@@ -267,7 +266,7 @@ public class GeometryEditPanel extends JPanel {
         
         drawImagePolygon();
         //delete any existing geometry
-        List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(false));
+        List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(this.isSecondPanel));
         tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
         tbModel.getGeometryEditModel().clear();
@@ -517,7 +516,7 @@ public class GeometryEditPanel extends JPanel {
   public void setCurrentTool(Tool newTool) {
     if (currentTool != null) currentTool.deactivate();
     currentTool = newTool;
-    if (currentTool != null) currentTool.activate(this);
+    if (currentTool != null) currentTool.activate(this, this.isSecondPanel);
     System.out.println(this.isSecondPanel+": "+currentTool);
   }
 

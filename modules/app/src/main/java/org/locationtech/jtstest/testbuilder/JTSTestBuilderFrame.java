@@ -108,6 +108,7 @@ public class JTSTestBuilderFrame extends JFrame
   JPanel jPanel1 = new JPanel();
   BorderLayout borderLayout2 = new BorderLayout();
   TestCasePanel testCasePanel = new TestCasePanel();
+  //this will be the 2nd panel, on the right
   TestCasePanel testCasePanel2 = new TestCasePanel(true);
   JPanel jPanel2 = new JPanel();
   JTabbedPane inputTabbedPane = new JTabbedPane();
@@ -501,6 +502,7 @@ public class JTSTestBuilderFrame extends JFrame
 
   void btnDeleteCase_actionPerformed(ActionEvent e) {
     tbModel.cases().deleteCase();
+    tbModel2.cases().deleteCase();
     updateTestCaseView();
     testListPanel.populateList();
   }
@@ -689,7 +691,6 @@ public class JTSTestBuilderFrame extends JFrame
     }
 
     void drawRectangleButton_actionPerformed(ActionEvent e) {
-
       testCasePanel2.getGeometryEditPanel().setCurrentTool(RectangleTool.getInstance());
       testCasePanel.getGeometryEditPanel().setCurrentTool(RectangleTool.getInstance());
     }
@@ -729,10 +730,10 @@ public class JTSTestBuilderFrame extends JFrame
         testCasePanel.getGeometryEditPanel().setCurrentTool(zoomTool);
     }
 
-  void oneToOneButton_actionPerformed(ActionEvent e) {
-    testCasePanel.getGeometryEditPanel().getViewport().zoomToInitialExtent();
-    testCasePanel2.getGeometryEditPanel().getViewport().zoomToInitialExtent();
-  }
+    void oneToOneButton_actionPerformed(ActionEvent e) {
+        testCasePanel.getGeometryEditPanel().getViewport().zoomToInitialExtent();
+        testCasePanel2.getGeometryEditPanel().getViewport().zoomToInitialExtent();
+    }
 
   void zoomToFullExtentButton_actionPerformed(ActionEvent e) {
     testCasePanel.getGeometryEditPanel().zoomToFullExtent();
@@ -969,12 +970,10 @@ public class JTSTestBuilderFrame extends JFrame
     updateStatsPanelIfVisible();
   }
 
-  public void displayInfo(Coordinate modelPt)
-  {
-    displayInfo(
-        testCasePanel.getGeometryEditPanel().getInfo(modelPt)
-        );
-  }
+    public void displayInfo(Coordinate modelPt)
+    {
+        displayInfo(testCasePanel.getGeometryEditPanel().getInfo(modelPt));
+    }
   
   public void displayInfo(String s)
   {

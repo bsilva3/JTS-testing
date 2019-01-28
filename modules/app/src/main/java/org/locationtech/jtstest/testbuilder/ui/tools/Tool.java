@@ -28,7 +28,7 @@ public interface Tool extends MouseListener, MouseMotionListener, MouseWheelList
 
     Cursor getCursor();
 
-    void activate(GeometryEditPanel panel);
+    void activate(GeometryEditPanel panel, boolean isSecondPanel);
 
     void deactivate();
 }

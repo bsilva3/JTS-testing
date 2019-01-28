@@ -37,8 +37,10 @@ public abstract class BasicTool implements Tool
   protected Cursor cursor = Cursor.getDefaultCursor();
 
   private PrecisionModel gridPM;
+  private PrecisionModel gridPM2;
 
   private GeometryEditPanel panel;
+  private GeometryEditPanel panel2;
   
   public BasicTool() {
     super();
@@ -50,7 +52,7 @@ public abstract class BasicTool implements Tool
   }
 
   protected Graphics2D getGraphics2D() {
-    Graphics2D g = (Graphics2D) panel().getGraphics();
+    Graphics2D g = (Graphics2D) getClickedPanel().getGraphics();
     if (g != null) {
       // guard against g == null
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -81,14 +83,24 @@ public abstract class BasicTool implements Tool
    * 
    * If subclasses override this method they must call <tt>super.activate()</tt>.
    */
-    public void activate(GeometryEditPanel panel) 
+    public void activate(GeometryEditPanel panel, boolean isSecondPanel) 
     {
-        this.panel = panel;
-        gridPM = getViewport().getGridPrecisionModel();
-        this.panel.setCursor(getCursor());
-        this.panel.addMouseListener(this);
-        this.panel.addMouseMotionListener(this);
-        this.panel.addMouseWheelListener(this);
+        if (isSecondPanel){
+            this.panel2 = panel;
+            gridPM2 = getViewport2().getGridPrecisionModel();
+            this.panel2.setCursor(getCursor());
+            this.panel2.addMouseListener(this);
+            this.panel2.addMouseMotionListener(this);
+            this.panel2.addMouseWheelListener(this);
+        }
+        else{
+            this.panel = panel;
+            gridPM = getViewport().getGridPrecisionModel();
+            this.panel.setCursor(getCursor());
+            this.panel.addMouseListener(this);
+            this.panel.addMouseMotionListener(this);
+            this.panel.addMouseWheelListener(this);
+        }
     }
  
     public void deactivate() 
@@ -96,6 +108,10 @@ public abstract class BasicTool implements Tool
         this.panel.removeMouseListener(this);
         this.panel.removeMouseMotionListener(this);
         this.panel.removeMouseWheelListener(this);
+        
+        this.panel2.removeMouseListener(this);
+        this.panel2.removeMouseMotionListener(this);
+        this.panel2.removeMouseWheelListener(this);
     }
 
   protected GeometryEditPanel panel()
@@ -105,76 +121,89 @@ public abstract class BasicTool implements Tool
     return panel;
   }
   
-  protected GeometryEditModel geomModel()
+  protected GeometryEditPanel panel2()
   {
     // this should probably be passed in during setup
-    return JTSTestBuilder.model().getGeometryEditModel();
+    //return JTSTestBuilderFrame.instance().getTestCasePanel().getGeometryEditPanel();
+    return panel2;
   }
   
-  private Viewport getViewport()
-  {
-    return panel().getViewport();
-  }
+    protected GeometryEditModel geomModel()
+    {
+        return getClickedPanel().getGeomModel();
+    }
   
-  Point2D toView(Coordinate modePt)
-  {
-    return getViewport().toView(modePt);
-  }
-  
-  double toView(double distance)
-  {
-    return getViewport().toView(distance);
-  }
-  
-  Point2D toModel(java.awt.Point viewPt)
-  {
-    return getViewport().toModel(viewPt);
-  }
-  
-  Coordinate toModelCoordinate(java.awt.Point viewPt)
-  {
-    return getViewport().toModelCoordinate(viewPt);
-  }
-  
-  double toModel(double viewDist)
-  {
-    return viewDist / getViewport().getScale();
-  }
-  
-  double getModelSnapTolerance()
-  {
-    return toModel(AppConstants.TOLERANCE_PIXELS);
-  }
-  
-  protected Coordinate toModelSnapped(Point2D p)
-  {
-  	return toModelSnappedIfCloseToViewGrid(p);  
-  }
-  
-  protected Coordinate toModelSnappedToViewGrid(Point2D p)
-  {
-  	// snap to view grid
-  	Coordinate pModel = getViewport().toModelCoordinate(p);
-  	gridPM.makePrecise(pModel);
-  	return pModel;
-  }
-  
-  protected Coordinate toModelSnappedIfCloseToViewGrid(Point2D p)
-  {
-  	// snap to view grid if close to view grid point
-  	Coordinate pModel = getViewport().toModelCoordinate(p);
-  	Coordinate pSnappedModel = new Coordinate(pModel);
-  	gridPM.makePrecise(pSnappedModel);
-  	
-  	double tol = getModelSnapTolerance();
-  	if (pModel.distance(pSnappedModel) <= tol)
-  		return pSnappedModel;
-  	return pModel;
-  }
+    private Viewport getViewport()
+    {
+
+      return panel().getViewport();
+    }
+
+    private Viewport getViewport2()
+    {
+
+      return panel2().getViewport();
+    }
+
+    Point2D toView(Coordinate modePt)
+    {
+      return getViewport().toView(modePt);
+    }
+
+    double toView(double distance)
+    {
+      return getClickedPanel().getViewport().toView(distance);
+    }
+
+    Point2D toModel(java.awt.Point viewPt)
+    {
+      return getClickedPanel().getViewport().toModel(viewPt);
+    }
+
+    Coordinate toModelCoordinate(java.awt.Point viewPt)
+    {
+      return getClickedPanel().getViewport().toModelCoordinate(viewPt);
+    }
+
+    double toModel(double viewDist)
+    {
+      return viewDist / getClickedPanel().getViewport().getScale();
+    }
+
+    double getModelSnapTolerance()
+    {
+      return toModel(AppConstants.TOLERANCE_PIXELS);
+    }
+
+    protected Coordinate toModelSnapped(Point2D p)
+    {
+          return toModelSnappedIfCloseToViewGrid(p);  
+    }
+
+    protected Coordinate toModelSnappedToViewGrid(Point2D p)
+    {
+          // snap to view grid
+          Coordinate pModel = getClickedPanel().getViewport().toModelCoordinate(p);
+          gridPM.makePrecise(pModel);
+          return pModel;
+    }
+
+    protected Coordinate toModelSnappedIfCloseToViewGrid(Point2D p)
+    {
+        // snap to view grid if close to view grid point
+        Coordinate pModel = getClickedPanel().getViewport().toModelCoordinate(p);
+        Coordinate pSnappedModel = new Coordinate(pModel);
+        gridPM.makePrecise(pSnappedModel);
+
+        double tol = getModelSnapTolerance();
+        if (pModel.distance(pSnappedModel) <= tol)
+                return pSnappedModel;
+        return pModel;
+    }
   
     protected double gridSize()
     {
-      return getViewport().getGridSizeModel();
+      return getClickedPanel().getViewport().getGridSizeModel();
     }
   
   /*
