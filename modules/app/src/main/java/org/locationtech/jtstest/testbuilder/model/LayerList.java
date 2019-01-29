@@ -27,15 +27,17 @@ public class LayerList
 {
   public static final int LYR_A = 1;
   public static final int LYR_B = 0;
-  public static final int LYR_RESULT = 2;
+  public static final int LYR_C = 2;
+  public static final int LYR_RESULT = 3;
   
-  private Layer[] layer = new Layer[3];
+  private Layer[] layer = new Layer[4];
   
   public LayerList() 
   {
     layer[0] = new Layer("A");
     layer[1] = new Layer("B");
-    layer[2] = new Layer("Result");
+    layer[2] = new Layer("C");
+    layer[3] = new Layer("Result");
   }
 
   public int size() { return layer.length; }
@@ -71,7 +73,7 @@ public class LayerList
   public Geometry[] getComponents(Geometry aoi)
   {
     Geometry comp[] = new Geometry[2];
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < comp.length; i++) {
       Layer lyr = getLayer(i);
       Geometry geom = lyr.getGeometry();
       if (geom == null) continue;

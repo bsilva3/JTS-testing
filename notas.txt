@@ -85,6 +85,11 @@ se encontra para fazer a ação respetiva.
 	-problemas: 	geometrias editadas/adicionadas desaparecem com resize de janela;
 			streampolygon e polygon desaparecem apos uma ação qualquer
 	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
+ - mostrar pontos correspondentes(ao selecionar 1 ponto num dos paineis, fazer higlight do ponto correspondente no outro)
+ - mostrar número do ponto no higlight ->
+ - eventual refactoring -> acaba aqui v0.2
+
+ - area e perimetro ao selecionar 
 
 
 (pode ser util)

@@ -29,6 +29,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -135,8 +136,6 @@ public class JTSTestBuilderFrame extends JFrame
   
   TestBuilderModel tbModel;
   TestBuilderModel tbModel2;
-  
-  private static TestCasePanel focusedPanel;
   
   private TestCaseTextDialog testCaseTextDlg = new TestCaseTextDialog(this,
       "", true);
@@ -285,11 +284,9 @@ public class JTSTestBuilderFrame extends JFrame
     
     public static GeometryEditPanel getGeometryEditPanelMouseIsIn(){
         if (isMouseWithinComponent(instance().getTestCasePanel2())){
-            focusedPanel = instance().getTestCasePanel2();
             return instance().getTestCasePanel2().getGeometryEditPanel();
         }
         else{
-            focusedPanel = instance().getTestCasePanel();
             return instance().getTestCasePanel().getGeometryEditPanel();
         }
     }
@@ -341,8 +338,6 @@ public class JTSTestBuilderFrame extends JFrame
     layerListPanel.populateList();
     updateTestCaseView();
     updatePrecisionModelDescription();
-    
-    focusedPanel = testCasePanel;
   }
   
   public static void reportException(Exception e) {
@@ -351,6 +346,7 @@ public class JTSTestBuilderFrame extends JFrame
 
   public void setCurrentTestCase(TestCaseEdit testCase) {
     tbModel.cases().setCurrent(testCase);
+    tbModel2.cases().setCurrent(testCase);
     updateTestCaseView();
     JTSTestBuilderController.zoomToInput();
   }
@@ -450,24 +446,27 @@ public class JTSTestBuilderFrame extends JFrame
 
   void createNewCase() {
     tbModel.cases().createNew();
+    tbModel2.cases().createNew();
     showGeomsTab();
     updateTestCases();
   }
 
   void moveToPrevCase(boolean isZoom) {
-    tbModel.cases().prevCase();
+    tbModel2.cases().prevCase();
     updateTestCaseView();
     if (isZoom) JTSTestBuilderController.zoomToInput();
   }
 
   void moveToNextCase(boolean isZoom) {
     tbModel.cases().nextCase();
+    tbModel2.cases().nextCase();
     updateTestCaseView();
     if (isZoom) JTSTestBuilderController.zoomToInput();
   }
 
   void copyCase() {
     tbModel.cases().copyCase();
+    tbModel2.cases().copyCase();
     updateTestCases();
   }
   TestCaseEdit currentCase() {
@@ -917,8 +916,10 @@ public class JTSTestBuilderFrame extends JFrame
     
     jSplitPane1.setDividerLocation(500);
     this.setJMenuBar(tbMenuBar.getMenuBar());
-    //contentPane.add(tbToolBar.getToolBar(), BorderLayout.NORTH);    
-  }
+    //contentPane.add(tbToolBar.getToolBar(), BorderLayout.NORTH);   
+    
+    
+    }
   
   
 
@@ -948,9 +949,9 @@ public class JTSTestBuilderFrame extends JFrame
   }
 
   private void updateWktPanel() {
-    Geometry g0 = tbModel.getGeometryEditModel().getGeometry(0);
+    Geometry g0 = tbModel.getGeometryEditModel().getGeometry(1);
     wktPanel.setText(g0, 0);
-    Geometry g1 = tbModel.getGeometryEditModel().getGeometry(1);
+    Geometry g1 = tbModel.getGeometryEditModel().getGeometry(2);
     wktPanel.setText(g1, 1);
   }
 
@@ -1035,9 +1036,6 @@ public class JTSTestBuilderFrame extends JFrame
     return null;
   }
 
-    public static TestCasePanel getFocusedPanel() {
-        return focusedPanel;
-    }
 
 }
 

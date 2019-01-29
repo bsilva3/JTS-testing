@@ -181,6 +181,7 @@ public class GeometryEditPanel extends JPanel {
       if (tbModel == null) return;
       getLayerList().getLayer(LayerList.LYR_A).setEnabled(isEnabled);
       getLayerList().getLayer(LayerList.LYR_B).setEnabled(isEnabled);
+      getLayerList().getLayer(LayerList.LYR_C).setEnabled(isEnabled);
       forceRepaint();
     }
 
@@ -265,7 +266,8 @@ public class GeometryEditPanel extends JPanel {
         AppImage.resizeImageDimension(this.getSize());
         
         drawImagePolygon();
-        //delete any existing geometry
+        //delete any existing geometry previously read from a corr file
+        //eliminate one set of coordinates
         List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(this.isSecondPanel));
         tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
@@ -274,7 +276,12 @@ public class GeometryEditPanel extends JPanel {
         //this.getGeomModel().getGeometry().getBoundary().get
         this.updateGeom();        
         //set an index for any other geometry drawn by the user
-        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().setEditGeomIndex(OTHER_GEOMETRY_INDEX);
+        //store this coordinates
+        if (this.isSecondPanel)
+            AppCorrGeometries.getInstance().setCorrGeometry2(coord);
+        else
+            AppCorrGeometries.getInstance().setCorrGeometry1(coord);
         
     }
     
@@ -295,7 +302,7 @@ public class GeometryEditPanel extends JPanel {
         tbModel.getGeometryEditModel().addComponent(coord);
         this.updateGeom();
         
-        tbModel.getGeometryEditModel().getGeometry(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().setEditGeomIndex(OTHER_GEOMETRY_INDEX);
         
     }
     
