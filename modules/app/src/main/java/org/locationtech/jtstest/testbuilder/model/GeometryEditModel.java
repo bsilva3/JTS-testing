@@ -41,6 +41,8 @@ public class GeometryEditModel
   private TestCaseEdit testCase;
   
   private transient Vector geometryListeners;
+  
+  private Geometry corrGeometry;
 
   public GeometryEditModel()
   {
@@ -195,6 +197,8 @@ public class GeometryEditModel
     GeometryCombiner creator = new GeometryCombiner(JTSTestBuilder.getGeometryFactory());
     
     Geometry newGeom = null;
+    /*try{ System.out.println("inter: "+getGeometry().intersection(this.corrGeometry).equals(this.corrGeometry));
+        System.out.println("inter: "+getGeometry().intersection(this.corrGeometry));} catch(Exception e){}*/
     switch(getGeometryType()) {
     case GeometryType.POLYGON:
       newGeom = creator.addPolygonRing(getGeometry(), getRing(coordList));
@@ -314,5 +318,13 @@ public class GeometryEditModel
     }
   }
 
+    public Geometry getCorrGeometry() {
+        return corrGeometry;
+    }
+
+    public void setCorrGeometry(Geometry corrGeometry) {
+        this.corrGeometry = corrGeometry;
+    }
+  
 
 }

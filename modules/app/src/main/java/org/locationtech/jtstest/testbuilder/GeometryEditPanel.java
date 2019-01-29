@@ -25,6 +25,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -35,6 +36,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jtstest.testbuilder.model.*;
 import org.locationtech.jtstest.testbuilder.ui.*;
 import org.locationtech.jtstest.testbuilder.ui.render.*;
@@ -85,6 +87,8 @@ public class GeometryEditPanel extends JPanel {
     
     //flag to check if this is the first(right) or second (left) panel
     private boolean isSecondPanel = false;
+    
+    private boolean corrGeometryAndImageLoaded = false;
     
     public GeometryEditPanel(boolean iSecondPanel) {
         this();
@@ -261,27 +265,22 @@ public class GeometryEditPanel extends JPanel {
     //draws the geometry defined by the coordinates in the "corr" file. These coordinates are transformed
     //to match the display
     public void drawGeometry(){
+        
         //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
         AppImage.resizeImageDimension(this.getSize());
-        
         drawImagePolygon();
-        //delete any existing geometry previously read from a corr file
-        //eliminate one set of coordinates
         List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(this.isSecondPanel));
+        
         tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
-        tbModel.getGeometryEditModel().clear();
+        //tbModel.getGeometryEditModel().clear();
         tbModel.getGeometryEditModel().addComponent(coord);
-        //this.getGeomModel().getGeometry().getBoundary().get
         this.updateGeom();        
-        //set an index for any other geometry drawn by the user
-        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
         //store this coordinates
         if (this.isSecondPanel)
             AppCorrGeometries.getInstance().setCorrGeometry2(coord);
         else
             AppCorrGeometries.getInstance().setCorrGeometry1(coord);
-        
     }
     
     //draw a square whose size is the same as the background image in the panel
@@ -512,7 +511,10 @@ public class GeometryEditPanel extends JPanel {
   	renderMgr.componentResized();
         viewport.update(this.getSize());
         //redraw the geometry
-        drawGeometry();
+        if (!corrGeometryAndImageLoaded){
+            drawGeometry();
+            corrGeometryAndImageLoaded = true;
+        }
   }
 
   /**

@@ -78,6 +78,9 @@ que a geometria fica em cima da imagem
 informação das geometrias que são desenhadas no ecrã.
 -Na package ui.tools, nas classes Rectangle tool e zoom tool e EditVertexTool, é considerado apenas o painel em que o rato
 se encontra para fazer a ação respetiva.
+- Para resolver certos problemas relacionado com desfasamento e remoçao de outras geometrias desenhadas em cima da imagem
+ao mudar tamanho da janela, o método que le as coordenadas do ficheiro (drawGeometry, classe GeometryEditPanel)
+ do ficheiro de correspondencias é chamado apenas 1 vez
 
 
 ---> todo:
