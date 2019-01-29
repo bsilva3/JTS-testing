@@ -87,11 +87,9 @@ public class TestBuilderModel
     {  	
   	GeometryContainer geomCont0 = new IndexedGeometryContainer(geomEditModel, 0);
   	GeometryContainer geomCont1 = new IndexedGeometryContainer(geomEditModel, 1);
-        GeometryContainer geomCont2 = new IndexedGeometryContainer(geomEditModel, 2);
   	
         layerList.getLayer(LayerList.LYR_A).setSource(geomCont0);
         layerList.getLayer(LayerList.LYR_B).setSource(geomCont1);
-        layerList.getLayer(LayerList.LYR_C).setSource(geomCont2);
 
         if (geomEditModel != null)
           layerList.getLayer(LayerList.LYR_RESULT).setSource(
@@ -105,10 +103,6 @@ public class TestBuilderModel
         //the lines and the fill of the geometry is transparent
         Layer lyrB = layerList.getLayer(LayerList.LYR_B);
         lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_TRANSPARENT));
-        
-        Layer lyrC = layerList.getLayer(LayerList.LYR_C);
-        lyrC.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_B_LINE_CLR,
-            GeometryDepiction.GEOM_B_FILL_CLR));
 
         Layer lyrR = layerList.getLayer(LayerList.LYR_RESULT);
         lyrR.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_RESULT_LINE_CLR,

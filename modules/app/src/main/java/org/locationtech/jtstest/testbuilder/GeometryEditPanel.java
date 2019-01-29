@@ -181,7 +181,6 @@ public class GeometryEditPanel extends JPanel {
       if (tbModel == null) return;
       getLayerList().getLayer(LayerList.LYR_A).setEnabled(isEnabled);
       getLayerList().getLayer(LayerList.LYR_B).setEnabled(isEnabled);
-      getLayerList().getLayer(LayerList.LYR_C).setEnabled(isEnabled);
       forceRepaint();
     }
 
@@ -276,7 +275,7 @@ public class GeometryEditPanel extends JPanel {
         //this.getGeomModel().getGeometry().getBoundary().get
         this.updateGeom();        
         //set an index for any other geometry drawn by the user
-        tbModel.getGeometryEditModel().setEditGeomIndex(OTHER_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
         //store this coordinates
         if (this.isSecondPanel)
             AppCorrGeometries.getInstance().setCorrGeometry2(coord);

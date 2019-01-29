@@ -949,9 +949,9 @@ public class JTSTestBuilderFrame extends JFrame
   }
 
   private void updateWktPanel() {
-    Geometry g0 = tbModel.getGeometryEditModel().getGeometry(1);
+    Geometry g0 = tbModel.getGeometryEditModel().getGeometry(0);
     wktPanel.setText(g0, 0);
-    Geometry g1 = tbModel.getGeometryEditModel().getGeometry(2);
+    Geometry g1 = tbModel.getGeometryEditModel().getGeometry(1);
     wktPanel.setText(g1, 1);
   }
 

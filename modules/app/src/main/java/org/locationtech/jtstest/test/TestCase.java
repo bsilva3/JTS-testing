@@ -37,7 +37,7 @@ public class TestCase implements Testable {
   private Geometry expectedSymDifference = null;
   private Geometry expectedCentroid = null;
   private IntersectionMatrix im;
-  private Geometry[] geom = new Geometry[3];
+  private Geometry[] geom = new Geometry[2];
   private String wkta;
   private String wktb;
 
@@ -301,10 +301,10 @@ public class TestCase implements Testable {
       return;
     }
     if (wkta != null) {
-      geom[1] = wktRdr.read(wkta);
+      geom[0] = wktRdr.read(wkta);
     }
     if (wktb != null) {
-      geom[2] = wktRdr.read(wktb);
+      geom[1] = wktRdr.read(wktb);
     }
   }
 

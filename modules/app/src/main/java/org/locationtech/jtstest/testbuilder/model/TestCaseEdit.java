@@ -25,7 +25,7 @@ import org.locationtech.jtstest.testbuilder.JTSTestBuilder;
  * @version 1.7
  */
 public class TestCaseEdit implements Testable {
-  private Geometry[] geom = new Geometry[3];
+  private Geometry[] geom = new Geometry[2];
   private Testable testable;
   
   private String opName = "";
@@ -43,28 +43,24 @@ public class TestCaseEdit implements Testable {
     testable.initGeometry();
     setGeometry(0, testable.getGeometry(0));
     setGeometry(1, testable.getGeometry(1));
-    setGeometry(2, testable.getGeometry(2));
   }
 
   public TestCaseEdit(TestCaseEdit tce)  {
     this.testable = new TestCase();
     setGeometry(0, tce.getGeometry(0));
     setGeometry(1, tce.getGeometry(1));
-    setGeometry(2, tce.getGeometry(2));
   }
 
   public TestCaseEdit(Geometry[] geom) {
     this.testable = new TestCase();
     setGeometry(0, geom[0]);
     setGeometry(1, geom[1]);
-    setGeometry(2, geom[2]);
   }
 
   public TestCaseEdit(Geometry[] geom, String name) {
     this.testable = new TestCase();
     setGeometry(0, geom[0]);
     setGeometry(1, geom[1]);
-    setGeometry(2, geom[2]);
     testable.setName(name);
   }
 
@@ -128,9 +124,9 @@ public class TestCaseEdit implements Testable {
 
   public void exchange() 
   {
-    Geometry temp = testable.getGeometry(1);
-    testable.setGeometry(1, testable.getGeometry(2));
-    testable.setGeometry(2, temp);
+    Geometry temp = testable.getGeometry(0);
+    testable.setGeometry(0, testable.getGeometry(1));
+    testable.setGeometry(1, temp);
   }
 
   public void initGeometry() throws ParseException {
@@ -139,7 +135,7 @@ public class TestCaseEdit implements Testable {
 
   public Geometry[] getGeometries() {
     return new Geometry[] {
-        testable.getGeometry(0), testable.getGeometry(1), testable.getGeometry(2)
+        testable.getGeometry(0), testable.getGeometry(1)
         };
   }
 
@@ -153,7 +149,7 @@ public class TestCaseEdit implements Testable {
     if (geom[0] == null || geom[1] == null) {
       return;
     }
-    testable.setIntersectionMatrix(geom[1].relate(geom[2]));
+    testable.setIntersectionMatrix(geom[0].relate(geom[1]));
   }
 }
 
