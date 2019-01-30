@@ -17,17 +17,17 @@ import java.util.*;
 
 import org.locationtech.jts.algorithm.Orientation;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jtstest.testbuilder.AppCorrGeometries;
 import org.locationtech.jtstest.testbuilder.geom.*;
 import org.locationtech.jtstest.testbuilder.model.*;
 
 
 public class GeometryLocationsWriter 
 {
-  public static String writeLocation(LayerList layers,
-      Coordinate pt, double tolerance)
+  public static String writeLocation(LayerList layers, Coordinate pt, double tolerance, boolean isSecondPanel)
   {
     GeometryLocationsWriter writer = new GeometryLocationsWriter();
-    return writer.writeLocationString(layers, pt, tolerance);
+    return writer.writeLocationString(layers, pt, tolerance, isSecondPanel);
   }
 
   private static final int MAX_ITEMS_TO_DISPLAY = 10;
@@ -38,6 +38,8 @@ public class GeometryLocationsWriter
   private String highlightEnd = null;
   private String documentStart = null;
   private String documentEnd = null;
+  
+  private static List<Coordinate> cursorCoordinates = new ArrayList<>();
   
   public GeometryLocationsWriter() {
     setHtml(true);
@@ -62,28 +64,43 @@ public class GeometryLocationsWriter
     }
  }
   
-  public String writeLocationString(LayerList layers,
-      Coordinate pt, double tolerance)
+  public String writeLocationString(LayerList layers, Coordinate pt, double tolerance, boolean isSecondPanel)
   {
     StringBuffer text = new StringBuffer();
     for (int i = 0; i < layers.size(); i++) {
 
       Layer lyr = layers.getLayer(i);
-      String locStr = writeLocation(lyr, pt, tolerance);
-      if (locStr == null) continue;
+      if (lyr.getName().equals("A")){
+          //this layer contains the geometry with the image and it's not relevant
+          continue;
+      }
+      //contains the coordinates and the number of the point
+      String locStr = writeLocation(lyr, pt, tolerance, isSecondPanel);
+      if (locStr == null) {
+            continue;
+      }
       
       if (i > 0 && text.length() > 0) {
         text.append(eol);
         text.append(eol);
       }
       
-      text.append(highlightStart + lyr.getName() + highlightEnd + eol);
+      //text.append(highlightStart + lyr.getName() + highlightEnd + eol);
+      
       text.append(locStr);
     }
     
     if (text.length() > 0) {
-      return documentStart + text.toString() +documentEnd;
+        //System.out.println(documentStart + text.toString() +documentEnd);
+        //remove any previously marked dots
+        AppCorrGeometries.getInstance().deleteMarkedPoints(isSecondPanel);
+        //mark a point in red:
+        for (int i = 0; i < cursorCoordinates.size(); i++){
+            AppCorrGeometries.getInstance().higlightCorrespondingPointInPanel(cursorCoordinates.get(i).x, cursorCoordinates.get(i).y, isSecondPanel);
+        }
+        return documentStart + text.toString() +documentEnd;
     }
+    //string is empty or null
     return null;
   }
     
@@ -101,13 +118,13 @@ public class GeometryLocationsWriter
       + coord.x + ", " + coord.y;
   }
   
-  public String writeLocation(Layer lyr, Coordinate p, double tolerance)
+  public String writeLocation(Layer lyr, Coordinate p, double tolerance, boolean isSecondPanel)
   {
     Geometry geom = lyr.getGeometry();
     if (geom == null) return null;
-    
+
     String locStr = writeComponentLocation(geom, p, tolerance);
-    String facetStr = writeFacetLocation(geom, p, tolerance);
+    String facetStr = writeFacetLocation(geom, p, tolerance, isSecondPanel);
     if (facetStr == null) 
       return locStr;
     return locStr + facetStr;   
@@ -125,28 +142,28 @@ public class GeometryLocationsWriter
     	
     	GeometryLocation loc = (GeometryLocation) i.next();
     	Geometry comp = loc.getComponent();
-      
-      String path = loc.pathString();
-      path = path.length() == 0 ? "" : path;
-    	buf.append("[" + path + "]  ");
-      
-      buf.append(comp.getGeometryType().toUpperCase());
-      if (comp instanceof GeometryCollection) {
-        buf.append("[" + comp.getNumGeometries() + "]");
-      }
-      else {
-        buf.append("(" + comp.getNumPoints() + ")");
-      }
-      if (comp.getUserData() != null) {
-      	buf.append("  Data: ");
-      	buf.append(comp.getUserData().toString());
-      }
-      buf.append(eol);
-      
-      if (count++ > MAX_ITEMS_TO_DISPLAY) {
-        buf.append(" & more..." + eol);
-        break;
-      }
+        
+        String path = loc.pathString();
+        path = path.length() == 0 ? "" : path;
+        buf.append("[" + path + "]  ");
+
+        buf.append(comp.getGeometryType().toUpperCase());
+        if (comp instanceof GeometryCollection) {
+          buf.append("[" + comp.getNumGeometries() + "]");
+        }
+        else {
+          buf.append("(" + comp.getNumPoints() + ")");
+        }
+        if (comp.getUserData() != null) {
+          buf.append("  Data: ");
+          buf.append(comp.getUserData().toString());
+        }
+        buf.append(eol);
+
+        if (count++ > MAX_ITEMS_TO_DISPLAY) {
+          buf.append(" & more..." + eol);
+          break;
+        }
     }
     String locStr = buf.toString();
     if (locStr.length() == 0)
@@ -154,7 +171,7 @@ public class GeometryLocationsWriter
     return locStr;
   }
     
-  public String writeFacetLocation(Geometry geom, Coordinate p, double tolerance)
+  public String writeFacetLocation(Geometry geom, Coordinate p, double tolerance, boolean isSecondPanel)
   {
     FacetLocater locater = new FacetLocater(geom);
     List locs = locater.getLocations(p, tolerance);
@@ -162,38 +179,44 @@ public class GeometryLocationsWriter
     
     // only show vertices if some are present, to avoid confusing with segments
     if (! vertexLocs.isEmpty()) 
-      return writeFacetLocations(vertexLocs);
+      return writeFacetLocations(vertexLocs, isSecondPanel);
     
     // write 'em all
-    return writeFacetLocations(locs);
+    return writeFacetLocations(locs, isSecondPanel);
   }
     
-  private String writeFacetLocations(List locs)
+  private String writeFacetLocations(List locs, boolean isSecondPanel)
   {
-    if (locs.size() <= 0) return null;
-    
+    if (locs.size() <= 0) {
+        cursorCoordinates.clear();
+        return null;
+    }
     StringBuffer buf = new StringBuffer();
     boolean isFirst = true;
     int count = 0;
     for (Iterator i = locs.iterator(); i.hasNext(); ) {
     	GeometryLocation loc = (GeometryLocation) i.next();
-
     	if (! isFirst) {
-    		buf.append(eol);
+            buf.append(eol);
     	}
 
     	isFirst = false;
       
-      buf.append(componentType(loc));
-      buf.append(loc.isVertex() ? "Vert" : "Seg");
+        /*buf.append(componentType(loc));
+        buf.append(loc.isVertex() ? "Vert" : "Seg");
     	buf.append(loc.toFacetString());
     	if (! loc.isVertex()) {
-    	  buf.append(" Len: " + loc.getLength());
+            buf.append(" Len: " + loc.getLength());
     	}
-      if (count++ > MAX_ITEMS_TO_DISPLAY) {
-        buf.append(eol + " & more..." + eol);
-        break;
-      }
+        if (count++ > MAX_ITEMS_TO_DISPLAY) {
+            buf.append(eol + " & more..." + eol);
+            break;
+        }*/
+        //add this coordinate to the list of points the mouse is over
+        cursorCoordinates.add(loc.getCoordinate());
+        int index = AppCorrGeometries.getInstance().getCordIndex(loc.getCoordinate().x, loc.getCoordinate().y, isSecondPanel);
+        buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
+        buf.append(loc.getCoordinate().x).append(", ").append(loc.getCoordinate().y);
     }
     return buf.toString();
   }

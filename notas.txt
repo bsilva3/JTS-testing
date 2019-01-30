@@ -81,20 +81,21 @@ se encontra para fazer a ação respetiva.
 - Para resolver certos problemas relacionado com desfasamento e remoçao de outras geometrias desenhadas em cima da imagem
 ao mudar tamanho da janela, o método que le as coordenadas do ficheiro (drawGeometry, classe GeometryEditPanel)
  do ficheiro de correspondencias é chamado apenas 1 vez
-
+- tooltips das coordenadas quando o cursor está em cima de um ponto: evento getToolTipText (GeometryEditPanel)
+, e o texto é dado na função writeLocationString, classe GeometryLocationsWritter. O texto da tooltip foi alterado
+de modo a indicar o numero do ponto e as suas coordenadas.
+- criado classe AppCorrGeometries. Guarda a lista de coordenadas das 2 geometrias (1 de cada painel). Tem métodos
+que lhe permitem ver se uma dada coordenada se encontra na geometria, ou devolver a coordenada da outra geometria que 
+corresponde a uma coordenada da geometria. 
+- A classe anterior permite também fazer higlight a vermelho no ponto correspondente da outra geometria. Ao colocar o rato
+sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada na outra geometria um ponto vermelho.
 
 ---> todo:
  - 2 viewports lado a lado com mesma imagem, mas 1º terá 1ª e 2ª coluna no ficheiro de corr e 2º terá 3ª e 4ª
-	-problemas: 	geometrias editadas/adicionadas desaparecem com resize de janela;
-			streampolygon e polygon desaparecem apos uma ação qualquer
+	-problemas: 	streampolygon e polygon desaparecem apos uma ação qualquer
 	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
  - mostrar pontos correspondentes(ao selecionar 1 ponto num dos paineis, fazer higlight do ponto correspondente no outro)
- - mostrar número do ponto no higlight ->
+ - mostrar número do ponto no higlight
  - eventual refactoring -> acaba aqui v0.2
 
  - area e perimetro ao selecionar 
-
-
-(pode ser util)
-https://community.oracle.com/thread/1263955
-

@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jtstest.testbuilder.AppCorrGeometries;
 import org.locationtech.jtstest.testbuilder.AppImage;
 
 import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
@@ -124,6 +125,10 @@ public class RenderManager
                 return;
             }
             g.drawImage(image, 0, 0, null);
+            
+            //necessary to highlight points. This is assynchronous, so if there is a point to be higlighted we call
+            //this function here
+            AppCorrGeometries.getInstance().drawPoints(panel);
 	}
   
 

@@ -89,6 +89,8 @@ public class GeometryEditPanel extends JPanel {
     private boolean isSecondPanel = false;
     
     private boolean corrGeometryAndImageLoaded = false;
+    //flag to indicate if there is currently any marked point
+    private boolean pointsDrawn = false;
     
     public GeometryEditPanel(boolean iSecondPanel) {
         this();
@@ -231,9 +233,11 @@ public class GeometryEditPanel extends JPanel {
   //    if (event.getPoint().x < 100) return null;
       Coordinate pt = viewport.toModelCoordinate(event.getPoint());
       double toleranceInModel = AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
+      
       // avoid wierd scale issues
       if (toleranceInModel <= 0.0) return null;
-      return GeometryLocationsWriter.writeLocation(getLayerList(), pt, toleranceInModel);
+      
+      return GeometryLocationsWriter.writeLocation(getLayerList(), pt, toleranceInModel, isSecondPanel);
   //    return viewport.toModel(event.getPoint()).toString();
   //    return null;
     }
@@ -248,7 +252,7 @@ public class GeometryEditPanel extends JPanel {
       double toleranceInModel = AppConstants.TOLERANCE_PIXELS / getViewport().getScale();
       GeometryLocationsWriter writer = new GeometryLocationsWriter();
       writer.setHtml(false);
-      return writer.writeLocationString(getLayerList(), pt, toleranceInModel);
+      return writer.writeLocationString(getLayerList(), pt, toleranceInModel, isSecondPanel);
     }
 
     public double getGridSize() {
@@ -612,21 +616,21 @@ public class GeometryEditPanel extends JPanel {
   class GeometryEditPanelRenderer implements Renderer
   {
     private GeometryStretcherView stretchView = null;
-  	private Renderer currentRenderer = null;
+    private Renderer currentRenderer = null;
     private boolean isMagnifyingTopology = false; 
     private boolean isRenderingStretchVertices = false; 
     
-  	public GeometryEditPanelRenderer()
-  	{
-      if (DisplayParameters.isMagnifyingTopology()) {
-        stretchView = new GeometryStretcherView(getGeomModel());
-        stretchView.setStretchSize(viewport.toModel(DisplayParameters.getTopologyStretchSize()));
-        stretchView.setNearnessTolerance(viewport.toModel(GeometryStretcherView.NEARNESS_TOL_IN_VIEW));
-        stretchView.setEnvelope(viewport.getModelEnv());
-        isMagnifyingTopology = DisplayParameters.isMagnifyingTopology();
-        isRenderingStretchVertices = stretchView.isViewPerformant();
-      }  		
-  	}
+    public GeometryEditPanelRenderer()
+    {
+        if (DisplayParameters.isMagnifyingTopology()) {
+          stretchView = new GeometryStretcherView(getGeomModel());
+          stretchView.setStretchSize(viewport.toModel(DisplayParameters.getTopologyStretchSize()));
+          stretchView.setNearnessTolerance(viewport.toModel(GeometryStretcherView.NEARNESS_TOL_IN_VIEW));
+          stretchView.setEnvelope(viewport.getModelEnv());
+          isMagnifyingTopology = DisplayParameters.isMagnifyingTopology();
+          isRenderingStretchVertices = stretchView.isViewPerformant();
+        }  		
+    }
   	
     public void render(Graphics2D g)
     {
@@ -751,22 +755,34 @@ public class GeometryEditPanel extends JPanel {
   
     }
     
-  	public synchronized void cancel()
-  	{
-  		if (currentRenderer != null)
-  			currentRenderer.cancel();
-  	}
+    public synchronized void cancel()
+    {
+        if (currentRenderer != null)
+                currentRenderer.cancel();
+    }
 
   }
+
+    public RenderManager getRenderMgr() {
+        return renderMgr;
+    }
   
-  public GridRenderer getGridRenderer(){
-      return gridRenderer;
-  }
+    public GridRenderer getGridRenderer(){
+        return gridRenderer;
+    }
 
     public boolean isSecondPanel() {
         return isSecondPanel;
     }
-  
+
+    public void setPointsDrawn(boolean pointsDrawn) {
+        this.pointsDrawn = pointsDrawn;
+    }
+    
+    public boolean isPointsDrawn() {
+        return pointsDrawn;
+    }
+    
 }
 
 

@@ -117,53 +117,53 @@ public class GeometryLocation
     return pt.toString();
   }
   
-  public String pathString()
-  {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < componentPath.length; i++) {
-			if (i > 0) {
-          buf.append(":");
-      }
-			buf.append(componentPath[i]);
-		}
-		return buf.toString();
-  }
+    public String pathString()
+    {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < componentPath.length; i++) {
+            if (i > 0) {
+                buf.append(":");
+            }
+            buf.append(componentPath[i]);
+        }
+        return buf.toString();
+    }
   
-	public String toFacetString()
-	{
-		StringBuffer buf = new StringBuffer();
-		
-		// facet index
-		buf.append("[");
-		for (int i = 0; i < componentPath.length; i++) {
-			if (i > 0) {
-          buf.append(":");
-      }
-			buf.append(componentPath[i]);
-		}
-		buf.append(" ");
-		buf.append(index);
-		if (! isVertex()) {
-			buf.append("-" + (index + 1));
-		}
-		buf.append("]  ");
-		
-		// facet value
-    buf.append(isVertex() ? "POINT " : "LINESTRING ");
+    public String toFacetString()
+    {
+        StringBuffer buf = new StringBuffer();
 
-    buf.append("( ");
-		buf.append(pt.x);
-		buf.append(" ");
-		buf.append(pt.y);
-		if (! isVertex()) {
-			Coordinate p1 = component.getCoordinates()[index + 1];
-  		buf.append(", ");
-  		buf.append(p1.x);
-  		buf.append(" ");
-  		buf.append(p1.y);		
-		}
-    buf.append(" )");
-		return buf.toString();
-	}
+        // facet index
+        buf.append("[");
+        for (int i = 0; i < componentPath.length; i++) {
+            if (i > 0) {
+                buf.append(":");
+            }
+            buf.append(componentPath[i]);
+        }
+        buf.append(" ");
+        buf.append(index);
+        if (! isVertex()) {
+            buf.append("-" + (index + 1));
+        }
+        buf.append("]  ");
+
+        // facet value
+        buf.append(isVertex() ? "POINT " : "LINESTRING ");
+
+        buf.append("( ");
+        buf.append(pt.x);
+        buf.append(" ");
+        buf.append(pt.y);
+        if (! isVertex()) {
+            Coordinate p1 = component.getCoordinates()[index + 1];
+            buf.append(", ");
+            buf.append(p1.x);
+            buf.append(" ");
+            buf.append(p1.y);		
+        }
+        buf.append(" )");
+        return buf.toString();
+    }
 
 }
