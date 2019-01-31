@@ -94,8 +94,7 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
  - 2 viewports lado a lado com mesma imagem, mas 1º terá 1ª e 2ª coluna no ficheiro de corr e 2º terá 3ª e 4ª
 	-problemas: 	streampolygon e polygon desaparecem apos uma ação qualquer
 	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
- - mostrar pontos correspondentes(ao selecionar 1 ponto num dos paineis, fazer higlight do ponto correspondente no outro)
- - mostrar número do ponto no higlight
+ - se se editar vertices -> alterar a lista de vertices no array AppCorrGeometries. 
  - eventual refactoring -> acaba aqui v0.2
 
  - area e perimetro ao selecionar 

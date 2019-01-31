@@ -215,7 +215,8 @@ public class GeometryLocationsWriter
         //add this coordinate to the list of points the mouse is over
         cursorCoordinates.add(loc.getCoordinate());
         int index = AppCorrGeometries.getInstance().getCordIndex(loc.getCoordinate().x, loc.getCoordinate().y, isSecondPanel);
-        buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
+        if(index > -1)
+            buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
         buf.append(loc.getCoordinate().x).append(", ").append(loc.getCoordinate().y);
     }
     return buf.toString();

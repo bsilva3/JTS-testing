@@ -28,6 +28,8 @@ public class AppCorrGeometries {
     
     private List<Coordinate> drawnPoints = new ArrayList<>();
     
+    private int editIndex = -1;
+    
     private static AppCorrGeometries instance;
     
     private AppCorrGeometries() {}
@@ -99,24 +101,26 @@ public class AppCorrGeometries {
     //that the cursor IS NOT IN
     public void higlightCorrespondingPointInPanel(double x, double y, boolean isSecondPanel){
         Coordinate c = getCorrespondingCoordinate(x, y, isSecondPanel);
-        if (drawnPoints.contains(c)){
-            //this point is already marked
-            return;
+        if (c != null){
+            if (drawnPoints.contains(c)){
+                //this point is already marked
+                return;
+            }
+            drawnPoints.add(c);
+            GeometryEditPanel editPanel;
+            if(isSecondPanel){
+                //we want to mark on the other panel
+                editPanel = JTSTestBuilderFrame.getGeometryEditPanel();
+            }
+            else{
+                editPanel = JTSTestBuilderFrame.getGeometryEditPanel2();
+            }
+            editPanel.setPointsDrawn(true);
+            drawPoints(editPanel);
         }
-        drawnPoints.add(c);
-        GeometryEditPanel editPanel;
-        if(isSecondPanel){
-            //we want to mark on the other panel
-            editPanel = JTSTestBuilderFrame.getGeometryEditPanel();
-        }
-        else{
-            editPanel = JTSTestBuilderFrame.getGeometryEditPanel2();
-        }
-        editPanel.setPointsDrawn(true);
-        drawPoints(editPanel);
     }
     
-    //call force repaint on the panel that has a highlited point. This will delete the higlited red points
+    //call forceRepaint on the panel that has a highlited point. This will delete the higlited red points
     public void deleteMarkedPoints(boolean isSecondPanel){
         GeometryEditPanel editPanel;
         
@@ -147,6 +151,29 @@ public class AppCorrGeometries {
                 g2.drawLine((int)point.getX(), (int)point.getY(), (int)point.getX(), (int)point.getY());
             }
             
+        }
+    }
+    
+    public void savePointIfExistInCorrGeometry(double x, double y, boolean isSecondPanel){
+        int index = getCordIndex(x, y, isSecondPanel);
+        if (index > -1){
+            editIndex = index;
+        }
+    }
+    
+    //if a point from the corr geometry is moved, update the moved coordinate in the index
+    //of the array with the edited corrGeometry
+    public void editPointIfExistInCorrGeometry(double newX, double newY, boolean isSecondPanel){
+        if (editIndex > -1){
+            Coordinate newC = new Coordinate(newX, newY);
+            if (isSecondPanel){
+                this.corrGeometry2.set(editIndex, newC);
+            }
+            else{
+                this.corrGeometry1.set(editIndex, newC);
+            }
+            //there is no longer a point edited 
+            editIndex = -1;
         }
     }
     

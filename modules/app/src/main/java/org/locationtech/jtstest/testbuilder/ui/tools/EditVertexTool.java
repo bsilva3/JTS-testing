@@ -19,7 +19,9 @@ import javax.swing.SwingUtilities;
 
 import org.locationtech.jts.awt.GeometryCollectionShape;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jtstest.testbuilder.AppCorrGeometries;
 import org.locationtech.jtstest.testbuilder.AppCursors;
+import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.IconLoader;
 import org.locationtech.jtstest.testbuilder.geom.*;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
@@ -57,11 +59,13 @@ extends IndicatorTool
     // initiate moving a vertex
     Coordinate mousePtModel = toModelCoordinate(e.getPoint());
     double tolModel = getModelSnapTolerance();
-
-    selectedVertexLocation = geomModel().locateVertexPt(mousePtModel, tolModel);
+    GeometryEditPanel editPanel = getClickedPanel();
+    selectedVertexLocation = editPanel.getGeomModel().locateVertexPt(mousePtModel, tolModel);
     if (selectedVertexLocation != null) {
       adjVertices = geomModel().findAdjacentVertices(selectedVertexLocation);
       currentVertexLoc = selectedVertexLocation;
+      //indicate that there is a coordinate that is being edited, that may or may not be from the corr geometry
+      AppCorrGeometries.getInstance().savePointIfExistInCorrGeometry(selectedVertexLocation.x, selectedVertexLocation.y, editPanel.isSecondPanel());
       redrawIndicator();
     }
   }
@@ -74,7 +78,10 @@ extends IndicatorTool
     // finish the move of the vertex
     if (selectedVertexLocation != null) {
       Coordinate newLoc = toModelSnapped(e.getPoint());
-      geomModel().moveVertex(selectedVertexLocation, newLoc);
+      GeometryEditPanel editPanel = getClickedPanel();
+      editPanel.getGeomModel().moveVertex(selectedVertexLocation, newLoc);
+      //update the coordinates if the moved vertex belonged to a corr Geometry
+      AppCorrGeometries.getInstance().editPointIfExistInCorrGeometry(newLoc.getX(), newLoc.getY(), editPanel.isSecondPanel());
     }
   }
 
@@ -96,14 +103,14 @@ extends IndicatorTool
       GeometryLocation geomLoc = geoModel.locateNonVertexPoint(mousePtModel, tolModel);
       //System.out.println("Testing: insert vertex at " + geomLoc);
       if (geomLoc != null) {
-        geoModel.setGeometry(geomLoc.insert());
+            geoModel.setGeometry(geomLoc.insert());
       }
     }
     else {  // is a delete
       GeometryLocation geomLoc = geoModel.locateVertex(mousePtModel, tolModel);
       //System.out.println("Testing: delete vertex at " + geomLoc);
       if (geomLoc != null) {
-        geoModel.setGeometry(geomLoc.delete());
+          geoModel.setGeometry(geomLoc.delete());
       }
     }
   }
