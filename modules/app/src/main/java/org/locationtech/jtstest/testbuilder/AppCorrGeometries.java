@@ -9,6 +9,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
@@ -27,6 +28,8 @@ public class AppCorrGeometries {
     private List<Coordinate> corrGeometry2;
     
     private List<Coordinate> drawnPoints = new ArrayList<>();
+    
+    private List<BufferedImage> images = new ArrayList<>();
     
     private int editIndex = -1;
     
@@ -142,12 +145,29 @@ public class AppCorrGeometries {
     //(this function is called on the render manager of the panel to be drawn the dots after a 
     //"force repaint" happens, because this method is asynchronous and this way the dots are not deleted.
     public void drawPoints(GeometryEditPanel editPanel){
+        Graphics2D g2 = (Graphics2D) editPanel.getGraphics();
+        g2.setStroke(new BasicStroke(7));
+        g2.setColor(Color.red);
+        Point2D point;
+        BufferedImage bi;
+        //draw the images to cover the red points previously drawn
+        for (BufferedImage image : images){
+            //PLACE IN THE RIGHT COORDS!
+            g2.drawImage(image, 0, 0, 10, 10, null);
+            
+        }
+        images.clear();
+        //place the images and remove them from the array
+        for (Coordinate c : drawnPoints){
+            point = editPanel.getViewport().toView(c);
+            BufferedImage originalImage = (BufferedImage) editPanel.getRenderMgr().getImage();
+            bi = originalImage.getSubimage((int)point.getX(), (int)point.getY(), 10, 10);
+            this.images.add(bi);
+        }
         if(editPanel.isPointsDrawn()){
             for (Coordinate c : drawnPoints){
-                Graphics2D g2 = (Graphics2D) editPanel.getGraphics();
-                g2.setColor(Color.red);
-                g2.setStroke(new BasicStroke(7));
-                Point2D point = editPanel.getViewport().toView(c);
+                
+                point = editPanel.getViewport().toView(c);
                 g2.drawLine((int)point.getX(), (int)point.getY(), (int)point.getX(), (int)point.getY());
             }
             

@@ -132,17 +132,21 @@ public class RenderManager
 	}
   
 
-    private void paintPanel()
-    {
-        copyImage(panel.getGraphics());
-    }
+        private void paintPanel()
+        {
+            copyImage(panel.getGraphics());
+        }
+        
+        public Image getImage(){
+            return this.image;
+        }
 }
 
 class RendererSwingWorker extends SwingWorker
 {
 	private Image image = null;
 
-  private Renderer renderer;
+        private Renderer renderer;
 	private boolean isRendering = true;
 	
 	public RendererSwingWorker(Renderer renderable, Image image)
@@ -151,22 +155,22 @@ class RendererSwingWorker extends SwingWorker
 		this.image = image;
 	}
 	
-  public Object construct()
-  {
-  	isRendering = true;
-	Graphics2D gr = (Graphics2D) image.getGraphics();
-        renderer.render(gr);
-  	isRendering = false;
-    return new Boolean(true);
-  }
-  
-  public boolean isRendering()
-  {
-  	return isRendering;
-  }
+        public Object construct()
+        {
+              isRendering = true;
+              Graphics2D gr = (Graphics2D) image.getGraphics();
+              renderer.render(gr);
+              isRendering = false;
+          return new Boolean(true);
+        }
 
-  public void cancel()
-  {
-  	renderer.cancel();
-  }
+        public boolean isRendering()
+        {
+              return isRendering;
+        }
+
+        public void cancel()
+        {
+              renderer.cancel();
+        }
 }

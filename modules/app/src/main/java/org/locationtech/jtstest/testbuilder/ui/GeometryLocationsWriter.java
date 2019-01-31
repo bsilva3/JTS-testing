@@ -93,7 +93,7 @@ public class GeometryLocationsWriter
     if (text.length() > 0) {
         //System.out.println(documentStart + text.toString() +documentEnd);
         //remove any previously marked dots
-        AppCorrGeometries.getInstance().deleteMarkedPoints(isSecondPanel);
+        //AppCorrGeometries.getInstance().deleteMarkedPoints(isSecondPanel);
         //mark a point in red:
         for (int i = 0; i < cursorCoordinates.size(); i++){
             AppCorrGeometries.getInstance().higlightCorrespondingPointInPanel(cursorCoordinates.get(i).x, cursorCoordinates.get(i).y, isSecondPanel);
