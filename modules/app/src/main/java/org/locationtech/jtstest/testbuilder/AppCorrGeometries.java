@@ -120,7 +120,7 @@ public class AppCorrGeometries {
         }
     }
     
-    //call forceRepaint on the panel that has a highlited point. This will delete the higlited red points
+    //call force repaint on the panel that has a highlited point. This will delete the higlited red points
     public void deleteMarkedPoints(boolean isSecondPanel){
         GeometryEditPanel editPanel;
         

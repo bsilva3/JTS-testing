@@ -58,7 +58,7 @@ public class RenderManager
     {
             this.panel = panel;
             // start with a short time cycle to give better appearance
-            repaintTimer.setInitialDelay(100);
+            repaintTimer.setInitialDelay(0);
     }
 
     public void setDirty(boolean isDirty)

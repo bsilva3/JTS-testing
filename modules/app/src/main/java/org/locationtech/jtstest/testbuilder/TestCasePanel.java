@@ -78,6 +78,7 @@ public class TestCasePanel extends JPanel {
     ValidPanel validPanel = new ValidPanel();
     JPanel statusBarPanel = new JPanel();
     JLabel lblMousePos = new JLabel();
+    JLabel geomArea = new JLabel();
     JLabel lblPrecisionModel = new JLabel();
     ScalarFunctionPanel scalarFunctionPanel = new ScalarFunctionPanel();
 
@@ -283,6 +284,12 @@ public class TestCasePanel extends JPanel {
         lblPrecisionModel.setBorder(BorderFactory.createLoweredBevelBorder());
     //    txtSelectedPoint.setEditable(false);
         lblPrecisionModel.setText("Sel Pt:");
+        
+        geomArea.setBackground(SystemColor.text);
+        geomArea.setBorder(BorderFactory.createLoweredBevelBorder());
+        geomArea.setPreferredSize(new Dimension(21, 21));
+        geomArea.setHorizontalAlignment(SwingConstants.RIGHT);
+        geomArea.setText("Area: ");
 
         editFramePanel.setLayout(editFrameLayout);
         editFramePanel.add(editPanel, BorderLayout.CENTER);
@@ -309,6 +316,7 @@ public class TestCasePanel extends JPanel {
         statusBarPanel.add(jPanelMagnify);
         statusBarPanel.add(lblPrecisionModel);
         statusBarPanel.add(lblMousePos);
+        statusBarPanel.add(geomArea);
 
         /*add(jTabbedPane1, BorderLayout.WEST);
         //jTabbedPane1.add(editCtlPanel, "Edit");
