@@ -47,8 +47,6 @@ chama métodos para transformar as coordenadas da imagem original para o tamanho 
 primeiro quaisquer desenhos que lá existam.
 Este método é chamado no main da classe JTSTestBuilder e também no metodo componentResized sempre a janela muda
 as suas dimensões.
-- na classe ViewPort, em setOrigin, foi adicionado um if que verifica a escala do view port.. se for 1,
-ou seja não há zoom, entao a origem será o 0,0, resolvendo assim o problema da origem (em principio..)
 - Agora a imagem é colocada nos pontos -x, e -y, correspondentes as coordenadas do painel do canto inferior esquerdo
 (para corrigir desfasamentos de geometria e imagem)
 - corrigido problema em que a geometria não era desenhada no sitio correto da imagem se a janela fosse maximizada
@@ -90,16 +88,13 @@ corresponde a uma coordenada da geometria.
 - A classe anterior permite também fazer higlight a vermelho no ponto correspondente da outra geometria. Ao colocar o rato
 sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada na outra geometria um ponto vermelho.
 
+-JTSTestBuilderToolBar: contem o botao next e previous, entre outros
+
 ---> todo:
  - 2 viewports lado a lado com mesma imagem, mas 1º terá 1ª e 2ª coluna no ficheiro de corr e 2º terá 3ª e 4ª
 	-problemas: 	streampolygon e polygon desaparecem apos uma ação qualquer
 	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
- - problema: muito flickering ao desenhar pontos highlited devido ao constante repaint. 2 soluções possiveis:
-		-desenhar uma tooltip em cima do ponto
-		-fazer crop de uma buffered imagem com o ponto. Guardar num array. Desenhar em cima o ponto vermelho.
-		Proxima vez, repor nas coordenadas do viewport a imagem que antes foi copiada e colar nas coordenadas,
-		depois retirar imagem do ponto correspondente de onde o rato esta, desenhar ponto vermelho.
-	- array de pontos deveria ser uma stack com max de 2 elementos..
+ - avançar para proxima imagem (com ficheiro corr dessa imagem)
  - eventual refactoring -> acaba aqui v0.2
 
  - area e perimetro ao selecionar 

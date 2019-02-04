@@ -271,7 +271,7 @@ public class GeometryEditPanel extends JPanel {
     public void drawGeometry(){
         
         //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
-        AppImage.resizeImageDimension(this.getSize());
+        AppImage.getInstance().resizeImageDimension(this.getSize());
         drawImagePolygon();
         List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(this.isSecondPanel));
         
@@ -290,11 +290,12 @@ public class GeometryEditPanel extends JPanel {
     //draw a square whose size is the same as the background image in the panel
     //it will add the image as background
     public void drawImagePolygon(){
+        AppImage appImage = AppImage.getInstance();
         List<Coordinate> coord = new ArrayList<>();
         coord.add( new Coordinate(0, 0));
-        coord.add( new Coordinate(AppImage.getImageWidthInPanel(), 0));
-        coord.add( new Coordinate(AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel()));
-        coord.add( new Coordinate(0, AppImage.getImageHeightInPanel()));
+        coord.add( new Coordinate(appImage.getImageWidthInPanel(), 0));
+        coord.add( new Coordinate(appImage.getImageWidthInPanel(), AppImage.getInstance().getImageHeightInPanel()));
+        coord.add( new Coordinate(0, appImage.getImageHeightInPanel()));
         
         // clear the current square and update (to be accordingly with the size of the panel)
         tbModel.getGeometryEditModel().clear(BACKGROUND_IMAGE_GEOMETRY_INDEX);
@@ -310,7 +311,7 @@ public class GeometryEditPanel extends JPanel {
     
   
     private List<Coordinate>correctCoordinates(Coordinate[] coord){
-        
+        AppImage appImage = AppImage.getInstance();
         Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
         double vOriginX = viewOrigin.getX();
         
@@ -318,15 +319,12 @@ public class GeometryEditPanel extends JPanel {
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
             coordUtils = new CoordinateUtils(c.getX(), c.getY() );
-            coordUtils.transformCoords(AppImage.getImageWidth(), AppImage.getImageHeight(),
-                    AppImage.getImageWidthInPanel(), AppImage.getImageHeightInPanel());
-            
-            //to correct the diference between the image height in the panel and the panel height
-            //coordUtils.translate(new CoordinateUtils(vOriginX, (int) Math.round(getSize().getHeight() - AppImage.getImageHeightInPanel())));
+            coordUtils.transformCoords(appImage.getCurrentImageWidth(), appImage.getCurrentImageHeight(),
+                    appImage.getImageWidthInPanel(), appImage.getImageHeightInPanel());
             
             //add the diference of the top of the panel and the image 
-            coordUtils.translate(new CoordinateUtils(vOriginX, (getSize().getHeight() - AppImage.getImageHeightInPanel()) - 
-                    (getSize().getHeight() - AppImage.getImageHeightInPanel()) ));
+            coordUtils.translate(new CoordinateUtils(vOriginX, (getSize().getHeight() - appImage.getImageHeightInPanel()) - 
+                    (getSize().getHeight() - appImage.getImageHeightInPanel()) ));
             
             transformedCoords.add(coordUtils);
         }

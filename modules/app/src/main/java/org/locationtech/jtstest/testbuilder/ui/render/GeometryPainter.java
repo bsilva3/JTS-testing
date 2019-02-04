@@ -222,7 +222,7 @@ public class GeometryPainter
         }
 
         Shape shape = converter.toShape(geometry);
-        g.drawImage(AppImage.getBackgroundImage(), shape.getBounds().x, shape.getBounds().y, shape.getBounds().width, shape.getBounds().height, null);
+        g.drawImage(AppImage.getInstance().getCurrentlySelectedImage(), shape.getBounds().x, shape.getBounds().y, shape.getBounds().width, shape.getBounds().height, null);
 
 
             // handle points in a special way for appearance and speed

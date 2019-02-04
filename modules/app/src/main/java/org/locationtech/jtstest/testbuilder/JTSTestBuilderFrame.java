@@ -456,6 +456,21 @@ public class JTSTestBuilderFrame extends JFrame
     updateTestCaseView();
     if (isZoom) JTSTestBuilderController.zoomToInput();
   }
+  
+  void moveToNextImage(){
+      AppImage.getInstance().loadNextImage();
+      this.reloadBothPanels();
+  }
+  
+  void moveToPreviousImage(){
+      AppImage.getInstance().loadPreviousImage();
+      this.reloadBothPanels();
+  }
+  
+  void reloadBothPanels(){
+      this.getTestCasePanel().getGeometryEditPanel().forceRepaint();
+      this.getTestCasePanel2().getGeometryEditPanel().forceRepaint();
+  }
 
   void moveToNextCase(boolean isZoom) {
     tbModel.cases().nextCase();

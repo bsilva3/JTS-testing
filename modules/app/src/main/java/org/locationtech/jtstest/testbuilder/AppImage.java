@@ -8,8 +8,11 @@ package org.locationtech.jtstest.testbuilder;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -19,86 +22,90 @@ import javax.imageio.ImageIO;
  * @author Bruno Silva
  */
 public class AppImage {
-    private static Image backgroundImage;
+    private int currentImageWidthInPanel;
     
-    private static int imageWidth;
+    private int currentImageHeightInPanel;
     
-    private static int imageHeight;
+    private List<Image> images = new ArrayList<>();
     
-    private static int imageWidthInPanel;
+    private int selectedImageIndex = 0;
     
-    private static int imageHeightInPanel;
-
-    private static int oldImageHeightInPanel;
+    private static AppImage instance;
     
-    private static int oldImageWidthInPanel;
-
-    public static Image getBackgroundImage() {
-        return backgroundImage;
-    }
-
-    public static void setBackgroundImage(Image backgroundImage) {
-        AppImage.backgroundImage = backgroundImage;
+    private AppImage() {}
+    
+    public static AppImage getInstance(){
+        if(instance == null){
+            instance = new AppImage();
+        }
+        return instance;
     }
     
-    public static void setBackgroundImageFile(File backgroundImageFile) {
-        try {
-            AppImage.backgroundImage = ImageIO.read(backgroundImageFile);
-        } catch (IOException | NullPointerException ex) {
-            Logger.getLogger(AppImage.class.getName()).log(Level.SEVERE, null, ex);
+    public void loadImages(File[] files){
+        for (File file : files){
+            try {
+                BufferedImage b = ImageIO.read(file);
+                images.add(b);
+            } catch (IOException ex) {
+                Logger.getLogger(AppImage.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
-    public static int getImageWidth() {
-        if (backgroundImage != null)
-            return backgroundImage.getWidth(null);
-        return 0;
-    }
-
-    public static void setImageWidth(int imageWidth) {
-        AppImage.imageWidth = imageWidth;
-    }
-
-    public static int getImageHeight() {
-        if (backgroundImage != null)
-            return backgroundImage.getHeight(null);
-        return 0;
-    }
-
-    public static void setImageHeight(int imageHeight) {
-        AppImage.imageHeight = imageHeight;
+    //load next Image in the list
+    public void loadNextImage(){
+        if(selectedImageIndex == images.size()-1){
+            //already on last image, return to first image
+            selectedImageIndex = 0;
+        }
+        else{
+            selectedImageIndex++;
+        }
     }
     
-        
-    //resizes a dimension to fit a boundary dimension, while maintaining the aspect ratio
-    public static Dimension resizeImageDimension(Dimension windowDimension, double scale){
-        //Dimension windowDimension = new Dimension(panelWidth, panelHeight);
-      
-        Dimension d = getScaledDimension(new Dimension((int) AppImage.getBackgroundImage().getWidth(null), 
-        (int) AppImage.getBackgroundImage().getHeight(null)), windowDimension );
-        AppImage.setImageHeightInPanel((int) Math.round(d.height * scale));
-        AppImage.setImageWidthInPanel((int) Math.round(d.width * scale));
-        return d;
+    //load previous image in the list
+    public void loadPreviousImage(){
+        if(selectedImageIndex == 0){
+            //already on first image, go to last image
+            selectedImageIndex = images.size()-1;
+        }
+        else{
+            selectedImageIndex--;
+        }
+    }
+
+    public Image getCurrentlySelectedImage(){
+        return images.get(selectedImageIndex);
     }
     
+    public int getCurrentImageWidth() {
+        return getCurrentlySelectedImage().getWidth(null);
+    }
+
+
+    public int getCurrentImageHeight() {
+        return getCurrentlySelectedImage().getHeight(null);
+    }
+
+    
     //resizes a dimension to fit a boundary dimension, while maintaining the aspect ratio
-    public static Dimension resizeImageDimension(Dimension windowDimension){
+    public Dimension resizeImageDimension(Dimension windowDimension){
         //Dimension windowDimension = new Dimension(panelWidth, panelHeight);
       
-        Dimension d = getScaledDimension(new Dimension((int) AppImage.getBackgroundImage().getWidth(null), 
-        (int) AppImage.getBackgroundImage().getHeight(null)), windowDimension );
-        AppImage.setImageHeightInPanel((int) Math.round(d.height));
-        AppImage.setImageWidthInPanel((int) Math.round(d.width));
+        Dimension d = getScaledDimension(new Dimension((int) getCurrentImageWidth(), 
+        (int) getCurrentImageHeight()), windowDimension );
+        setImageHeightInPanel((int) Math.round(d.height));
+        setImageWidthInPanel((int) Math.round(d.width));
         return d;
     }
        
      //keeps the 1:1 aspect ration of the image and draws it
-    public static void keepAspectRatioAndDrawImage(Graphics2D g, Dimension panelDim){
-        Dimension d = AppImage.resizeImageDimension(panelDim);
-        g.drawImage(AppImage.getBackgroundImage(), 0, 0, d.width, d.height, null);
+    public void keepAspectRatioAndDrawImage(Graphics2D g, Dimension panelDim){
+        Dimension d = resizeImageDimension(panelDim);
+        g.drawImage(getCurrentlySelectedImage(), 0, 0, d.width, d.height, null);
     }
       
-    private static Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {
+    private Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {
         double widthRatio = boundary.getWidth() / imageSize.getWidth();
         double heightRatio = boundary.getHeight() / imageSize.getHeight();
         double ratio = Math.min(widthRatio, heightRatio);
@@ -106,37 +113,23 @@ public class AppImage {
         return new Dimension((int) (imageSize.width * ratio), (int) (imageSize.height * ratio));
     }
 
-    public static int getImageWidthInPanel() {
-        return imageWidthInPanel;
+    public int getImageWidthInPanel() {
+        return currentImageWidthInPanel;
     }
 
-    public static void setImageWidthInPanel(int imageWidthInPanel) {
-        AppImage.imageWidthInPanel = imageWidthInPanel;
+    public void setImageWidthInPanel(int imageWidthInPanel) {
+        this.currentImageWidthInPanel = imageWidthInPanel;
     }
 
-    public static int getImageHeightInPanel() {
-        return imageHeightInPanel;
+    public int getImageHeightInPanel() {
+        return currentImageHeightInPanel;
     }
 
-    public static void setImageHeightInPanel(int imageHeightInPanel) {
-        AppImage.imageHeightInPanel = imageHeightInPanel;
+    public void setImageHeightInPanel(int imageHeightInPanel) {
+        this.currentImageHeightInPanel = imageHeightInPanel;
     }
 
-    public static int getOldImageHeightInPanel() {
-        return oldImageHeightInPanel;
-    }
-
-    public static void setOldImageHeightInPanel(int oldImageHeightInPanel) {
-        AppImage.oldImageHeightInPanel = oldImageHeightInPanel;
-    }
-
-    public static int getOldImageWidthInPanel() {
-        return oldImageWidthInPanel;
-    }
-
-    public static void setOldImageWidthInPanel(int oldImageWidthInPanel) {
-        AppImage.oldImageWidthInPanel = oldImageWidthInPanel;
-    }
+   
     
     
     

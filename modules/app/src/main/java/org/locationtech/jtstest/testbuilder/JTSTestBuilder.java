@@ -25,7 +25,6 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jtstest.command.*;
 import org.locationtech.jtstest.function.*;
 import org.locationtech.jtstest.geomfunction.GeometryFunctionRegistry;
-import static org.locationtech.jtstest.testbuilder.AppImage.setBackgroundImageFile;
 import org.locationtech.jtstest.testbuilder.model.*;
 
 
@@ -125,7 +124,25 @@ public class JTSTestBuilder
   public static void main(String[] args)
   {
     try {
-        //file chooser window to select an image
+        //file chooser window to select a directory of images
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        jfc.setDialogTitle("Choose a directory with images to open: ");
+           
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        jfc.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("png, gif, jpg, bmp or tiff images", "png", "gif", "jpg", "bmp", "tiff");
+        jfc.addChoosableFileFilter(filter);
+        int returnValue = jfc.showOpenDialog(null);
+        File selectedDirectory = null;
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+             selectedDirectory = jfc.getSelectedFile();
+        }
+        else{
+            //no valid image selected, end the program
+            return;
+        }
+
+        AppImage.getInstance().loadImages(jfc.getSelectedFile().listFiles());
         /*JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose an image: ");
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -165,7 +182,7 @@ public class JTSTestBuilder
         AppImage.setBackgroundImageFile(selectedFile);
         AppFiles.setCorrFile(selectedCorrFile);*/
         
-        AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
+        //AppImage.setBackgroundImageFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\0_.jpg"));
         AppFiles.setCorrFile(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\corr\\ice1_0_1.corr"));
     	
         readArgs(args);

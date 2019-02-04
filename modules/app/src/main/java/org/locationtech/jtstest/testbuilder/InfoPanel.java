@@ -29,24 +29,21 @@ import org.locationtech.jtstest.testbuilder.model.*;
 /**
  * @version 1.7
  */
-public class InfoPanel 
-extends JPanel 
-{
-	TestBuilderModel tbModel = null;
+public class InfoPanel extends JPanel{
+    TestBuilderModel tbModel = null;
+
+    JScrollPane jScrollPane1 = new JScrollPane();
+    JTextArea txtInfo = new JTextArea();
+    BorderLayout tabPanelLayout = new BorderLayout();
+    StringBuffer text = new StringBuffer();
 	
-	JScrollPane jScrollPane1 = new JScrollPane();
-	JTextArea txtInfo = new JTextArea();
-  BorderLayout tabPanelLayout = new BorderLayout();
-  
-  StringBuffer text = new StringBuffer();
-	
-	public InfoPanel() {
-		try {
-			jbInit();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
+    public InfoPanel() {
+        try {
+            jbInit();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 	
   void jbInit() throws Exception {
     

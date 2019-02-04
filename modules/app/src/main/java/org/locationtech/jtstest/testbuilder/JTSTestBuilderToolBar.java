@@ -122,7 +122,7 @@ public class JTSTestBuilderToolBar {
           new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
               boolean isZoom = 0 == (e.getModifiers() & ActionEvent.CTRL_MASK);
-              tbFrame.moveToPrevCase(isZoom);
+              tbFrame.moveToPreviousImage();
             }
           });
       
@@ -139,7 +139,7 @@ public class JTSTestBuilderToolBar {
           new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
              boolean isZoom = 0 == (e.getModifiers() & ActionEvent.CTRL_MASK);
-             tbFrame.moveToNextCase(isZoom);
+             tbFrame.moveToNextImage();
             }
           });
       
