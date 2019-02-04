@@ -11,7 +11,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 
@@ -29,7 +32,11 @@ public class AppCorrGeometries {
     
     private List<Coordinate> drawnPoints = new ArrayList<>();
     
-    private List<BufferedImage> images = new ArrayList<>();
+    private Map<BufferedImage, Coordinate> images = new HashMap<>();
+    
+    private static final int IMAGE_HEIGHT = 10;
+    
+    private static final int IMAGE_WIDTH = 10;
     
     private int editIndex = -1;
     
@@ -104,8 +111,8 @@ public class AppCorrGeometries {
     //that the cursor IS NOT IN
     public void higlightCorrespondingPointInPanel(double x, double y, boolean isSecondPanel){
         Coordinate c = getCorrespondingCoordinate(x, y, isSecondPanel);
-        if (c != null){
-            if (drawnPoints.contains(c)){
+        if (c != null || drawnPoints.size() < 2){
+            if (Arrays.asList(drawnPoints).contains(c)){
                 //this point is already marked
                 return;
             }
@@ -118,7 +125,7 @@ public class AppCorrGeometries {
             else{
                 editPanel = JTSTestBuilderFrame.getGeometryEditPanel2();
             }
-            editPanel.setPointsDrawn(true);
+            //editPanel.setPointsDrawn(true);
             drawPoints(editPanel);
         }
     }
@@ -146,32 +153,32 @@ public class AppCorrGeometries {
     //"force repaint" happens, because this method is asynchronous and this way the dots are not deleted.
     public void drawPoints(GeometryEditPanel editPanel){
         Graphics2D g2 = (Graphics2D) editPanel.getGraphics();
-        g2.setStroke(new BasicStroke(7));
+        g2.setStroke(new BasicStroke(6));
         g2.setColor(Color.red);
         Point2D point;
         BufferedImage bi;
         //draw the images to cover the red points previously drawn
-        for (BufferedImage image : images){
-            //PLACE IN THE RIGHT COORDS!
-            g2.drawImage(image, 0, 0, 10, 10, null);
-            
+        for (Map.Entry<BufferedImage, Coordinate> image : images.entrySet()){
+            try{
+                Point2D p = editPanel.getViewport().toView(image.getValue());
+                g2.drawImage(image.getKey(), (int)p.getX()-IMAGE_WIDTH/2, (int)p.getY()-IMAGE_HEIGHT/2, IMAGE_WIDTH, IMAGE_HEIGHT, null);
+            } catch (java.awt.image.RasterFormatException e) {}
+                        
         }
         images.clear();
-        //place the images and remove them from the array
+        //get the images cropped from the panel
         for (Coordinate c : drawnPoints){
-            point = editPanel.getViewport().toView(c);
-            BufferedImage originalImage = (BufferedImage) editPanel.getRenderMgr().getImage();
-            bi = originalImage.getSubimage((int)point.getX(), (int)point.getY(), 10, 10);
-            this.images.add(bi);
-        }
-        if(editPanel.isPointsDrawn()){
-            for (Coordinate c : drawnPoints){
-                
+            if (c!= null){
                 point = editPanel.getViewport().toView(c);
+                BufferedImage originalImage = (BufferedImage) editPanel.getRenderMgr().getImage();
+                try{ 
+                    bi = originalImage.getSubimage((int)point.getX()-IMAGE_WIDTH/2, (int)point.getY()-IMAGE_HEIGHT/2, IMAGE_WIDTH, IMAGE_HEIGHT);
+                    this.images.put(bi, c);
+                } catch (java.awt.image.RasterFormatException e) {}
                 g2.drawLine((int)point.getX(), (int)point.getY(), (int)point.getX(), (int)point.getY());
             }
-            
         }
+        drawnPoints.clear();        
     }
     
     public void savePointIfExistInCorrGeometry(double x, double y, boolean isSecondPanel){

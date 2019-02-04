@@ -128,7 +128,7 @@ public class RenderManager
             
             //necessary to highlight points. This is assynchronous, so if there is a point to be higlighted we call
             //this function here
-            AppCorrGeometries.getInstance().drawPoints(panel);
+            //AppCorrGeometries.getInstance().drawPoints(panel);
 	}
   
 
