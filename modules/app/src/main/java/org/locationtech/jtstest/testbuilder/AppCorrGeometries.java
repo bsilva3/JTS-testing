@@ -38,6 +38,8 @@ public class AppCorrGeometries {
     
     private static final int IMAGE_WIDTH = 10;
     
+    private static final int MAX_POINTS_STORED = 2;
+    
     private int editIndex = -1;
     
     private static AppCorrGeometries instance;
@@ -111,8 +113,8 @@ public class AppCorrGeometries {
     //that the cursor IS NOT IN
     public void higlightCorrespondingPointInPanel(double x, double y, boolean isSecondPanel){
         Coordinate c = getCorrespondingCoordinate(x, y, isSecondPanel);
-        if (c != null || drawnPoints.size() < 2){
-            if (Arrays.asList(drawnPoints).contains(c)){
+        if (c != null || drawnPoints.size() < MAX_POINTS_STORED){
+            if (drawnPoints.contains(c)){
                 //this point is already marked
                 return;
             }
@@ -130,6 +132,7 @@ public class AppCorrGeometries {
         }
     }
     
+    /*
     //call force repaint on the panel that has a highlited point. This will delete the higlited red points
     public void deleteMarkedPoints(boolean isSecondPanel){
         GeometryEditPanel editPanel;
@@ -146,7 +149,7 @@ public class AppCorrGeometries {
             drawnPoints.clear();
         }
         
-    }
+    }*/
     
     //draws a red dot on all points in the list in the panel
     //(this function is called on the render manager of the panel to be drawn the dots after a 
