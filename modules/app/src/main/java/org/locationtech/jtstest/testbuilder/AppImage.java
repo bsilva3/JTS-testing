@@ -65,6 +65,8 @@ public class AppImage {
     }
     
     //select the correct corr files for the currently selected image on panel 1
+    // it is assumed that the corr files have a <number>_<number>_<number> in the name, with the number
+    //in the middle indicating the corresponding image (starting at 0)
     public void loadCorrFiles(){
         corrFiles.clear();
         Pattern pattern = Pattern.compile("\\d+_" + selectedImageIndexPanel1 + "_\\d+");
@@ -78,40 +80,26 @@ public class AppImage {
         }
     }
     
-    //load next Image in the list
-    public void loadNextImage(){
-        if(selectedImageIndexPanel1 == images.size()-1){
-            //already on last image, return to first image
-            selectedImageIndexPanel1 = 0;
-            selectedImageIndexPanel2 = 1;
-        }
-        else if (selectedImageIndexPanel1 == images.size()-2){
-            selectedImageIndexPanel1++;
-            selectedImageIndexPanel2 = 0;//second panel must go from last to first image
-        }
-        else{
+    //load next Image in the list, unless it is the last image in the list 
+    //return true if the image changed is the last one, false otherwise
+    public boolean loadNextImage(){
+        if(selectedImageIndexPanel1 < images.size()-1){
             selectedImageIndexPanel1++;
             selectedImageIndexPanel2++;
+            loadCorrFiles();
         }
-        loadCorrFiles();
+        return selectedImageIndexPanel1 != images.size()-1;
     }
     
-    //load previous image in the list
-    public void loadPreviousImage(){
-        if(selectedImageIndexPanel1 == 0){
-            //already on first image, go to last image
-            selectedImageIndexPanel1 = images.size()-1;
-            selectedImageIndexPanel2 = 0;
-        }
-        else if (selectedImageIndexPanel1 == images.size()-1){
-            selectedImageIndexPanel1--;
-            selectedImageIndexPanel2 = images.size()-1;//second panel must go from first to last image
-        }
-        else{
+    //load previous image in the list, unless the image in the first panel is the first one in the list
+    //returns true if the image changed is the first image, false otherwise
+    public boolean loadPreviousImage(){
+        if(selectedImageIndexPanel1 > 0){
             selectedImageIndexPanel1--;
             selectedImageIndexPanel2--;
+            loadCorrFiles();
         }
-        loadCorrFiles();
+        return selectedImageIndexPanel1 != 0;
     }
 
     

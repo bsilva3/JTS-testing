@@ -95,7 +95,6 @@ public class GeometryLocationsWriter
         /*for (int i = 0; i < cursorCoordinates.size(); i++){
             AppCorrGeometries.getInstance().higlightCorrespondingPointInPanel(cursorCoordinates.get(i).x, cursorCoordinates.get(i).y, isSecondPanel);
         }*/
-        System.out.println(cursorCoordinates);
         AppCorrGeometries.getInstance().higlightCorrespondingPointInPanel(cursorCoordinates, isSecondPanel);
         return documentStart + text.toString() +documentEnd;
     }

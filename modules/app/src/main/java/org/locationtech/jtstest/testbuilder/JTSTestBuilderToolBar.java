@@ -554,4 +554,28 @@ public class JTSTestBuilderToolBar {
     return btn;
   }
   
+    public boolean isNextBtnActivated(){
+        return this.nextButton.isEnabled();
+    }
+
+    public boolean isPreviousBtnActivated(){
+        return this.previousButton.isEnabled();
+    }
+    
+    public void enableNextBtn(){
+        nextButton.setEnabled(true);
+    }
+
+    public void disableNextBtn(){
+        nextButton.setEnabled(false);
+    }
+
+    public void enablePreviousBtn(){
+        previousButton.setEnabled(true);
+    }
+
+    public void disablePreviousBtn(){
+        previousButton.setEnabled(false);
+    }
+  
 }

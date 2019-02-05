@@ -95,7 +95,15 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	-problemas: 	streampolygon e polygon desaparecem apos uma ação qualquer
 	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
  - avançar para proxima imagem (com ficheiro corr dessa imagem)
- - apagar e adicionar vertices
+ - adicionar um label editavel com o numero da imagem em cada painel.
+ - colocar botões nao ciclicos (avançar fica inativo ao chegar a ultima imagem e retorceder fica inativo na 1ª imagem)
+ - permitir abrir um novo folder para carregar ficheiros de correlaçao novos ( apartir do menu Files)
+ - apagar vertices. Se apagar num dos paineis eliminar o ponto correspondente na geometria do outro painel.
+ - adicionar vertices. Na outra geometria adicionar no mesmo segmento de reta o ponto
  - eventual refactoring -> acaba aqui v0.2
 
  - area e perimetro ao selecionar 
+
+- bugs:
+	-no 2º painel, por vezes o zoom deixa de funcionar
+

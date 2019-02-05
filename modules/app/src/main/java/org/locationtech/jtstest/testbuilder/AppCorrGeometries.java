@@ -134,48 +134,6 @@ public class AppCorrGeometries {
         drawPoints(editPanel);
     }
     
-    //store the point(s) the cursor is in. call a method to higlight the point in the panel
-    //that the cursor IS NOT IN
-    public void higlightCorrespondingPointInPanel(double x, double y, boolean isSecondPanel){
-        Coordinate c = getCorrespondingCoordinate(x, y, isSecondPanel);
-        if (c != null || drawnPoints.size() < MAX_POINTS_STORED){
-            if (drawnPoints.contains(c)){
-                //this point is already marked
-                return;
-            }
-            drawnPoints.add(c);
-            GeometryEditPanel editPanel;
-            if(isSecondPanel){
-                //we want to mark on the other panel
-                editPanel = JTSTestBuilderFrame.getGeometryEditPanel();
-            }
-            else{
-                editPanel = JTSTestBuilderFrame.getGeometryEditPanel2();
-            }
-            //editPanel.setPointsDrawn(true);
-            drawPoints(editPanel);
-        }
-    }
-    
-    /*
-    //call force repaint on the panel that has a highlited point. This will delete the higlited red points
-    public void deleteMarkedPoints(boolean isSecondPanel){
-        GeometryEditPanel editPanel;
-        
-        if (isSecondPanel){
-            editPanel=JTSTestBuilderFrame.getGeometryEditPanel();
-        }
-        else{
-            editPanel=JTSTestBuilderFrame.getGeometryEditPanel2();
-        }
-        if(editPanel.isPointsDrawn()){
-            editPanel.forceRepaint();
-            editPanel.setPointsDrawn(false);
-            drawnPoints.clear();
-        }
-        
-    }*/
-    
     //draws a red dot on all points in the list in the panel
     //(this function is called on the render manager of the panel to be drawn the dots after a 
     //"force repaint" happens, because this method is asynchronous and this way the dots are not deleted.
