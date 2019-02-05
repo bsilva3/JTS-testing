@@ -95,6 +95,7 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	-problemas: 	streampolygon e polygon desaparecem apos uma ação qualquer
 	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
  - avançar para proxima imagem (com ficheiro corr dessa imagem)
+ - apagar e adicionar vertices
  - eventual refactoring -> acaba aqui v0.2
 
  - area e perimetro ao selecionar 

@@ -12,6 +12,8 @@
 
 package org.locationtech.jtstest.testbuilder.geom;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.locationtech.jts.geom.*;
 
 /**
@@ -164,6 +166,16 @@ public class GeometryLocation
         }
         buf.append(" )");
         return buf.toString();
+    }
+    public List<Coordinate> getCoordsInSegment()
+    {
+        List<Coordinate> coords = new ArrayList<>();
+        coords.add(pt);
+        if (! isVertex()) {
+            Coordinate p1 = component.getCoordinates()[index + 1];
+            coords.add(p1);	
+        }
+        return coords;
     }
 
 }

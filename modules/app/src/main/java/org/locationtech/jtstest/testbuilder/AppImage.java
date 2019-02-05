@@ -72,7 +72,7 @@ public class AppImage {
         for (File corrFile : files){
             Matcher matcher = pattern.matcher(corrFile.getName());
             if (matcher.find()){
-                System.out.println(corrFile.getName());
+                //System.out.println(corrFile.getName());
                 corrFiles.add(corrFile);
             }
         }

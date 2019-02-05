@@ -92,9 +92,11 @@ public class GeometryLocationsWriter
     
     if (text.length() > 0) {
         //mark a point in red:
-        for (int i = 0; i < cursorCoordinates.size(); i++){
+        /*for (int i = 0; i < cursorCoordinates.size(); i++){
             AppCorrGeometries.getInstance().higlightCorrespondingPointInPanel(cursorCoordinates.get(i).x, cursorCoordinates.get(i).y, isSecondPanel);
-        }
+        }*/
+        System.out.println(cursorCoordinates);
+        AppCorrGeometries.getInstance().higlightCorrespondingPointInPanel(cursorCoordinates, isSecondPanel);
         return documentStart + text.toString() +documentEnd;
     }
     //string is empty or null
@@ -184,8 +186,8 @@ public class GeometryLocationsWriter
     
   private String writeFacetLocations(List locs, boolean isSecondPanel)
   {
+    cursorCoordinates.clear();
     if (locs.size() <= 0) {
-        cursorCoordinates.clear();
         return null;
     }
     StringBuffer buf = new StringBuffer();
@@ -209,12 +211,19 @@ public class GeometryLocationsWriter
             buf.append(eol + " & more..." + eol);
             break;
         }*/
-        //add this coordinate to the list of points the mouse is over
-        cursorCoordinates.add(loc.getCoordinate());
-        int index = AppCorrGeometries.getInstance().getCordIndex(loc.getCoordinate().x, loc.getCoordinate().y, isSecondPanel);
-        if(index > -1)
-            buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
-        buf.append(loc.getCoordinate().x).append(", ").append(loc.getCoordinate().y);
+        if(!loc.isVertex()){
+            cursorCoordinates.addAll(loc.getCoordsInSegment());
+        }
+        else{
+            //add this coordinate to the list of points the mouse is over
+            cursorCoordinates.add(loc.getCoordinate());
+        }
+        for (Coordinate c : cursorCoordinates){
+            int index = AppCorrGeometries.getInstance().getCordIndex(c.x, c.y, isSecondPanel);
+            if(index > -1)
+                buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
+            buf.append(c.x).append(", ").append(c.y).append("\n");
+        }
     }
     return buf.toString();
   }

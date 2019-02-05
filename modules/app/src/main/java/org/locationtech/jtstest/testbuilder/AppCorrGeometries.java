@@ -111,6 +111,31 @@ public class AppCorrGeometries {
     
     //store the point(s) the cursor is in. call a method to higlight the point in the panel
     //that the cursor IS NOT IN
+    public void higlightCorrespondingPointInPanel(List<Coordinate> coords, boolean isSecondPanel){
+        for (Coordinate coord : coords){
+            Coordinate c = getCorrespondingCoordinate(coord.x, coord.y, isSecondPanel);
+            if (c != null || drawnPoints.size() < MAX_POINTS_STORED){
+                if (drawnPoints.contains(c)){
+                    //this point is already marked
+                    continue;
+                }
+                drawnPoints.add(c);
+            }
+        }
+        //editPanel.setPointsDrawn(true);
+        GeometryEditPanel editPanel;
+        if(isSecondPanel){
+            //we want to mark on the other panel
+            editPanel = JTSTestBuilderFrame.getGeometryEditPanel();
+        }
+        else{
+            editPanel = JTSTestBuilderFrame.getGeometryEditPanel2();
+        }
+        drawPoints(editPanel);
+    }
+    
+    //store the point(s) the cursor is in. call a method to higlight the point in the panel
+    //that the cursor IS NOT IN
     public void higlightCorrespondingPointInPanel(double x, double y, boolean isSecondPanel){
         Coordinate c = getCorrespondingCoordinate(x, y, isSecondPanel);
         if (c != null || drawnPoints.size() < MAX_POINTS_STORED){
