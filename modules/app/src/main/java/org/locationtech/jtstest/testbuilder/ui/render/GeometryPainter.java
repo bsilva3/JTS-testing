@@ -196,14 +196,14 @@ public class GeometryPainter
     }
 
     public static void paintCostum(Geometry geometry, Viewport viewport, Graphics2D g,
-        Color lineColor, Color fillColor) {
+        Color lineColor, Color fillColor, boolean isSecondPanel) {
           ShapeWriter converter = getConverter(viewport);
           //ShapeWriter converter = new ShapeWriter(viewport);
-          paintCostum(geometry, converter, g, lineColor, fillColor, null);
+          paintCostum(geometry, converter, g, lineColor, fillColor, null, isSecondPanel);
         }
        
     private static void paintCostum(Geometry geometry, ShapeWriter converter, Graphics2D g,
-          Color lineColor, Color fillColor, Stroke stroke) {
+          Color lineColor, Color fillColor, Stroke stroke, boolean isSecondPanel) {
         
         if (geometry == null)
             return;
@@ -216,14 +216,13 @@ public class GeometryPainter
            * (1D) elements correctly
            */
           for (int i = 0; i < gc.getNumGeometries(); i++) {
-            paintCostum(gc.getGeometryN(i), converter, g, lineColor, fillColor, stroke);
+            paintCostum(gc.getGeometryN(i), converter, g, lineColor, fillColor, stroke, isSecondPanel);
           }
           return;
         }
 
         Shape shape = converter.toShape(geometry);
-        g.drawImage(AppImage.getInstance().getCurrentlySelectedImage(), shape.getBounds().x, shape.getBounds().y, shape.getBounds().width, shape.getBounds().height, null);
-
+        g.drawImage(AppImage.getInstance().getCurrentlySelectedImageForPanel(isSecondPanel), shape.getBounds().x, shape.getBounds().y, shape.getBounds().width, shape.getBounds().height, null);
 
             // handle points in a special way for appearance and speed
         if (geometry instanceof Point) {

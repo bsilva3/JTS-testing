@@ -99,7 +99,7 @@ public class GeometryEditPanel extends JPanel {
 
     public GeometryEditPanel() {
         gridRenderer = new GridRenderer(viewport, grid);
-        corrToGeomUtils = new CorrToGeometryUtils(AppFiles.getCorrFile());
+        corrToGeomUtils = new CorrToGeometryUtils(AppImage.getInstance().getCurrentCorrFile());
         try {
           initUI();
         } catch (Exception ex) {
@@ -266,12 +266,18 @@ public class GeometryEditPanel extends JPanel {
         renderMgr.copyImage(g);
     }
     
+    public void cleanAndDrawGeometry(){
+        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().clear(OBJECT_GEOMETRY_INDEX);
+        drawGeometry();
+    }
+    
     //draws the geometry defined by the coordinates in the "corr" file. These coordinates are transformed
     //to match the display
     public void drawGeometry(){
-        
+        corrToGeomUtils = new CorrToGeometryUtils(AppImage.getInstance().getCurrentCorrFile());
         //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
-        AppImage.getInstance().resizeImageDimension(this.getSize());
+        AppImage.getInstance().resizeImageDimension(this.getSize(), isSecondPanel);
         drawImagePolygon();
         List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(this.isSecondPanel));
         
@@ -319,7 +325,7 @@ public class GeometryEditPanel extends JPanel {
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
             coordUtils = new CoordinateUtils(c.getX(), c.getY() );
-            coordUtils.transformCoords(appImage.getCurrentImageWidth(), appImage.getCurrentImageHeight(),
+            coordUtils.transformCoords(appImage.getCurrentImageWidth(isSecondPanel), appImage.getCurrentImageHeight(isSecondPanel),
                     appImage.getImageWidthInPanel(), appImage.getImageHeightInPanel());
             
             //add the diference of the top of the panel and the image 

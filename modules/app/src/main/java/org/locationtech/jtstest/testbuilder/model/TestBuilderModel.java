@@ -43,16 +43,12 @@ public class TestBuilderModel
     private String opName = "";
     private boolean isSecondPanelModel = false;
 
-    public TestBuilderModel()
+    public TestBuilderModel(boolean isSecondPanelModel)
     {
+        this.isSecondPanelModel = isSecondPanelModel;
         geomEditModel = new GeometryEditModel();
         initLayers();
         caseList.init();
-    }
-    public TestBuilderModel(boolean isSecondPanelModel)
-    {
-        this();
-        this.isSecondPanelModel = isSecondPanelModel;
     }
 
     public GeometryEditModel getGeometryEditModel() { return geomEditModel; }
@@ -102,7 +98,7 @@ public class TestBuilderModel
         //using a new created model for the geometry... one that uses a background
         //the lines and the fill of the geometry is transparent
         Layer lyrB = layerList.getLayer(LayerList.LYR_B);
-        lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_TRANSPARENT));
+        lyrB.setGeometryStyle(new CostumBasicStyle(GeometryDepiction.GEOM_TRANSPARENT, this.isSecondPanelModel));
 
         Layer lyrR = layerList.getLayer(LayerList.LYR_RESULT);
         lyrR.setGeometryStyle(new BasicStyle(GeometryDepiction.GEOM_RESULT_LINE_CLR,

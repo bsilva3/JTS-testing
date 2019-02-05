@@ -356,7 +356,7 @@ public class HtmlWriter {
       boolean showingAB,
       int imageWidth, int imageHeight, boolean zoomToFullExtent) throws FileNotFoundException,
       IOException {
-  	TestBuilderModel tbModel = new TestBuilderModel();
+  	TestBuilderModel tbModel = new TestBuilderModel(false);
     TestCaseEdit tc = new TestCaseEdit(new Geometry[]{ a, b });
     tc.setResult(result);
     tbModel.getGeometryEditModel().setTestCase(tc);

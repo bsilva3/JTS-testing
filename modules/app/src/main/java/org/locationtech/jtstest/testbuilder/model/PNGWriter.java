@@ -78,7 +78,7 @@ public class PNGWriter {
       Geometry result,
       int imageWidth, int imageHeight) throws FileNotFoundException,
       IOException {
-    TestBuilderModel tbModel = new TestBuilderModel();
+    TestBuilderModel tbModel = new TestBuilderModel(false);
     TestCaseEdit tc = new TestCaseEdit(new Geometry[]{ a, b });
     tc.setResult(result);
     tbModel.getGeometryEditModel().setTestCase(tc);

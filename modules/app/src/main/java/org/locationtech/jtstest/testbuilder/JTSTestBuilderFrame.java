@@ -468,6 +468,8 @@ public class JTSTestBuilderFrame extends JFrame
   }
   
   void reloadBothPanels(){
+      this.getTestCasePanel().getGeometryEditPanel().cleanAndDrawGeometry();
+      this.getTestCasePanel2().getGeometryEditPanel().cleanAndDrawGeometry();
       this.getTestCasePanel().getGeometryEditPanel().forceRepaint();
       this.getTestCasePanel2().getGeometryEditPanel().forceRepaint();
   }

@@ -18,10 +18,12 @@ import org.locationtech.jtstest.testbuilder.ui.render.GeometryPainter;
 public class CostumBasicStyle extends BasicStyle{
     private Color lineColor;
     private Color fillColor;
+    private boolean isSecondPanel;
 
-    public CostumBasicStyle(Color lineColor) {
+    public CostumBasicStyle(Color lineColor, boolean isSecondPanel) {
       this.lineColor = lineColor;
       this.fillColor = new Color(255, 200, 200, 0);//transparent
+      this.isSecondPanel = isSecondPanel;
     }
 
     public CostumBasicStyle() {
@@ -29,7 +31,7 @@ public class CostumBasicStyle extends BasicStyle{
 
     public void paint(Geometry geom, Viewport viewport, Graphics2D g)
     {
-        GeometryPainter.paintCostum(geom, viewport, g, lineColor, fillColor);
+        GeometryPainter.paintCostum(geom, viewport, g, lineColor, fillColor, isSecondPanel);
     }
 
     public Color getLineColor() {
@@ -39,5 +41,10 @@ public class CostumBasicStyle extends BasicStyle{
     public Color getFillColor() {
       return fillColor;
     }
+
+    public boolean isIsSecondPanel() {
+        return isSecondPanel;
+    }
+    
 
 }
