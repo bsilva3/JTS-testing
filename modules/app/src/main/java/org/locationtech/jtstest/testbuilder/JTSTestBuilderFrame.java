@@ -298,409 +298,401 @@ public class JTSTestBuilderFrame extends JFrame
         return bounds.contains(mousePos);
     }
   
-  public TestBuilderModel getModel()
-  {
-    return tbModel;
-  }
-  
-  public TestBuilderModel getModel2()
-  {
-    return tbModel2;
-  }
-  
-  public void setModel(TestBuilderModel model, TestBuilderModel model2)
-  {
-    tbModel = model;
-    tbModel2 = model2;
-    testCasePanel.setModel(tbModel);
-    testCasePanel2.setModel(tbModel2);
-    wktPanel.setModel(model);
-    inspectPanel.setModel(model);
-    resultWKTPanel.setModel(model);
-    resultValuePanel.setModel(model);
-    statsPanel.setModel(model);
-    
-    model.getGeometryEditModel().addGeometryListener(
-        new org.locationtech.jtstest.testbuilder.model.GeometryListener() {
-          public void geometryChanged(GeometryEvent e) {
-            model_geometryChanged(e);
-          }
-        });
-    model2.getGeometryEditModel().addGeometryListener(
-        new org.locationtech.jtstest.testbuilder.model.GeometryListener() {
-          public void geometryChanged(GeometryEvent e) {
-            model2_geometryChanged(e);
-          }
-        });
-    
-    testListPanel.populateList();
-    //layerListPanel.init(getModel().getLayers());
-    layerListPanel.populateList();
-    updateTestCaseView();
-    updatePrecisionModelDescription();
-  }
-  
-  public static void reportException(Exception e) {
-  	SwingUtil.reportException(instance(), e);
-  }
-
-  public void setCurrentTestCase(TestCaseEdit testCase) {
-    tbModel.cases().setCurrent(testCase);
-    tbModel2.cases().setCurrent(testCase);
-    updateTestCaseView();
-    JTSTestBuilderController.zoomToInput();
-  }
-
-  public TestCasePanel getTestCasePanel() {
-    return testCasePanel;
-  }
-  public TestCasePanel getTestCasePanel2() {
-    return testCasePanel2;
-  }
-
-  public ResultWKTPanel getResultWKTPanel() {
-    return resultWKTPanel;
-  }
-
-  public ResultValuePanel getResultValuePanel() {
-    return resultValuePanel;
-  }
-  
-  /**
-   *  File | Exit action performed
-   */
-  public void jMenuFileExit_actionPerformed(ActionEvent e) {
-    System.exit(0);
-  }
-
-  /**
-   *  Help | About action performed
-   */
-  public void jMenuHelpAbout_actionPerformed(ActionEvent e) {
-    JTSTestBuilder_AboutBox dlg = new JTSTestBuilder_AboutBox(this);
-    java.awt.Dimension dlgSize = dlg.getPreferredSize();
-    java.awt.Dimension frmSize = getSize();
-    java.awt.Point loc = getLocation();
-    dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height
-         - dlgSize.height) / 2 + loc.y);
-    dlg.setModal(true);
-    dlg.setVisible(true);
-  }
-
-  public void showTab(String name)
-  {
-    inputTabbedPane.setSelectedIndex(inputTabbedPane.indexOfTab(name));
-  }
-  
-  public void showGeomsTab()
-  {
-    showTab(AppStrings.TAB_LABEL_INPUT);
-  }
-  
-  public void showResultWKTTab()
-  {
-    showTab(AppStrings.TAB_LABEL_RESULT);
-  }
-  public void showResultValueTab()
-  {
-    showTab(AppStrings.TAB_LABEL_VALUE);
-  }
-  
-  public void showInfoTab()
-  {
-    showTab(AppStrings.TAB_LABEL_LOG);
-  }
-  
-  public void openXmlFilesAndDirectories(File[] files) throws Exception {
-    if (files.length == 1) {
-      fileChooser.setSelectedFile(files[0]);
+    public TestBuilderModel getModel()
+    {
+      return tbModel;
     }
-    tbModel.openXmlFilesAndDirectories(files);
-    reportProblemsParsingXmlTestFile(tbModel.getParsingProblems());
-    updateTestCaseView();
-    testListPanel.populateList();
-    updatePrecisionModelDescription();
-    JTSTestBuilderController.zoomToInput();
-  }
 
-  /**
-   *  Overridden so we can exit when window is closed
-   */
-  protected void processWindowEvent(WindowEvent e) {
-    super.processWindowEvent(e);
-    if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-      jMenuFileExit_actionPerformed(null);
+    public TestBuilderModel getModel2()
+    {
+      return tbModel2;
     }
-  }
 
-  void model_geometryChanged(GeometryEvent e) {
-    //testCasePanel.relatePanel.clearResults();
-    JTSTestBuilderController.geometryViewChanged();
-    updateWktPanel();
-  }
-  void model2_geometryChanged(GeometryEvent e) {
-    //testCasePanel.relatePanel.clearResults();
-    JTSTestBuilderController.geometryViewChanged2();
-    updateWktPanel();
-  }
+    public void setModel(TestBuilderModel model, TestBuilderModel model2)
+    {
+      tbModel = model;
+      tbModel2 = model2;
+      testCasePanel.setModel(tbModel);
+      testCasePanel2.setModel(tbModel2);
+      wktPanel.setModel(model);
+      inspectPanel.setModel(model);
+      resultWKTPanel.setModel(model);
+      resultValuePanel.setModel(model);
+      statsPanel.setModel(model);
 
-  void createNewCase() {
-    tbModel.cases().createNew();
-    tbModel2.cases().createNew();
-    showGeomsTab();
-    updateTestCases();
-  }
+      model.getGeometryEditModel().addGeometryListener(
+          new org.locationtech.jtstest.testbuilder.model.GeometryListener() {
+            public void geometryChanged(GeometryEvent e) {
+              model_geometryChanged(e);
+            }
+          });
+      model2.getGeometryEditModel().addGeometryListener(
+          new org.locationtech.jtstest.testbuilder.model.GeometryListener() {
+            public void geometryChanged(GeometryEvent e) {
+              model2_geometryChanged(e);
+            }
+          });
 
-  /*void moveToPrevCase(boolean isZoom) {
-    tbModel2.cases().prevCase();
-    updateTestCaseView();
-    if (isZoom) JTSTestBuilderController.zoomToInput();
-  }*/
-  
-  void moveToNextImage(){
-      boolean lastImage = AppImage.getInstance().loadNextImage();
-      this.reloadBothPanels();
-          
-      if (lastImage){
-        tbToolBar.disableNextBtn();
+      testListPanel.populateList();
+      //layerListPanel.init(getModel().getLayers());
+      layerListPanel.populateList();
+      updateTestCaseView();
+      updatePrecisionModelDescription();
+    }
+
+    public static void reportException(Exception e) {
+          SwingUtil.reportException(instance(), e);
+    }
+
+    public void setCurrentTestCase(TestCaseEdit testCase) {
+      tbModel.cases().setCurrent(testCase);
+      tbModel2.cases().setCurrent(testCase);
+      updateTestCaseView();
+      JTSTestBuilderController.zoomToInput();
+    }
+
+    public TestCasePanel getTestCasePanel() {
+      return testCasePanel;
+    }
+    public TestCasePanel getTestCasePanel2() {
+      return testCasePanel2;
+    }
+
+    public ResultWKTPanel getResultWKTPanel() {
+      return resultWKTPanel;
+    }
+
+    public ResultValuePanel getResultValuePanel() {
+      return resultValuePanel;
+    }
+
+    /**
+     *  File | Exit action performed
+     */
+    public void jMenuFileExit_actionPerformed(ActionEvent e) {
+      System.exit(0);
+    }
+
+    /**
+     *  Help | About action performed
+     */
+    public void jMenuHelpAbout_actionPerformed(ActionEvent e) {
+      JTSTestBuilder_AboutBox dlg = new JTSTestBuilder_AboutBox(this);
+      java.awt.Dimension dlgSize = dlg.getPreferredSize();
+      java.awt.Dimension frmSize = getSize();
+      java.awt.Point loc = getLocation();
+      dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height
+           - dlgSize.height) / 2 + loc.y);
+      dlg.setModal(true);
+      dlg.setVisible(true);
+    }
+
+    public void showTab(String name)
+    {
+      inputTabbedPane.setSelectedIndex(inputTabbedPane.indexOfTab(name));
+    }
+
+    public void showGeomsTab()
+    {
+      showTab(AppStrings.TAB_LABEL_INPUT);
+    }
+
+    public void showResultWKTTab()
+    {
+      showTab(AppStrings.TAB_LABEL_RESULT);
+    }
+    public void showResultValueTab()
+    {
+      showTab(AppStrings.TAB_LABEL_VALUE);
+    }
+
+    public void showInfoTab()
+    {
+      showTab(AppStrings.TAB_LABEL_LOG);
+    }
+
+    public void openXmlFilesAndDirectories(File[] files) throws Exception {
+      if (files.length == 1) {
+        fileChooser.setSelectedFile(files[0]);
       }
-      else{
+      tbModel.openXmlFilesAndDirectories(files);
+      reportProblemsParsingXmlTestFile(tbModel.getParsingProblems());
+      updateTestCaseView();
+      testListPanel.populateList();
+      updatePrecisionModelDescription();
+      JTSTestBuilderController.zoomToInput();
+    }
+
+    /**
+     *  Overridden so we can exit when window is closed
+     */
+    protected void processWindowEvent(WindowEvent e) {
+      super.processWindowEvent(e);
+      if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+        jMenuFileExit_actionPerformed(null);
+      }
+    }
+
+    void model_geometryChanged(GeometryEvent e) {
+      //testCasePanel.relatePanel.clearResults();
+      JTSTestBuilderController.geometryViewChanged();
+      updateWktPanel();
+    }
+    void model2_geometryChanged(GeometryEvent e) {
+      //testCasePanel.relatePanel.clearResults();
+      JTSTestBuilderController.geometryViewChanged2();
+      updateWktPanel();
+    }
+
+    void createNewCase() {
+      tbModel.cases().createNew();
+      tbModel2.cases().createNew();
+      showGeomsTab();
+      updateTestCases();
+    }
+
+    /*void moveToPrevCase(boolean isZoom) {
+      tbModel2.cases().prevCase();
+      updateTestCaseView();
+      if (isZoom) JTSTestBuilderController.zoomToInput();
+    }*/
+
+    void moveToNextImage(){
+        boolean lastImage = AppImage.getInstance().loadNextImage();
+        this.reloadBothPanels();
+        if (lastImage){
+            tbToolBar.disableNextBtn();
+        }
         if (!tbToolBar.isPreviousBtnActivated()){
-              System.out.println("hey next");
-              tbToolBar.enablePreviousBtn();
-          }
-      }
-  }
-  
-  void moveToPreviousImage(){
-      boolean firstImage = AppImage.getInstance().loadPreviousImage();
-      this.reloadBothPanels();
-          
-      if (firstImage){
-        tbToolBar.disablePreviousBtn();
-      }
-      else{
+            tbToolBar.enablePreviousBtn();
+        }
+    }
+
+    void moveToPreviousImage(){
+        boolean firstImage = AppImage.getInstance().loadPreviousImage();
+        this.reloadBothPanels();
+        if (firstImage){
+            tbToolBar.disablePreviousBtn();
+        }
         if (!tbToolBar.isNextBtnActivated()){
-              System.out.println("hey prev");
-              tbToolBar.enableNextBtn();
-          }
-      }
-  }
-  
-  void reloadBothPanels(){
-      this.getTestCasePanel().getGeometryEditPanel().cleanAndDrawGeometry();
-      this.getTestCasePanel2().getGeometryEditPanel().cleanAndDrawGeometry();
-      this.getTestCasePanel().getGeometryEditPanel().forceRepaint();
-      this.getTestCasePanel2().getGeometryEditPanel().forceRepaint();
-  }
-
-  /*void moveToNextCase(boolean isZoom) {
-    tbModel.cases().nextCase();
-    tbModel2.cases().nextCase();
-    updateTestCaseView();
-    if (isZoom) JTSTestBuilderController.zoomToInput();
-  }*/
-
-  void copyCase() {
-    tbModel.cases().copyCase();
-    tbModel2.cases().copyCase();
-    updateTestCases();
-  }
-  TestCaseEdit currentCase() {
-    return tbModel.cases().getCurrentCase();
-  }
-  TestCaseEdit currentCase2() {
-    return tbModel2.cases().getCurrentCase();
-  }
-  public void updateTestCases()
-  {
-    testListPanel.populateList();    
-    updateTestCaseView();
-  }
-  
-  public void copyResultToTest() 
-  {
-    Object currResult = tbModel.getResult();
-    if (! (currResult instanceof Geometry))
-      return;
-    tbModel.addCase(new Geometry[] { (Geometry) currResult, null }, 
-    		"Result of " + tbModel.getOpName());
-    updateTestCaseView();
-    testListPanel.populateList();  
-  }
-  
-  public void actionExchangeGeoms() {
-    currentCase().exchange();
-    testCasePanel.setTestCase(currentCase());
-    currentCase2().exchange();
-    testCasePanel2.setTestCase(currentCase2());
-  }
-
-  void btnDeleteCase_actionPerformed(ActionEvent e) {
-    tbModel.cases().deleteCase();
-    tbModel2.cases().deleteCase();
-    updateTestCaseView();
-    testListPanel.populateList();
-  }
-
-  /*
-  void menuLoadTestCases_actionPerformed(ActionEvent e) {
-    try {
-      loadTestCasesDlg.show();
-      TestCaseList tcl = loadTestCasesDlg.getList();
-      loadTestCaseList(tcl, new PrecisionModel());
-      refreshNavBar();
+            tbToolBar.enableNextBtn();
+        }
     }
-    catch (Exception x) {
-      reportException(this, x);
+
+    void reloadBothPanels(){
+        this.getTestCasePanel().getGeometryEditPanel().cleanAndDrawGeometry();
+        this.getTestCasePanel2().getGeometryEditPanel().cleanAndDrawGeometry();
+        this.getTestCasePanel().getGeometryEditPanel().forceRepaint();
+        this.getTestCasePanel2().getGeometryEditPanel().forceRepaint();
     }
-  }
 
-  void loadTestCaseList(TestCaseList tcl, PrecisionModel precisionModel) throws Exception {
-    tbModel.setPrecisionModel(precisionModel);
-    if (tcl != null) {
-      loadEditList(tcl);
+    /*void moveToNextCase(boolean isZoom) {
+      tbModel.cases().nextCase();
+      tbModel2.cases().nextCase();
+      updateTestCaseView();
+      if (isZoom) JTSTestBuilderController.zoomToInput();
+    }*/
+
+    void copyCase() {
+      tbModel.cases().copyCase();
+      tbModel2.cases().copyCase();
+      updateTestCases();
     }
-    testListPanel.populateList();
-  }
-*/
-  
-  void menuExchangeGeom_actionPerformed(ActionEvent e) {
-    currentCase().exchange();
-    testCasePanel.setTestCase(currentCase());
-  }
+    TestCaseEdit currentCase() {
+      return tbModel.cases().getCurrentCase();
+    }
+    TestCaseEdit currentCase2() {
+      return tbModel2.cases().getCurrentCase();
+    }
+    public void updateTestCases()
+    {
+      testListPanel.populateList();    
+      updateTestCaseView();
+    }
 
-  void menuViewText_actionPerformed(ActionEvent e) {
-    testCaseTextDlg.setTestCase(currentCase());
-    testCaseTextDlg.setVisible(true);
-  }
+    public void copyResultToTest() 
+    {
+      Object currResult = tbModel.getResult();
+      if (! (currResult instanceof Geometry))
+        return;
+      tbModel.addCase(new Geometry[] { (Geometry) currResult, null }, 
+                  "Result of " + tbModel.getOpName());
+      updateTestCaseView();
+      testListPanel.populateList();  
+    }
 
-  public void actionInspectGeometry() {
-    int geomIndex = tbModel.getGeometryEditModel().getGeomIndex();
-    String tag = geomIndex == 0 ? AppStrings.GEOM_LABEL_A : AppStrings.GEOM_LABEL_B;
-    Geometry geometry = currentCase().getGeometry(geomIndex);
-    inspectPanel.setGeometry( tag, geometry, geomIndex);
-    showTab(AppStrings.TAB_LABEL_INSPECT);
+    public void actionExchangeGeoms() {
+      currentCase().exchange();
+      testCasePanel.setTestCase(currentCase());
+      currentCase2().exchange();
+      testCasePanel2.setTestCase(currentCase2());
+    }
+
+    void btnDeleteCase_actionPerformed(ActionEvent e) {
+      tbModel.cases().deleteCase();
+      tbModel2.cases().deleteCase();
+      updateTestCaseView();
+      testListPanel.populateList();
+    }
+
     /*
-    geomInspectorDlg.setGeometry(
-        geomIndex == 0 ? AppStrings.GEOM_LABEL_A : AppStrings.GEOM_LABEL_B,
-        tbModel.getCurrentTestCaseEdit().getGeometry(geomIndex));
-        */
-    //geomInspectorDlg.setVisible(true);
-  }
+    void menuLoadTestCases_actionPerformed(ActionEvent e) {
+      try {
+        loadTestCasesDlg.show();
+        TestCaseList tcl = loadTestCasesDlg.getList();
+        loadTestCaseList(tcl, new PrecisionModel());
+        refreshNavBar();
+      }
+      catch (Exception x) {
+        reportException(this, x);
+      }
+    }
 
-  public void actionInspectGeometryDialog() {
-    int geomIndex = tbModel.getGeometryEditModel().getGeomIndex();
-    String tag = geomIndex == 0 ? AppStrings.GEOM_LABEL_A : AppStrings.GEOM_LABEL_B;
-    Geometry geometry = currentCase().getGeometry(geomIndex);
-    geomInspectorDlg.setGeometry(tag, geometry);
-    geomInspectorDlg.setVisible(true);
-  }
+    void loadTestCaseList(TestCaseList tcl, PrecisionModel precisionModel) throws Exception {
+      tbModel.setPrecisionModel(precisionModel);
+      if (tcl != null) {
+        loadEditList(tcl);
+      }
+      testListPanel.populateList();
+    }
+  */
 
-  void menuLoadXmlTestFile_actionPerformed(ActionEvent e) {
-    try {
-      fileChooser.removeChoosableFileFilter(SwingUtil.JAVA_FILE_FILTER);
-      fileChooser.addChoosableFileFilter(SwingUtil.XML_FILE_FILTER);
-      fileChooser.setDialogTitle("Open XML Test File(s)");
-      fileChooser.setMultiSelectionEnabled(true);
-      if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(this)) {
-        File[] files = fileChooser.getSelectedFiles();
-        if (files.length == 0) {
-          files = new File[]{fileChooser.getSelectedFile()};
+    void menuExchangeGeom_actionPerformed(ActionEvent e) {
+      currentCase().exchange();
+      testCasePanel.setTestCase(currentCase());
+    }
+
+    void menuViewText_actionPerformed(ActionEvent e) {
+      testCaseTextDlg.setTestCase(currentCase());
+      testCaseTextDlg.setVisible(true);
+    }
+
+    public void actionInspectGeometry() {
+      int geomIndex = tbModel.getGeometryEditModel().getGeomIndex();
+      String tag = geomIndex == 0 ? AppStrings.GEOM_LABEL_A : AppStrings.GEOM_LABEL_B;
+      Geometry geometry = currentCase().getGeometry(geomIndex);
+      inspectPanel.setGeometry( tag, geometry, geomIndex);
+      showTab(AppStrings.TAB_LABEL_INSPECT);
+      /*
+      geomInspectorDlg.setGeometry(
+          geomIndex == 0 ? AppStrings.GEOM_LABEL_A : AppStrings.GEOM_LABEL_B,
+          tbModel.getCurrentTestCaseEdit().getGeometry(geomIndex));
+          */
+      //geomInspectorDlg.setVisible(true);
+    }
+
+    public void actionInspectGeometryDialog() {
+      int geomIndex = tbModel.getGeometryEditModel().getGeomIndex();
+      String tag = geomIndex == 0 ? AppStrings.GEOM_LABEL_A : AppStrings.GEOM_LABEL_B;
+      Geometry geometry = currentCase().getGeometry(geomIndex);
+      geomInspectorDlg.setGeometry(tag, geometry);
+      geomInspectorDlg.setVisible(true);
+    }
+
+    void menuLoadXmlTestFile_actionPerformed(ActionEvent e) {
+      try {
+        fileChooser.removeChoosableFileFilter(SwingUtil.JAVA_FILE_FILTER);
+        fileChooser.addChoosableFileFilter(SwingUtil.XML_FILE_FILTER);
+        fileChooser.setDialogTitle("Open XML Test File(s)");
+        fileChooser.setMultiSelectionEnabled(true);
+        if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(this)) {
+          File[] files = fileChooser.getSelectedFiles();
+          if (files.length == 0) {
+            files = new File[]{fileChooser.getSelectedFile()};
+          }
+          openXmlFilesAndDirectories(files);
         }
-        openXmlFilesAndDirectories(files);
+      }
+      catch (Exception x) {
+        SwingUtil.reportException(this, x);
       }
     }
-    catch (Exception x) {
-      SwingUtil.reportException(this, x);
-    }
-  }
 
-  void menuSaveAsXml_actionPerformed(ActionEvent e) {
-    try {
-      fileChooser.removeChoosableFileFilter(SwingUtil.JAVA_FILE_FILTER);
-      fileChooser.addChoosableFileFilter(SwingUtil.XML_FILE_FILTER);
-      fileChooser.setDialogTitle("Save XML Test File");
-      if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(this)) {
-        File file = fileChooser.getSelectedFile();
-        if (! SwingUtil.confirmOverwrite(this, file)) return;
-        FileUtil.setContents(fileChooser.getSelectedFile().getPath(), 
-        		XMLTestWriter.getRunXml(tbModel.getTestCaseList(), tbModel.getPrecisionModel()) );
-      }
-    }
-    catch (Exception x) {
-      SwingUtil.reportException(this, x);
-    }
-  }
-
-  public String getRunXml() 
-  {
-  	return XMLTestWriter.getRunXml(tbModel.getTestCaseList(), tbModel.getPrecisionModel());
-  }
-  
-  void menuSaveAsJava_actionPerformed(ActionEvent e) {
-    try {
-      fileChooser.removeChoosableFileFilter(SwingUtil.XML_FILE_FILTER);
-      fileChooser.addChoosableFileFilter(SwingUtil.JAVA_FILE_FILTER);
-      fileChooser.setDialogTitle("Save Java File");
-      if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(this)) {
-        File file = fileChooser.getSelectedFile();
-        if (! SwingUtil.confirmOverwrite(this, file)) return;
-        String className = fileChooser.getSelectedFile().getName();
-        int extensionIndex = className.lastIndexOf(".");
-        if (extensionIndex > 0) {
-          className = className.substring(0, extensionIndex);
+    void menuSaveAsXml_actionPerformed(ActionEvent e) {
+      try {
+        fileChooser.removeChoosableFileFilter(SwingUtil.JAVA_FILE_FILTER);
+        fileChooser.addChoosableFileFilter(SwingUtil.XML_FILE_FILTER);
+        fileChooser.setDialogTitle("Save XML Test File");
+        if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(this)) {
+          File file = fileChooser.getSelectedFile();
+          if (! SwingUtil.confirmOverwrite(this, file)) return;
+          FileUtil.setContents(fileChooser.getSelectedFile().getPath(), 
+                          XMLTestWriter.getRunXml(tbModel.getTestCaseList(), tbModel.getPrecisionModel()) );
         }
-        ;
-        FileUtil.setContents(fileChooser.getSelectedFile().getPath(), JavaTestWriter.getRunJava(className, tbModel));
+      }
+      catch (Exception x) {
+        SwingUtil.reportException(this, x);
       }
     }
-    catch (Exception x) {
-      SwingUtil.reportException(this, x);
-    }
-  }
 
-  void menuSaveAsHtml_actionPerformed(ActionEvent e) {
-    try {
-      directoryChooser.setDialogTitle("Select Folder In Which To Save HTML and GIF Files");
-      if (JFileChooser.APPROVE_OPTION == directoryChooser.showSaveDialog(this)) {
-        int choice = JOptionPane.showConfirmDialog(this,
-            "Would you like the spatial function images "
-             + "to show the A and B geometries?", "Confirmation",
-            JOptionPane.YES_NO_CANCEL_OPTION);
-        final HtmlWriter writer = new HtmlWriter();
-        switch (choice) {
-          case JOptionPane.CANCEL_OPTION:
-            return;
-          case JOptionPane.YES_OPTION:
-            writer.setShowingABwithSpatialFunction(true);
-            break;
-          case JOptionPane.NO_OPTION:
-            writer.setShowingABwithSpatialFunction(false);
-            break;
+    public String getRunXml() 
+    {
+          return XMLTestWriter.getRunXml(tbModel.getTestCaseList(), tbModel.getPrecisionModel());
+    }
+
+    void menuSaveAsJava_actionPerformed(ActionEvent e) {
+      try {
+        fileChooser.removeChoosableFileFilter(SwingUtil.XML_FILE_FILTER);
+        fileChooser.addChoosableFileFilter(SwingUtil.JAVA_FILE_FILTER);
+        fileChooser.setDialogTitle("Save Java File");
+        if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(this)) {
+          File file = fileChooser.getSelectedFile();
+          if (! SwingUtil.confirmOverwrite(this, file)) return;
+          String className = fileChooser.getSelectedFile().getName();
+          int extensionIndex = className.lastIndexOf(".");
+          if (extensionIndex > 0) {
+            className = className.substring(0, extensionIndex);
+          }
+          ;
+          FileUtil.setContents(fileChooser.getSelectedFile().getPath(), JavaTestWriter.getRunJava(className, tbModel));
         }
-        final File directory = directoryChooser.getSelectedFile();
-        Assert.isTrue(directory.exists());
-        //        BusyDialog.setOwner(this);
-        //        BusyDialog busyDialog = new BusyDialog();
-        //        writer.setBusyDialog(busyDialog);
-        //        try {
-        //          busyDialog.execute("Saving .html and .gif files", new BusyDialog.Executable() {
-        //            public void execute() throws Exception {
-        writer.write(directory, tbModel.getTestCaseList(), tbModel.getPrecisionModel());
-        //            }
-        //          });
-        //        }
-        //        catch (Exception e2) {
-        //          System.out.println(busyDialog.getStackTrace());
-        //          throw e2;
-        //        }
+      }
+      catch (Exception x) {
+        SwingUtil.reportException(this, x);
       }
     }
-    catch (Exception x) {
-      SwingUtil.reportException(this, x);
+
+    void menuSaveAsHtml_actionPerformed(ActionEvent e) {
+      try {
+        directoryChooser.setDialogTitle("Select Folder In Which To Save HTML and GIF Files");
+        if (JFileChooser.APPROVE_OPTION == directoryChooser.showSaveDialog(this)) {
+          int choice = JOptionPane.showConfirmDialog(this,
+              "Would you like the spatial function images "
+               + "to show the A and B geometries?", "Confirmation",
+              JOptionPane.YES_NO_CANCEL_OPTION);
+          final HtmlWriter writer = new HtmlWriter();
+          switch (choice) {
+            case JOptionPane.CANCEL_OPTION:
+              return;
+            case JOptionPane.YES_OPTION:
+              writer.setShowingABwithSpatialFunction(true);
+              break;
+            case JOptionPane.NO_OPTION:
+              writer.setShowingABwithSpatialFunction(false);
+              break;
+          }
+          final File directory = directoryChooser.getSelectedFile();
+          Assert.isTrue(directory.exists());
+          //        BusyDialog.setOwner(this);
+          //        BusyDialog busyDialog = new BusyDialog();
+          //        writer.setBusyDialog(busyDialog);
+          //        try {
+          //          busyDialog.execute("Saving .html and .gif files", new BusyDialog.Executable() {
+          //            public void execute() throws Exception {
+          writer.write(directory, tbModel.getTestCaseList(), tbModel.getPrecisionModel());
+          //            }
+          //          });
+          //        }
+          //        catch (Exception e2) {
+          //          System.out.println(busyDialog.getStackTrace());
+          //          throw e2;
+          //        }
+        }
+      }
+      catch (Exception x) {
+        SwingUtil.reportException(this, x);
+      }
     }
-  }
 
     void menuSaveAsPNG_actionPerformed(ActionEvent e) {
       initFileChoosers();
@@ -896,8 +888,10 @@ public class JTSTestBuilderFrame extends JFrame
       border4 = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Color.white,
           Color.white, new Color(93, 93, 93), new Color(134, 134, 134));
       contentPane.setLayout(borderLayout1);
-      this.setSize(new Dimension(800, 800));
+      this.setSize(new Dimension(screenSize.width, screenSize.height));
       this.setTitle("JTS TestBuilder");
+      //start JFrame maximized
+      setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
 
       /*
       testCasePanel.editPanel.addGeometryListener(
@@ -960,56 +954,56 @@ public class JTSTestBuilderFrame extends JFrame
   
   
 
-  public JTSTestBuilderToolBar getToolbar()
-  {
-    return tbToolBar;
-  }
-  
-  private void updateStatsPanelIfVisible()
-  {
-    int index = inputTabbedPane.getSelectedIndex();
-    if (index < 0) return;
-    if (inputTabbedPane.getComponent(index) == statsPanel) {
-      statsPanel.refresh();         
-    }   
-  }
-  
-  private void updateGeometry() {
-    testCasePanel.relatePanel.clearResults();
-    testCasePanel.setTestCase(currentCase());
-    updateWktPanel();
-  }
-  private void updateGeometry2() {
-    testCasePanel2.relatePanel.clearResults();
-    testCasePanel2.setTestCase(currentCase2());
-    //updateWktPanel();
-  }
+    public JTSTestBuilderToolBar getToolbar()
+    {
+      return tbToolBar;
+    }
 
-  private void updateWktPanel() {
-    try{
-        Geometry g0 = tbModel.getGeometryEditModel().getGeometry(0);
-        wktPanel.setText(g0, 0);
-        Geometry g1 = tbModel2.getGeometryEditModel().getGeometry(0);
-        wktPanel.setText(g1, 1);
-    } catch (NullPointerException e) {}
-    
-  }
+    private void updateStatsPanelIfVisible()
+    {
+      int index = inputTabbedPane.getSelectedIndex();
+      if (index < 0) return;
+      if (inputTabbedPane.getComponent(index) == statsPanel) {
+        statsPanel.refresh();         
+      }   
+    }
 
-  private void updatePrecisionModelDescription() {
-    testCasePanel.setPrecisionModelDescription(tbModel.getPrecisionModel().toString());
-    testCasePanel2.setPrecisionModelDescription(tbModel2.getPrecisionModel().toString());
-  }
+    private void updateGeometry() {
+      testCasePanel.relatePanel.clearResults();
+      testCasePanel.setTestCase(currentCase());
+      updateWktPanel();
+    }
+    private void updateGeometry2() {
+      testCasePanel2.relatePanel.clearResults();
+      testCasePanel2.setTestCase(currentCase2());
+      //updateWktPanel();
+    }
 
-  public void updateTestCaseView() {
-    testCasePanel.setTestCase(currentCase());
-    getTestCasePanel().setCurrentTestCaseIndex(tbModel.getCurrentCaseIndex() + 1);
-    getTestCasePanel().setMaxTestCaseIndex(tbModel.getCasesSize());
-    testCasePanel2.setTestCase(currentCase2());
-    getTestCasePanel2().setCurrentTestCaseIndex(tbModel2.getCurrentCaseIndex() + 1);
-    getTestCasePanel2().setMaxTestCaseIndex(tbModel2.getCasesSize());
-    updateWktPanel();
-    updateStatsPanelIfVisible();
-  }
+    private void updateWktPanel() {
+      try{
+          Geometry g0 = tbModel.getGeometryEditModel().getGeometry(0);
+          wktPanel.setText(g0, 0);
+          Geometry g1 = tbModel2.getGeometryEditModel().getGeometry(0);
+          wktPanel.setText(g1, 1);
+      } catch (NullPointerException e) {}
+
+    }
+
+    private void updatePrecisionModelDescription() {
+      testCasePanel.setPrecisionModelDescription(tbModel.getPrecisionModel().toString());
+      testCasePanel2.setPrecisionModelDescription(tbModel2.getPrecisionModel().toString());
+    }
+
+    public void updateTestCaseView() {
+      testCasePanel.setTestCase(currentCase());
+      getTestCasePanel().setCurrentTestCaseIndex(tbModel.getCurrentCaseIndex() + 1);
+      getTestCasePanel().setMaxTestCaseIndex(tbModel.getCasesSize());
+      testCasePanel2.setTestCase(currentCase2());
+      getTestCasePanel2().setCurrentTestCaseIndex(tbModel2.getCurrentCaseIndex() + 1);
+      getTestCasePanel2().setMaxTestCaseIndex(tbModel2.getCasesSize());
+      updateWktPanel();
+      updateStatsPanelIfVisible();
+    }
 
     public void displayInfo(Coordinate modelPt)
     {

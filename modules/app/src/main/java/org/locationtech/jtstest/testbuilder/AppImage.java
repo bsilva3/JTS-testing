@@ -24,9 +24,10 @@ import javax.imageio.ImageIO;
  * @author Bruno Silva
  */
 public class AppImage {
-    private int currentImageWidthInPanel;
-    
-    private int currentImageHeightInPanel;
+    private int currentImageWidthInPanel1;
+    private int currentImageWidthInPanel2;
+    private int currentImageHeightInPanel1;
+    private int currentImageHeightInPanel2;
     
     private List<Image> images = new ArrayList<>();
     
@@ -57,6 +58,10 @@ public class AppImage {
                 Logger.getLogger(AppImage.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        if (images.size() == 1){
+            selectedImageIndexPanel2 = 0;
+            //if there is only one image, immediately deactivate one
+        }
     }
     
     public void setAndLoadCorrDirFiles(File corrDir){
@@ -83,12 +88,12 @@ public class AppImage {
     //load next Image in the list, unless it is the last image in the list 
     //return true if the image changed is the last one, false otherwise
     public boolean loadNextImage(){
-        if(selectedImageIndexPanel1 < images.size()-1){
+        if(selectedImageIndexPanel1 < images.size()-2){
             selectedImageIndexPanel1++;
             selectedImageIndexPanel2++;
             loadCorrFiles();
         }
-        return selectedImageIndexPanel1 != images.size()-1;
+        return selectedImageIndexPanel1 == images.size()-2; //the left panel only has 2nd image from the end maximum. Last image is on left panel
     }
     
     //load previous image in the list, unless the image in the first panel is the first one in the list
@@ -99,7 +104,7 @@ public class AppImage {
             selectedImageIndexPanel2--;
             loadCorrFiles();
         }
-        return selectedImageIndexPanel1 != 0;
+        return selectedImageIndexPanel1 == 0;
     }
 
     
@@ -110,6 +115,18 @@ public class AppImage {
         else{
             return images.get(selectedImageIndexPanel1);
         }
+    }
+    
+    public int getTotalNumberOfImages(){
+        return images.size();
+    }
+    
+    public int getCurrentIndexImageForPanel1(){
+        return selectedImageIndexPanel1;
+    }
+    
+    public int getCurrentIndexImageForPanel2(){
+        return selectedImageIndexPanel2;
     }
     
     public int getCurrentImageWidth(boolean isSecondPanel) {
@@ -133,8 +150,8 @@ public class AppImage {
         Image im = getCurrentlySelectedImageForPanel(isSecondPanel);
         Dimension d = getScaledDimension(new Dimension((int) im.getWidth(null), 
         (int) im.getHeight(null)), windowDimension );
-        setImageHeightInPanel((int) Math.round(d.height));
-        setImageWidthInPanel((int) Math.round(d.width));
+        setImageHeightInPanel((int) Math.round(d.height), isSecondPanel);
+        setImageWidthInPanel((int) Math.round(d.width), isSecondPanel);
         return d;
     }
       
@@ -146,20 +163,36 @@ public class AppImage {
         return new Dimension((int) (imageSize.width * ratio), (int) (imageSize.height * ratio));
     }
 
-    public int getImageWidthInPanel() {
-        return currentImageWidthInPanel;
+    public int getImageWidthInPanel(boolean isSecondPanel) {
+        if(isSecondPanel){
+            return currentImageWidthInPanel2;
+        }
+        return currentImageWidthInPanel1;
     }
 
-    public void setImageWidthInPanel(int imageWidthInPanel) {
-        this.currentImageWidthInPanel = imageWidthInPanel;
+    public void setImageWidthInPanel(int imageWidthInPanel, boolean isSecondPanel) {
+        if (isSecondPanel){
+            this.currentImageWidthInPanel2 = imageWidthInPanel;
+        }
+        else{
+            this.currentImageWidthInPanel1 = imageWidthInPanel;
+        }
     }
 
-    public int getImageHeightInPanel() {
-        return currentImageHeightInPanel;
+    public int getImageHeightInPanel(boolean isSecondPanel) {
+        if(isSecondPanel){
+            return currentImageHeightInPanel2;
+        }
+        return currentImageHeightInPanel1;
     }
 
-    public void setImageHeightInPanel(int imageHeightInPanel) {
-        this.currentImageHeightInPanel = imageHeightInPanel;
+    public void setImageHeightInPanel(int imageHeightInPanel, boolean isSecondPanel) {
+        if(isSecondPanel){
+            this.currentImageHeightInPanel2 = imageHeightInPanel;
+        }
+        else{
+            this.currentImageHeightInPanel1 = imageHeightInPanel;
+        }   
     }
 
     public File getCurrentCorrFile(){

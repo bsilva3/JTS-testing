@@ -20,9 +20,16 @@ import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class JTSTestBuilderToolBar {
 
@@ -31,6 +38,13 @@ public class JTSTestBuilderToolBar {
 
   JToolBar jToolBar1 = new JToolBar();
   JButton previousButton = new JButton();
+  SpinnerModel sm;
+  SpinnerModel sm2;
+  JLabel labelForImageNumberPanel1 = new JLabel();
+  JSpinner panel1ImageNumber;//image number on panel 1
+  JLabel labelForImageNumberPanel2 = new JLabel();
+  JSpinner panel2ImageNumber;//image number on panel 2
+  JLabel totalImages = new JLabel();//a number with the total number of images in the directory (i.e. loaded to memory)
   JButton nextButton = new JButton();
   JButton newButton = new JButton();
   JButton copyButton = new JButton();
@@ -123,8 +137,38 @@ public class JTSTestBuilderToolBar {
             public void actionPerformed(ActionEvent e) {
               boolean isZoom = 0 == (e.getModifiers() & ActionEvent.CTRL_MASK);
               tbFrame.moveToPreviousImage();
+              updateImageNumbersInFields();
             }
           });
+      sm = new SpinnerNumberModel(1, 1, AppImage.getInstance().getTotalNumberOfImages(), 1); //default value,lower bound,upper bound,increment by
+      sm2 = new SpinnerNumberModel(1, 1, AppImage.getInstance().getTotalNumberOfImages(), 1); //default value,lower bound,upper bound,increment by
+      panel1ImageNumber = new JSpinner(sm);
+      panel1ImageNumber.setFont(new java.awt.Font("SansSerif", 0, 10));
+      panel1ImageNumber.setMaximumSize(new Dimension(40, 20));
+      panel1ImageNumber.setMinimumSize(new Dimension(40, 20));
+      panel1ImageNumber.setPreferredSize(new Dimension(40, 20));
+      
+      panel1ImageNumber.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                System.out.println("value changed: " + panel1ImageNumber.getValue());
+            }
+        });
+      
+      panel2ImageNumber = new JSpinner(sm2);
+      panel2ImageNumber.setFont(new java.awt.Font("SansSerif", 0, 10));
+      panel2ImageNumber.setMaximumSize(new Dimension(40, 20));
+      panel2ImageNumber.setMinimumSize(new Dimension(40, 20));
+      panel2ImageNumber.setPreferredSize(new Dimension(40, 20));
+      panel2ImageNumber.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                System.out.println("value changed: " + panel2ImageNumber.getValue());
+            }
+        });
+      
+      updateImageNumbersInFields();
+      setTextForImageNumberLabels();
       
       nextButton.setMargin(new Insets(0, 0, 0, 0));
       nextButton.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -140,6 +184,7 @@ public class JTSTestBuilderToolBar {
             public void actionPerformed(ActionEvent e) {
              boolean isZoom = 0 == (e.getModifiers() & ActionEvent.CTRL_MASK);
              tbFrame.moveToNextImage();
+             updateImageNumbersInFields();
             }
           });
       
@@ -470,6 +515,11 @@ public class JTSTestBuilderToolBar {
       jToolBar1.add(newButton, null);
       jToolBar1.add(copyButton, null);
       jToolBar1.add(previousButton, null);
+      jToolBar1.add(labelForImageNumberPanel1, null);
+      jToolBar1.add(panel1ImageNumber, null);
+      jToolBar1.add(labelForImageNumberPanel2, null);
+      jToolBar1.add(panel2ImageNumber, null);
+      jToolBar1.add(totalImages, null);
       jToolBar1.add(nextButton, null);
       
       jToolBar1.add(Box.createHorizontalStrut(8), null);
@@ -504,6 +554,9 @@ public class JTSTestBuilderToolBar {
       jToolBar1.add(btnEditVertex, null);
       jToolBar1.add(deleteVertexButton, null);
       jToolBar1.add(btnShowHideGrid, null);
+      
+      //start with previous button deactivated because we begin with the first image and there is no image to go back to
+      disablePreviousBtn();
       
       return jToolBar1;
   }
@@ -576,6 +629,27 @@ public class JTSTestBuilderToolBar {
 
     public void disablePreviousBtn(){
         previousButton.setEnabled(false);
+    }
+    
+    private int getNumberOfImagePanel1(){
+        return AppImage.getInstance().getCurrentIndexImageForPanel1()+1;
+    }
+    
+    private int getNumberOfImagePanel2(){
+        return AppImage.getInstance().getCurrentIndexImageForPanel2()+1;
+    }
+    
+    //updates the number of the currently shown images in each text field
+    private void updateImageNumbersInFields(){
+      panel1ImageNumber.setValue(getNumberOfImagePanel1());
+      panel2ImageNumber.setValue(getNumberOfImagePanel2());
+    }
+    
+    //set the text for the labels next to the spinners with the number of the images in the panel
+    private void setTextForImageNumberLabels(){
+        labelForImageNumberPanel1.setText("  left panel image nº: ");
+        labelForImageNumberPanel2.setText(" right panel image nº: ");
+        totalImages.setText(" "+AppImage.getInstance().getTotalNumberOfImages()+" images total  ");
     }
   
 }
