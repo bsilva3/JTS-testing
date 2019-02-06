@@ -154,7 +154,6 @@ public class JTSTestBuilderToolBar {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if ((int)panel1ImageNumber.getValue() != getNumberOfImagePanel1()){
-                    System.out.println("value changed: " + panel1ImageNumber.getValue());
                     tbFrame.movePanel1ToImage((int) panel1ImageNumber.getValue());
                     updateImageNumbersInFields();//this is only called to update the number in the other spinner
                     //recall that the number of the image in the first panel == number imagem in second panel -1
@@ -172,8 +171,7 @@ public class JTSTestBuilderToolBar {
             public void stateChanged(ChangeEvent e) {
                 if ((int)panel2ImageNumber.getValue() != getNumberOfImagePanel2()){
                     //the value in the jspinner was changed diretly by the user
-                    System.out.println("value changed: " + panel2ImageNumber.getValue());
-                    tbFrame.movePanel2ToImage((int) panel1ImageNumber.getValue());
+                    tbFrame.movePanel2ToImage((int) panel2ImageNumber.getValue());
                     updateImageNumbersInFields();//this is only called to update the number in the other spinner
                     //recall that the number of the image in the first panel == number imagem in second panel -1
                 }

@@ -125,7 +125,7 @@ public class AppImage {
     
     public boolean imageExistForPanel1(int i){
         i--;//decrease because the index of an image in the list of images == the number of the image in the panel -1
-        if (i < images.size() -2 && i >= 0){
+        if (i <= images.size()-2 && i >= 0){
             //there is a image for both panels
             this.selectedImageIndexPanel1 = i;
             //the index of the selected image in panel 2 will always be 1 more than the index of the image in panel 1
@@ -160,7 +160,7 @@ public class AppImage {
     
     public boolean imageExistForPanel2(int i){
         i--; //decrease because the index of an image in the list of images == the number of the image in the panel -1
-        if (i < images.size() -1 && i >= 1){
+        if (i <= images.size()-1 && i >= 1){
             this.selectedImageIndexPanel2 = i;
             //the index of the selected image in panel 1 will always be 1 less than the index of the image in panel2
             this.selectedImageIndexPanel1 = i-1;
