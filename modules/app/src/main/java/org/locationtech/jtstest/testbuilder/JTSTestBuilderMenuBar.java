@@ -31,6 +31,7 @@ public class JTSTestBuilderMenuBar
   JMenu jMenuEdit = new JMenu();
   //JMenu jMenuTools = new JMenu();
   //JMenu jMenuOptions = new JMenu();
+  JMenuItem menuLoadCorrFilesFolder = new JMenuItem();
   JMenuItem menuExchangeGeom = new JMenuItem();
   JMenuItem menuViewText = new JMenuItem();
   JMenuItem menuViewGeometry = new JMenuItem();
@@ -75,6 +76,15 @@ public class JTSTestBuilderMenuBar
           tbFrame.jMenuFileExit_actionPerformed(e);
         }
       });
+    
+    menuLoadCorrFilesFolder.setText("Load Corr files from folder");
+    menuLoadCorrFilesFolder.addActionListener(
+      new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          tbFrame.menuLoadCorrFilesFolder_actionPerformed(e);
+        }
+      });
+    
     menuExchangeGeom.setText("Exchange Geometries");
     menuExchangeGeom.addActionListener(
       new java.awt.event.ActionListener() {
@@ -249,6 +259,7 @@ public class JTSTestBuilderMenuBar
     fillGroup.add(rainbowRandomFillMenuItem);
     basicFillMenuItem.setSelected(true);
 
+    jMenuFile.add(menuLoadCorrFilesFolder);
     jMenuFile.add(menuLoadXmlTestFile);
     jMenuFile.add(menuLoadXmlTestFolder);
     jMenuFile.add(saveAsPNGMenuItem);

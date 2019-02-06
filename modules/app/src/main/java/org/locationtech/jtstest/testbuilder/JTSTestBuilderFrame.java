@@ -52,6 +52,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -627,6 +628,31 @@ public class JTSTestBuilderFrame extends JFrame
       Geometry geometry = currentCase().getGeometry(geomIndex);
       geomInspectorDlg.setGeometry(tag, geometry);
       geomInspectorDlg.setVisible(true);
+    }
+    
+    void menuLoadCorrFilesFolder_actionPerformed(ActionEvent e) {
+      try {
+        fileChooser.removeChoosableFileFilter(SwingUtil.JAVA_FILE_FILTER);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("wkt, corr", "corr", "wkt");
+        fileChooser.addChoosableFileFilter(filter);
+        fileChooser.addChoosableFileFilter(SwingUtil.XML_FILE_FILTER);
+        fileChooser.setDialogTitle("Open Folder with Corr File(s)");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setMultiSelectionEnabled(false);
+        if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(this)) {
+          File[] files = fileChooser.getSelectedFile().listFiles();
+          if (files.length == 0) {
+              //no files in directory!
+            JOptionPane.showMessageDialog(this, "The indicated folder is empty!\n No files were loaded.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+          }
+          AppImage.getInstance().setAndLoadCorrDirFiles(fileChooser.getSelectedFile());
+          this.reloadBothPanels();
+        }
+      }
+      catch (Exception x) {
+        SwingUtil.reportException(this, x);
+      }
     }
 
     void menuLoadXmlTestFile_actionPerformed(ActionEvent e) {

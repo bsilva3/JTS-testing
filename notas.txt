@@ -91,12 +91,6 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 -JTSTestBuilderToolBar: contem o botao next e previous, entre outros
 
 ---> todo:
- - 2 viewports lado a lado com mesma imagem, mas 1º terá 1ª e 2ª coluna no ficheiro de corr e 2º terá 3ª e 4ª
-	-problemas: 	streampolygon e polygon desaparecem apos uma ação qualquer
-	-classe basic tool: limpar codigo e remover atributos que poderão nao ser necessários com as alterações feitas
- - avançar para proxima imagem (com ficheiro corr dessa imagem)
- - adicionar um label editavel com o numero da imagem em cada painel.
- - permitir abrir um novo folder para carregar ficheiros de correlaçao novos ( apartir do menu Files)
  - apagar vertices. Se apagar num dos paineis eliminar o ponto correspondente na geometria do outro painel.
  - adicionar vertices. Na outra geometria adicionar no mesmo segmento de reta o ponto
  - eventual refactoring -> acaba aqui v0.2
@@ -105,4 +99,5 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 
 - bugs:
 	-no 2º painel, por vezes o zoom deixa de funcionar
+	-streampolygon e polygon desaparecem apos uma ação qualquer
 

@@ -156,7 +156,7 @@ public class JTSTestBuilder
              selectedDirectory = jfc.getSelectedFile();
         }
         else{
-            //no valid image selected, end the program
+            //no valid corr files folder selected, end the program
             return;
         }
         AppImage.getInstance().setAndLoadCorrDirFiles(selectedDirectory);*/

@@ -190,6 +190,20 @@ public class AppCorrGeometries {
         }
     }
     
+    //given a coordinate, if it is exists on one of the corr geometries, it is deleted from both geometries
+    public void deletePointInBothCorrGeometries(Coordinate c){
+        if ( this.corrGeometry1.contains(c)){
+            int index = corrGeometry1.indexOf(c);
+            corrGeometry2.remove(index);
+            corrGeometry1.remove(index);
+        }
+        else if ( this.corrGeometry2.contains(c)){
+            int index = corrGeometry2.indexOf(c);
+            corrGeometry2.remove(index);
+            corrGeometry1.remove(index);
+        }
+    }
+    
     public List<Coordinate> getCorrGeometry1() {
         return corrGeometry1;
     }

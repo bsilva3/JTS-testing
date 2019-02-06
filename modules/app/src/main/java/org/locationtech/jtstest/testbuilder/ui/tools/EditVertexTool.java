@@ -110,6 +110,7 @@ extends IndicatorTool
       GeometryLocation geomLoc = geoModel.locateVertex(mousePtModel, tolModel);
       //System.out.println("Testing: delete vertex at " + geomLoc);
       if (geomLoc != null) {
+          AppCorrGeometries.getInstance().deletePointInBothCorrGeometries(geomLoc.getCoordinate());
           geoModel.setGeometry(geomLoc.delete());
       }
     }
