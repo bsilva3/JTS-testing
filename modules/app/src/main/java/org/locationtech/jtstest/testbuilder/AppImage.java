@@ -33,6 +33,8 @@ public class AppImage {
     
     private List<File> corrFiles = new ArrayList<>();
     
+    //stores the index of the image selected in each panel in the list of images 
+    //the index of the selected image in panel 1 will always be 1 less than the index of the image in panel2
     private int selectedImageIndexPanel1 = 0;
     private int selectedImageIndexPanel2 = 1;
     
@@ -119,6 +121,53 @@ public class AppImage {
     
     public int getTotalNumberOfImages(){
         return images.size();
+    }
+    
+    public boolean imageExistForPanel1(int i){
+        i--;//decrease because the index of an image in the list of images == the number of the image in the panel -1
+        if (i < images.size() -2 && i >= 0){
+            //there is a image for both panels
+            this.selectedImageIndexPanel1 = i;
+            //the index of the selected image in panel 2 will always be 1 more than the index of the image in panel 1
+            this.selectedImageIndexPanel2 = i+1;
+            loadCorrFiles();
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean isLastImageForPanel1(){
+        if(images.size() == 1){
+            return this.selectedImageIndexPanel2 == images.size()-1;
+        }
+        return this.selectedImageIndexPanel1 == images.size()-2;
+    }
+    
+    public boolean isFirstImageForPanel1(){
+        return this.selectedImageIndexPanel1 == 0;
+    }
+    
+    public boolean isFirstImageForPanel2(){
+        if(images.size() == 1){
+            return this.selectedImageIndexPanel2 == 0;
+        }
+        return this.selectedImageIndexPanel2 == 1;
+    }
+    
+    public boolean isLastImageForPanel2(){
+        return this.selectedImageIndexPanel1 == images.size()-1;
+    }
+    
+    public boolean imageExistForPanel2(int i){
+        i--; //decrease because the index of an image in the list of images == the number of the image in the panel -1
+        if (i < images.size() -1 && i >= 1){
+            this.selectedImageIndexPanel2 = i;
+            //the index of the selected image in panel 1 will always be 1 less than the index of the image in panel2
+            this.selectedImageIndexPanel1 = i-1;
+            loadCorrFiles();
+            return true;
+        }
+        return false;
     }
     
     public int getCurrentIndexImageForPanel1(){

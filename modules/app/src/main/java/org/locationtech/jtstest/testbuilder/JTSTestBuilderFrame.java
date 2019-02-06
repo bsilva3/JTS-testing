@@ -485,6 +485,46 @@ public class JTSTestBuilderFrame extends JFrame
         this.getTestCasePanel().getGeometryEditPanel().forceRepaint();
         this.getTestCasePanel2().getGeometryEditPanel().forceRepaint();
     }
+    
+    //select the image i in the list of images and selects the image i+1 for the panel 2.
+    void movePanel1ToImage(int i){
+        boolean imageChanged = AppImage.getInstance().imageExistForPanel1(i);
+        if (imageChanged){
+            this.reloadBothPanels();
+            if (AppImage.getInstance().isLastImageForPanel1()){
+                tbToolBar.disableNextBtn();
+            }
+            else{
+                tbToolBar.enableNextBtn();
+            }
+            if (AppImage.getInstance().isFirstImageForPanel1()){
+                tbToolBar.disablePreviousBtn();
+            }
+            else{
+                tbToolBar.enablePreviousBtn();
+            }
+        }
+    }
+    
+    //select the image i in the list of images and selects the image i+1 for the panel 2.
+    void movePanel2ToImage(int i){
+        boolean imageChanged = AppImage.getInstance().imageExistForPanel2(i);
+        if (imageChanged){
+            this.reloadBothPanels();
+            if (AppImage.getInstance().isLastImageForPanel2()){
+                tbToolBar.disableNextBtn();
+            }
+            else{
+                tbToolBar.enableNextBtn();
+            }
+            if (AppImage.getInstance().isFirstImageForPanel2()){
+                tbToolBar.disablePreviousBtn();
+            }
+            else{
+                tbToolBar.enablePreviousBtn();
+            }
+        }
+    }
 
     /*void moveToNextCase(boolean isZoom) {
       tbModel.cases().nextCase();

@@ -140,7 +140,9 @@ public class JTSTestBuilderToolBar {
               updateImageNumbersInFields();
             }
           });
-      sm = new SpinnerNumberModel(1, 1, AppImage.getInstance().getTotalNumberOfImages(), 1); //default value,lower bound,upper bound,increment by
+      //limit the number of the spinners accordingly with the number of images loaded
+      //the number in the spinner for the first panel can only go to the penultimate image
+      sm = new SpinnerNumberModel(1, 1, AppImage.getInstance().getTotalNumberOfImages()-1, 1); //default value,lower bound,upper bound,increment by
       sm2 = new SpinnerNumberModel(1, 1, AppImage.getInstance().getTotalNumberOfImages(), 1); //default value,lower bound,upper bound,increment by
       panel1ImageNumber = new JSpinner(sm);
       panel1ImageNumber.setFont(new java.awt.Font("SansSerif", 0, 10));
@@ -151,7 +153,12 @@ public class JTSTestBuilderToolBar {
       panel1ImageNumber.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                System.out.println("value changed: " + panel1ImageNumber.getValue());
+                if ((int)panel1ImageNumber.getValue() != getNumberOfImagePanel1()){
+                    System.out.println("value changed: " + panel1ImageNumber.getValue());
+                    tbFrame.movePanel1ToImage((int) panel1ImageNumber.getValue());
+                    updateImageNumbersInFields();//this is only called to update the number in the other spinner
+                    //recall that the number of the image in the first panel == number imagem in second panel -1
+                }
             }
         });
       
@@ -163,7 +170,13 @@ public class JTSTestBuilderToolBar {
       panel2ImageNumber.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                System.out.println("value changed: " + panel2ImageNumber.getValue());
+                if ((int)panel2ImageNumber.getValue() != getNumberOfImagePanel2()){
+                    //the value in the jspinner was changed diretly by the user
+                    System.out.println("value changed: " + panel2ImageNumber.getValue());
+                    tbFrame.movePanel2ToImage((int) panel1ImageNumber.getValue());
+                    updateImageNumbersInFields();//this is only called to update the number in the other spinner
+                    //recall that the number of the image in the first panel == number imagem in second panel -1
+                }
             }
         });
       
@@ -631,11 +644,11 @@ public class JTSTestBuilderToolBar {
         previousButton.setEnabled(false);
     }
     
-    private int getNumberOfImagePanel1(){
+    public int getNumberOfImagePanel1(){
         return AppImage.getInstance().getCurrentIndexImageForPanel1()+1;
     }
     
-    private int getNumberOfImagePanel2(){
+    public int getNumberOfImagePanel2(){
         return AppImage.getInstance().getCurrentIndexImageForPanel2()+1;
     }
     
