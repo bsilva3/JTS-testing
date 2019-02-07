@@ -12,11 +12,14 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
+import org.locationtech.jtstest.testbuilder.geom.GeometryLocation;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 
@@ -100,7 +103,7 @@ public class AppCorrGeometries {
     
     //returns the index of the coordinates in the array or -1 if it doesnt exist. The corresponding coordenate in the other geometry
     //on the other panel will be on the other list in the same index
-    public int getCordIndex(double x, double y, boolean isSecondPanel){
+    public int getCordIndex(Coordinate c, boolean isSecondPanel){
         List<Coordinate> listToSearch;
         if(isSecondPanel){
             listToSearch = corrGeometry2;
@@ -109,7 +112,7 @@ public class AppCorrGeometries {
             listToSearch = corrGeometry1;
         }
         for (int i = 0; i < listToSearch.size(); i++){
-            if (x == listToSearch.get(i).x && y == listToSearch.get(i).y){
+            if (c.equals(listToSearch.get(i))){
                 return i;
             }
         }
@@ -119,7 +122,7 @@ public class AppCorrGeometries {
     
     //returns the matching coordinates of the other list of coordinates.
     //They have the same indexes in both lists
-    public Coordinate getCorrespondingCoordinate(double x, double y, boolean isSecondPanel){
+    public Coordinate getCorrespondingCoordinate(Coordinate c, boolean isSecondPanel){
         List<Coordinate> correspondingCoordinates;
         if (isSecondPanel){
             //we want the other list of coordinates!
@@ -128,7 +131,7 @@ public class AppCorrGeometries {
         else{
             correspondingCoordinates = corrGeometry2;
         }
-        int index = getCordIndex(x, y, isSecondPanel);
+        int index = getCordIndex(c, isSecondPanel);
         if (index == -1){
             //not found
             return null;
@@ -158,7 +161,7 @@ public class AppCorrGeometries {
     //that the cursor IS NOT IN
     public void higlightCorrespondingPointInPanel(List<Coordinate> coords, boolean isSecondPanel){
         for (Coordinate coord : coords){
-            Coordinate c = getCorrespondingCoordinate(coord.x, coord.y, isSecondPanel);
+            Coordinate c = getCorrespondingCoordinate(coord, isSecondPanel);
             if (c != null || drawnPoints.size() < MAX_POINTS_STORED){
                 if (drawnPoints.contains(c)){
                     //this point is already marked
@@ -212,8 +215,8 @@ public class AppCorrGeometries {
         drawnPoints.clear();        
     }
     
-    public void savePointIfExistInCorrGeometry(double x, double y, boolean isSecondPanel){
-        int index = getCordIndex(x, y, isSecondPanel);
+    public void savePointIfExistInCorrGeometry(Coordinate c, boolean isSecondPanel){
+        int index = getCordIndex(c, isSecondPanel);
         if (index > -1){
             editIndex = index;
         }
@@ -255,6 +258,49 @@ public class AppCorrGeometries {
         }
     }
     
+    public void addPointToCorrGeometries(GeometryLocation loc, boolean isSecondPanel){
+        List<Coordinate> coordsToAdd;
+        List<Coordinate> coordsToAddSimilar;
+        Coordinate newCoordinate = loc.getCoordinate();
+        List<Coordinate> nearbyCoords = loc.get2CoordsInSegment();//size 2
+        if (isSecondPanel){
+            coordsToAdd = corrGeometry2;
+            coordsToAddSimilar = corrGeometry1;
+        }
+        else{
+            coordsToAdd = corrGeometry1;
+            coordsToAddSimilar = corrGeometry2;
+        }
+        //add coordinate in second panel , but first, find the points closest to the new point in a line segment
+        int index1 = this.getCordIndex(nearbyCoords.get(0), isSecondPanel);
+        int index2 = this.getCordIndex(nearbyCoords.get(1), isSecondPanel);
+        if (index1 > -1 && index2 > -1){//they exist in the geometry
+            int [] indexes = new int[]{index1, index2};
+            List indexesList = Arrays.asList(ArrayUtils.toObject(indexes));
+            //the new coordinate will now be on the position of the coordinate with the biggest index
+            int indexForNewCoord = Integer.parseInt(Collections.max(indexesList).toString());
+            int minIndex = Integer.parseInt(Collections.min(indexesList).toString());
+            if (indexForNewCoord == coordsToAdd.size()-1 && minIndex == 0){
+                //special case: simply add to the last position the new coordinate
+                coordsToAdd.add(newCoordinate);
+                coordsToAddSimilar.add(newCoordinate);
+            }
+            else{
+                coordsToAdd.add(indexForNewCoord, newCoordinate);
+                coordsToAddSimilar.add(indexForNewCoord, newCoordinate);
+            }
+            
+            //frame.reloadBothPanels();
+        }
+    }
+    
+    public void clearCoords(){
+        if(corrGeometry1 != null && corrGeometry2 != null){
+            corrGeometry1.clear();
+            corrGeometry2.clear();
+        }
+    }
+    
     public List<Coordinate> getCorrGeometry1() {
         return corrGeometry1;
     }
@@ -274,5 +320,15 @@ public class AppCorrGeometries {
     public void setFrame(JTSTestBuilderFrame frame){
         this.frame = frame;
     }
+
+    public JTSTestBuilderFrame getFrame() {
+        return frame;
+    }
+    
+    public void setGeometriesEdited(boolean b){
+        this.isCorrGeometryEdited = b;
+    }
+    
+    
     
 }

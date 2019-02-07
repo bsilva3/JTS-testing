@@ -177,5 +177,19 @@ public class GeometryLocation
         }
         return coords;
     }
+    
+    //given a point in a line, returns the 2 points closest in the line
+    public List<Coordinate> get2CoordsInSegment()
+    {
+        List<Coordinate> coords = new ArrayList<>();
+        //coords.add(pt);
+        if (! isVertex()) {
+            Coordinate p1 = component.getCoordinates()[index + 1];
+            coords.add(p1);	
+            Coordinate p2 = component.getCoordinates()[index];
+            coords.add(p2);
+        }
+        return coords;
+    }
 
 }

@@ -91,13 +91,13 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 -JTSTestBuilderToolBar: contem o botao next e previous, entre outros
 
 ---> todo:
- - apagar vertices. Se apagar num dos paineis eliminar o ponto correspondente na geometria do outro painel.
  - adicionar vertices. Na outra geometria adicionar no mesmo segmento de reta o ponto
  - eventual refactoring -> acaba aqui v0.2
-
+ - a precisao apos a ediçao de um vertice é baixa (as coordenadas sao arredondadas)
  - area e perimetro ao selecionar 
 
 - bugs:
 	-no 2º painel, por vezes o zoom deixa de funcionar
+	- problema ao mudar de imagens quando existe zoom
 	-streampolygon e polygon desaparecem apos uma ação qualquer
 

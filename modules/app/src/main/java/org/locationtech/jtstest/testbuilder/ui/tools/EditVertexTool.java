@@ -23,6 +23,7 @@ import org.locationtech.jtstest.testbuilder.AppCorrGeometries;
 import org.locationtech.jtstest.testbuilder.AppCursors;
 import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.IconLoader;
+import org.locationtech.jtstest.testbuilder.JTSTestBuilderFrame;
 import org.locationtech.jtstest.testbuilder.geom.*;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 
@@ -65,7 +66,7 @@ extends IndicatorTool
       adjVertices = geomModel().findAdjacentVertices(selectedVertexLocation);
       currentVertexLoc = selectedVertexLocation;
       //indicate that there is a coordinate that is being edited, that may or may not be from the corr geometry
-      AppCorrGeometries.getInstance().savePointIfExistInCorrGeometry(selectedVertexLocation.x, selectedVertexLocation.y, editPanel.isSecondPanel());
+      AppCorrGeometries.getInstance().savePointIfExistInCorrGeometry(selectedVertexLocation, editPanel.isSecondPanel());
       redrawIndicator();
     }
   }
@@ -94,16 +95,21 @@ extends IndicatorTool
   public void mouseClicked(MouseEvent e) {
     if (! SwingUtilities.isRightMouseButton(e))
       return;
-    GeometryEditModel geoModel = geomModel();
+    GeometryEditPanel editPanelMouseIn = JTSTestBuilderFrame.getGeometryEditPanelMouseIsIn();
+    GeometryEditModel geoModel = editPanelMouseIn.getGeomModel();
     Coordinate mousePtModel = toModelCoordinate(e.getPoint());
     double tolModel = getModelSnapTolerance();
 
     boolean isMove = ! e.isControlDown();
-    if (isMove) {
+    if (isMove) { //insert vertex
       GeometryLocation geomLoc = geoModel.locateNonVertexPoint(mousePtModel, tolModel);
-      //System.out.println("Testing: insert vertex at " + geomLoc);
       if (geomLoc != null) {
-            geoModel.setGeometry(geomLoc.insert());
+          AppCorrGeometries.getInstance().addPointToCorrGeometries(geomLoc, editPanelMouseIn.isSecondPanel());
+          
+          geoModel.setGeometry(geomLoc.insert());
+          //INCOMPLETE! DETERMINE THE RIGHT COORDS FOR THE OTHER PANEL!
+          GeometryEditPanel editPanelMouseNotIn = JTSTestBuilderFrame.getGeometryEditPanelMouseIsNotIn();
+          editPanelMouseNotIn.getGeomModel().setGeometry(geomLoc.insert());
       }
     }
     else {  // is a delete
@@ -122,13 +128,13 @@ extends IndicatorTool
   	Point2D currentIndicatorLoc = toView(currentVertexLoc);
   	ind.add(getIndicatorCircle(currentIndicatorLoc));
   	if (adjVertices != null) {
-  		for (int i = 0; i < adjVertices.length; i++) {
-  	    GeneralPath line = new GeneralPath();
-  	    line.moveTo((float) currentIndicatorLoc.getX(), (float) currentIndicatorLoc.getY());
-  	    Point2D pt = toView(adjVertices[i]);
-  	    line.lineTo((float) pt.getX(), (float) pt.getY());
-  	    ind.add(line);
-  		}
+            for (int i = 0; i < adjVertices.length; i++) {
+                GeneralPath line = new GeneralPath();
+                line.moveTo((float) currentIndicatorLoc.getX(), (float) currentIndicatorLoc.getY());
+                Point2D pt = toView(adjVertices[i]);
+                line.lineTo((float) pt.getX(), (float) pt.getY());
+                ind.add(line);
+            }
   	}
   	return ind;
   	

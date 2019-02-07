@@ -292,6 +292,16 @@ public class JTSTestBuilderFrame extends JFrame
             return instance().getTestCasePanel().getGeometryEditPanel();
         }
     }
+    
+    public static GeometryEditPanel getGeometryEditPanelMouseIsNotIn(){
+        if (!isMouseWithinComponent(instance().getTestCasePanel2())){
+            return instance().getTestCasePanel2().getGeometryEditPanel();
+        }
+        else{
+            return instance().getTestCasePanel().getGeometryEditPanel();
+        }
+    }
+    
     public static boolean isMouseWithinComponent(Component c)
     {
         java.awt.Point mousePos = new java.awt.Point(MouseInfo.getPointerInfo().getLocation());

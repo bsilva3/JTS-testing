@@ -85,6 +85,9 @@ public class AppImage {
                 corrFiles.add(corrFile);
             }
         }
+        //delete the previous coords since the geometries will be redrawn
+        AppCorrGeometries.getInstance().clearCoords();
+        AppCorrGeometries.getInstance().setGeometriesEdited(false);
     }
     
     //load next Image in the list, unless it is the last image in the list 

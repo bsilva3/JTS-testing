@@ -218,7 +218,7 @@ public class GeometryLocationsWriter
             cursorCoordinates.add(loc.getCoordinate());
         }
         for (Coordinate c : cursorCoordinates){
-            int index = AppCorrGeometries.getInstance().getCordIndex(c.x, c.y, isSecondPanel);
+            int index = AppCorrGeometries.getInstance().getCordIndex(c, isSecondPanel);
             if(index > -1)
                 buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
             buf.append(c.x).append(", ").append(c.y).append("\n");
