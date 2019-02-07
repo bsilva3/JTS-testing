@@ -156,6 +156,7 @@ public class JTSTestBuilderFrame extends JFrame
         singleton = this;
         enableEvents(AWTEvent.WINDOW_EVENT_MASK);
         setIconImage(appIcon.getImage());
+        AppCorrGeometries.getInstance().setFrame(this);
         jbInit();
         //#setRollover was introduced in Java 1.4 and is not present in 1.3.1. [Jon Aquino]
         //jToolBar1.setRollover(true);
@@ -480,11 +481,11 @@ public class JTSTestBuilderFrame extends JFrame
         }
     }
 
-    void reloadBothPanels(){
-        this.getTestCasePanel().getGeometryEditPanel().cleanAndDrawGeometry();
-        this.getTestCasePanel2().getGeometryEditPanel().cleanAndDrawGeometry();
-        this.getTestCasePanel().getGeometryEditPanel().forceRepaint();
-        this.getTestCasePanel2().getGeometryEditPanel().forceRepaint();
+    public void reloadBothPanels(){
+        getTestCasePanel().getGeometryEditPanel().cleanAndDrawGeometry();
+        getTestCasePanel2().getGeometryEditPanel().cleanAndDrawGeometry();
+        getTestCasePanel().getGeometryEditPanel().forceRepaint();
+        getTestCasePanel2().getGeometryEditPanel().forceRepaint();
     }
     
     //select the image i in the list of images and selects the image i+1 for the panel 2.

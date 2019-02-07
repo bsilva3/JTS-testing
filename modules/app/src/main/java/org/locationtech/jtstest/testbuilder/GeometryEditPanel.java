@@ -275,11 +275,11 @@ public class GeometryEditPanel extends JPanel {
     //draws the geometry defined by the coordinates in the "corr" file. These coordinates are transformed
     //to match the display
     public void drawGeometry(){
-        corrToGeomUtils = new CorrToGeometryUtils(AppImage.getInstance().getCurrentCorrFile());
         //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
         AppImage.getInstance().resizeImageDimension(this.getSize(), isSecondPanel);
         drawImagePolygon();
-        List<Coordinate> coord = correctCoordinates(corrToGeomUtils.getCoordsFromFile(this.isSecondPanel));
+        
+        List<Coordinate> coord = AppCorrGeometries.getInstance().getListOfCoords(this);
         
         tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
@@ -319,7 +319,7 @@ public class GeometryEditPanel extends JPanel {
     }
     
   
-    private List<Coordinate>correctCoordinates(Coordinate[] coord){
+    /*private List<Coordinate>correctCoordinates(Coordinate[] coord){
         AppImage appImage = AppImage.getInstance();
         Point2D viewOrigin = viewport.toView(new Coordinate(0, 0));
         double vOriginX = viewOrigin.getX();
@@ -340,7 +340,7 @@ public class GeometryEditPanel extends JPanel {
             transformedCoords.add(coordUtils);
         }
         return transformedCoords;
-    }
+    }*/
   
   private static int VERTEX_SIZE = AppConstants.VERTEX_SIZE + 1;
   private static double VERTEX_SIZE_OVER_2 = VERTEX_SIZE / 2;

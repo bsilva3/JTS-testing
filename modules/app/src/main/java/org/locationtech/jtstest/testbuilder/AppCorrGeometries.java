@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateUtils;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
+import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 
 /**
  *
@@ -40,7 +42,13 @@ public class AppCorrGeometries {
     
     private static final int MAX_POINTS_STORED = 2;
     
+    private JTSTestBuilderFrame frame;
+    
     private int editIndex = -1;
+    
+    //flag to indicate if user manually edited, added, or deleted a point from on of the geometries
+    //any changed made to one of the geometries will be equally made in the other geometry
+    private boolean isCorrGeometryEdited = false;
     
     private static AppCorrGeometries instance;
     
@@ -51,6 +59,43 @@ public class AppCorrGeometries {
             instance = new AppCorrGeometries();
         }
         return instance;
+    }
+    
+    public List<Coordinate> getListOfCoords(GeometryEditPanel editPanel){
+        if (isCorrGeometryEdited){
+            if (editPanel.isSecondPanel()){
+                return this.corrGeometry2;
+            }
+            return this.corrGeometry1;
+        }
+        else{
+            CorrToGeometryUtils corrToGeomUtils = new CorrToGeometryUtils(AppImage.getInstance().getCurrentCorrFile());
+            //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
+            return correctCoordinates(corrToGeomUtils.getCoordsFromFile(editPanel.isSecondPanel()), editPanel);
+        }
+    }
+    
+    private List<Coordinate> correctCoordinates(Coordinate[] coord, GeometryEditPanel editPanel){
+        AppImage appImage = AppImage.getInstance();
+        Point2D viewOrigin = editPanel.getViewport().toView(new Coordinate(0, 0));
+        double vOriginX = viewOrigin.getX();
+        double currImageHeight = appImage.getImageHeightInPanel(editPanel.isSecondPanel());
+        double currImageWidth = appImage.getImageWidthInPanel(editPanel.isSecondPanel());
+        List<Coordinate> transformedCoords = new ArrayList<>();
+        CoordinateUtils coordUtils;
+        for (Coordinate c : coord){
+            coordUtils = new CoordinateUtils(c.getX(), c.getY() );
+            
+            coordUtils.transformCoords(appImage.getCurrentImageWidth(editPanel.isSecondPanel()), 
+                    appImage.getCurrentImageHeight(editPanel.isSecondPanel()), currImageWidth, currImageHeight);
+            
+            //add the diference of the top of the panel and the image 
+            coordUtils.translate(new CoordinateUtils(vOriginX, (editPanel.getSize().getHeight() - currImageHeight) - 
+                    (editPanel.getSize().getHeight() - currImageHeight) ));
+            
+            transformedCoords.add(coordUtils);
+        }
+        return transformedCoords;
     }
     
     //returns the index of the coordinates in the array or -1 if it doesnt exist. The corresponding coordenate in the other geometry
@@ -178,6 +223,7 @@ public class AppCorrGeometries {
     //of the array with the edited corrGeometry
     public void editPointIfExistInCorrGeometry(double newX, double newY, boolean isSecondPanel){
         if (editIndex > -1){
+            this.isCorrGeometryEdited = true;
             Coordinate newC = new Coordinate(newX, newY);
             if (isSecondPanel){
                 this.corrGeometry2.set(editIndex, newC);
@@ -187,20 +233,25 @@ public class AppCorrGeometries {
             }
             //there is no longer a point edited 
             editIndex = -1;
+            frame.reloadBothPanels();
         }
     }
     
     //given a coordinate, if it is exists on one of the corr geometries, it is deleted from both geometries
     public void deletePointInBothCorrGeometries(Coordinate c){
         if ( this.corrGeometry1.contains(c)){
+            this.isCorrGeometryEdited = true;
             int index = corrGeometry1.indexOf(c);
             corrGeometry2.remove(index);
             corrGeometry1.remove(index);
+            frame.reloadBothPanels();
         }
         else if ( this.corrGeometry2.contains(c)){
+            this.isCorrGeometryEdited = true;
             int index = corrGeometry2.indexOf(c);
             corrGeometry2.remove(index);
             corrGeometry1.remove(index);
+            frame.reloadBothPanels();
         }
     }
     
@@ -220,6 +271,8 @@ public class AppCorrGeometries {
         this.corrGeometry2 = corrGeometry2;
     }
     
-    
+    public void setFrame(JTSTestBuilderFrame frame){
+        this.frame = frame;
+    }
     
 }
