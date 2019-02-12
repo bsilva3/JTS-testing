@@ -161,8 +161,8 @@ public class JTSTestBuilder
         }
         AppImage.getInstance().setAndLoadCorrDirFiles(selectedDirectory);*/
         
-        AppImage.getInstance().loadImages(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\img\\").listFiles());
-        AppImage.getInstance().setAndLoadCorrDirFiles(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\corr\\"));
+        AppImage.getInstance().loadImages(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\JTS-testing\\img\\").listFiles());
+        AppImage.getInstance().setAndLoadCorrDirFiles(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\JTS-testing\\corr\\"));
     	
         readArgs(args);
     	setLookAndFeel();

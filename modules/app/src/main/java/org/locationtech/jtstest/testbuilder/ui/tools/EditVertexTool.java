@@ -104,12 +104,14 @@ extends IndicatorTool
     if (isMove) { //insert vertex
       GeometryLocation geomLoc = geoModel.locateNonVertexPoint(mousePtModel, tolModel);
       if (geomLoc != null) {
-          AppCorrGeometries.getInstance().addPointToCorrGeometries(geomLoc, editPanelMouseIn.isSecondPanel());
-          
-          geoModel.setGeometry(geomLoc.insert());
-          //INCOMPLETE! DETERMINE THE RIGHT COORDS FOR THE OTHER PANEL!
-          GeometryEditPanel editPanelMouseNotIn = JTSTestBuilderFrame.getGeometryEditPanelMouseIsNotIn();
-          editPanelMouseNotIn.getGeomModel().setGeometry(geomLoc.insert());
+          //add the coordinate in to the list and get the corresponding coordinate to draw in the other panel
+           Coordinate correspondingCoord = AppCorrGeometries.getInstance().addPointToCorrGeometries(geomLoc, editPanelMouseIn.isSecondPanel());
+           if(correspondingCoord != null){
+            geoModel.setGeometry(geomLoc.insert());
+            GeometryEditPanel editPanelMouseNotIn = JTSTestBuilderFrame.getOtherGeometryEditPanel(editPanelMouseIn);
+            GeometryLocation geomLocOtherPanel = editPanelMouseNotIn.getGeomModel().locateNonVertexPoint(correspondingCoord, tolModel+1000);
+            editPanelMouseNotIn.getGeomModel().setGeometry(geomLocOtherPanel.insert());
+          }
       }
     }
     else {  // is a delete

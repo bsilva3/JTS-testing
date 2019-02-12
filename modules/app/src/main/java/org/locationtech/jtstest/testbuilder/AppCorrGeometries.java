@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
+import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jtstest.testbuilder.geom.GeometryLocation;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
@@ -258,20 +259,22 @@ public class AppCorrGeometries {
         }
     }
     
-    public void addPointToCorrGeometries(GeometryLocation loc, boolean isSecondPanel){
-        List<Coordinate> coordsToAdd;
-        List<Coordinate> coordsToAddSimilar;
+    //give a new coordinate for a panel, add that coordinate to the list (between the 2 points)
+    //and find a corresponding coordinate to add in the other panel. Returns this corresponding coordinate
+    public Coordinate addPointToCorrGeometries(GeometryLocation loc, boolean isSecondPanel){
+        List<Coordinate> interactedPanelCoords;
+        List<Coordinate> otherPanelCoords;
         Coordinate newCoordinate = loc.getCoordinate();
         List<Coordinate> nearbyCoords = loc.get2CoordsInSegment();//size 2
         if (isSecondPanel){
-            coordsToAdd = corrGeometry2;
-            coordsToAddSimilar = corrGeometry1;
+            interactedPanelCoords = corrGeometry2;
+            otherPanelCoords = corrGeometry1;
         }
         else{
-            coordsToAdd = corrGeometry1;
-            coordsToAddSimilar = corrGeometry2;
+            interactedPanelCoords = corrGeometry1;
+            otherPanelCoords = corrGeometry2;
         }
-        //add coordinate in second panel , but first, find the points closest to the new point in a line segment
+        //add coordinate in both panels, but first, find the points closest to the new point in a line segment
         int index1 = this.getCordIndex(nearbyCoords.get(0), isSecondPanel);
         int index2 = this.getCordIndex(nearbyCoords.get(1), isSecondPanel);
         if (index1 > -1 && index2 > -1){//they exist in the geometry
@@ -280,17 +283,49 @@ public class AppCorrGeometries {
             //the new coordinate will now be on the position of the coordinate with the biggest index
             int indexForNewCoord = Integer.parseInt(Collections.max(indexesList).toString());
             int minIndex = Integer.parseInt(Collections.min(indexesList).toString());
-            if (indexForNewCoord == coordsToAdd.size()-1 && minIndex == 0){
+            if (indexForNewCoord == interactedPanelCoords.size()-1 && minIndex == 0){
                 //special case: simply add to the last position the new coordinate
-                coordsToAdd.add(newCoordinate);
-                coordsToAddSimilar.add(newCoordinate);
+                indexForNewCoord = interactedPanelCoords.size();
             }
-            else{
-                coordsToAdd.add(indexForNewCoord, newCoordinate);
-                coordsToAddSimilar.add(indexForNewCoord, newCoordinate);
-            }
-            
-            //frame.reloadBothPanels();
+            interactedPanelCoords.add(indexForNewCoord, newCoordinate);
+            Coordinate newCoordinateOtherPanel = findPointInLine(interactedPanelCoords, otherPanelCoords, newCoordinate, indexForNewCoord);
+            otherPanelCoords.add(indexForNewCoord, newCoordinateOtherPanel);
+            return newCoordinateOtherPanel;
+        }
+        return null;
+    }
+    
+    //find a point in the respective line segment on the other panel to add a point
+    private Coordinate findPointInLine(List<Coordinate> referenceCoords, List<Coordinate> coordsToAddNewPoint, Coordinate newCoord, int newPointNumber){
+        Coordinate c1 = referenceCoords.get(newPointNumber-1);
+        Coordinate c2 = referenceCoords.get(newPointNumber+1);
+        double distanceC1_newCoord = c1.distance(newCoord);
+        //total distance between the points that a coordinate was added between in the original panel
+        double totalDistance = c1.distance(c2);
+        double c1_newCoordRatio = (100.0*distanceC1_newCoord)/totalDistance;
+        
+        Coordinate c1Target = coordsToAddNewPoint.get(newPointNumber-1);
+        Coordinate c2Target = coordsToAddNewPoint.get(newPointNumber);//point hasnt been added yet!
+        double totalTargetDistance = c1Target.distance(c2Target);
+        double distanceC1_target = (totalTargetDistance*c1_newCoordRatio) / 100;
+        
+        LineSegment l = new LineSegment();
+        l.setCoordinates(c1Target, c2Target);
+        if(distanceC1_target > 60){
+            //the new point is closer do point c2
+             LineSegment midLine = new LineSegment();
+             midLine.setCoordinates(c2, l.midPoint());
+             return midLine.midPoint();
+        }
+        if(distanceC1_target < 40){
+            //the new point is closer do point c1
+             LineSegment midLine = new LineSegment();
+             midLine.setCoordinates(c1, l.midPoint());
+             return midLine.midPoint();
+        }
+        else{
+            //its more or less in the middle (40 to 60% closer to c1)
+            return l.midPoint();
         }
     }
     

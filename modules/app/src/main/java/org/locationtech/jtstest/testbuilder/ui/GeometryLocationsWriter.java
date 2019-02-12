@@ -189,6 +189,7 @@ public class GeometryLocationsWriter
     if (locs.size() <= 0) {
         return null;
     }
+    
     StringBuffer buf = new StringBuffer();
     boolean isFirst = true;
     int count = 0;
@@ -221,7 +222,7 @@ public class GeometryLocationsWriter
             int index = AppCorrGeometries.getInstance().getCordIndex(c, isSecondPanel);
             if(index > -1)
                 buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
-            buf.append(c.x).append(", ").append(c.y).append("\n");
+            buf.append(c.x).append(", ").append(c.y).append(eol);
         }
     }
     return buf.toString();
