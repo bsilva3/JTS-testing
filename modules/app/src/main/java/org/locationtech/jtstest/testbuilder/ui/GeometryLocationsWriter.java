@@ -39,7 +39,7 @@ public class GeometryLocationsWriter
   private String documentStart = null;
   private String documentEnd = null;
   
-  private static List<Coordinate> cursorCoordinates = new ArrayList<>();
+  private static Set<Coordinate> cursorCoordinates = new HashSet<>();
   
   public GeometryLocationsWriter() {
     setHtml(true);
@@ -218,10 +218,13 @@ public class GeometryLocationsWriter
             //add this coordinate to the list of points the mouse is over
             cursorCoordinates.add(loc.getCoordinate());
         }
-        for (Coordinate c : cursorCoordinates){
-            int index = AppCorrGeometries.getInstance().getCordIndex(c, isSecondPanel);
-            if(index > -1)
-                buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
+        
+    }
+    for (Coordinate c : cursorCoordinates){
+        int index = AppCorrGeometries.getInstance().getCordIndex(c, isSecondPanel);
+        System.out.println("index: "+index+", coords: "+cursorCoordinates);
+        if(index > -1){
+            buf.append(highlightStart).append("Point Number: ").append(highlightEnd).append(index).append(eol);
             buf.append(c.x).append(", ").append(c.y).append(eol);
         }
     }

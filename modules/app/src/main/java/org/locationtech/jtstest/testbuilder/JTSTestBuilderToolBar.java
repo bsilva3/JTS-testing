@@ -135,7 +135,8 @@ public class JTSTestBuilderToolBar {
       previousButton.addActionListener(
           new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              boolean isZoom = 0 == (e.getModifiers() & ActionEvent.CTRL_MASK);
+              //remove any zoom
+              tbFrame.resetZoom();
               tbFrame.moveToPreviousImage();
               updateImageNumbersInFields();
             }
@@ -193,7 +194,7 @@ public class JTSTestBuilderToolBar {
       nextButton.addActionListener(
           new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-             boolean isZoom = 0 == (e.getModifiers() & ActionEvent.CTRL_MASK);
+             tbFrame.resetZoom();
              tbFrame.moveToNextImage();
              updateImageNumbersInFields();
             }

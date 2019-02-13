@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -160,7 +161,7 @@ public class AppCorrGeometries {
     
     //store the point(s) the cursor is in. call a method to higlight the point in the panel
     //that the cursor IS NOT IN
-    public void higlightCorrespondingPointInPanel(List<Coordinate> coords, boolean isSecondPanel){
+    public void higlightCorrespondingPointInPanel(Collection<Coordinate> coords, boolean isSecondPanel){
         for (Coordinate coord : coords){
             Coordinate c = getCorrespondingCoordinate(coord, isSecondPanel);
             if (c != null || drawnPoints.size() < MAX_POINTS_STORED){

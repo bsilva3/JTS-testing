@@ -834,8 +834,7 @@ public class JTSTestBuilderFrame extends JFrame
     }
 
     void oneToOneButton_actionPerformed(ActionEvent e) {
-        testCasePanel.getGeometryEditPanel().getViewport().zoomToInitialExtent();
-        testCasePanel2.getGeometryEditPanel().getViewport().zoomToInitialExtent();
+        resetZoom();
     }
 
     void zoomToFullExtentButton_actionPerformed(ActionEvent e) {
@@ -856,6 +855,7 @@ public class JTSTestBuilderFrame extends JFrame
 
     void zoomToInputB_actionPerformed(ActionEvent e) {
       testCasePanel.getGeometryEditPanel().zoomToGeometry(1);
+      testCasePanel.getGeometryEditPanel().zoomToFullExtent();
     }
 
     void panButton_actionPerformed(ActionEvent e) {
@@ -1144,6 +1144,11 @@ public class JTSTestBuilderFrame extends JFrame
     }
     return null;
   }
+  
+    public void resetZoom(){
+        testCasePanel.getGeometryEditPanel().getViewport().zoomToInitialExtent();
+        testCasePanel2.getGeometryEditPanel().getViewport().zoomToInitialExtent();
+    }
 
 
 }

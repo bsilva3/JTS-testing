@@ -99,6 +99,5 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 
 - bugs:
 	-no 2º painel, por vezes o zoom deixa de funcionar
-	- problema ao mudar de imagens quando existe zoom
 	-streampolygon e polygon desaparecem apos uma ação qualquer
 
