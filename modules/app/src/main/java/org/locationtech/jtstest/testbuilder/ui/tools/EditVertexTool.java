@@ -102,17 +102,17 @@ extends IndicatorTool
 
     boolean isMove = ! e.isControlDown();
     if (isMove) { //insert vertex
-      GeometryLocation geomLoc = geoModel.locateNonVertexPoint(mousePtModel, tolModel);
-      if (geomLoc != null) {
-          //add the coordinate in to the list and get the corresponding coordinate to draw in the other panel
-           Coordinate correspondingCoord = AppCorrGeometries.getInstance().addPointToCorrGeometries(geomLoc, editPanelMouseIn.isSecondPanel());
-           if(correspondingCoord != null){
+        GeometryLocation geomLoc = geoModel.locateNonVertexPoint(mousePtModel, tolModel);
+        if (geomLoc != null) {
+            //add the coordinate in to the list and get the corresponding coordinate to draw in the other panel
+            Coordinate correspondingCoord = AppCorrGeometries.getInstance().addPointToCorrGeometries(geomLoc, editPanelMouseIn.isSecondPanel());
             geoModel.setGeometry(geomLoc.insert());
-            GeometryEditPanel editPanelMouseNotIn = JTSTestBuilderFrame.getOtherGeometryEditPanel(editPanelMouseIn);
-            GeometryLocation geomLocOtherPanel = editPanelMouseNotIn.getGeomModel().locateNonVertexPoint(correspondingCoord, tolModel+1000);
-            editPanelMouseNotIn.getGeomModel().setGeometry(geomLocOtherPanel.insert());
-          }
-      }
+            if(correspondingCoord != null){
+                GeometryEditPanel editPanelMouseNotIn = JTSTestBuilderFrame.getOtherGeometryEditPanel(editPanelMouseIn);
+                GeometryLocation geomLocOtherPanel = editPanelMouseNotIn.getGeomModel().locateNonVertexPoint(correspondingCoord, 0);
+                editPanelMouseNotIn.getGeomModel().setGeometry(AppCorrGeometries.getInstance().getPanelCorrGeometry(editPanelMouseNotIn.isSecondPanel()));
+            }
+        }
     }
     else {  // is a delete
       GeometryLocation geomLoc = geoModel.locateVertex(mousePtModel, tolModel);

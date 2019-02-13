@@ -20,10 +20,14 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jtstest.testbuilder.geom.GeometryLocation;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
+import org.locationtech.jts.operation.distance.DistanceOp;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  *
@@ -289,44 +293,75 @@ public class AppCorrGeometries {
                 indexForNewCoord = interactedPanelCoords.size();
             }
             interactedPanelCoords.add(indexForNewCoord, newCoordinate);
-            Coordinate newCoordinateOtherPanel = findPointInLine(interactedPanelCoords, otherPanelCoords, newCoordinate, indexForNewCoord);
+            Coordinate newCoordinateOtherPanel = findPointInLine(interactedPanelCoords, otherPanelCoords, 
+                    newCoordinate, indexForNewCoord, isSecondPanel);
             otherPanelCoords.add(indexForNewCoord, newCoordinateOtherPanel);
+            System.out.println("new coord: "+newCoordinateOtherPanel.x+", "+newCoordinateOtherPanel.y);
             return newCoordinateOtherPanel;
         }
         return null;
     }
     
     //find a point in the respective line segment on the other panel to add a point
-    private Coordinate findPointInLine(List<Coordinate> referenceCoords, List<Coordinate> coordsToAddNewPoint, Coordinate newCoord, int newPointNumber){
+    private Coordinate findPointInLine(List<Coordinate> referenceCoords, List<Coordinate> coordsToAddNewPoint,
+            Coordinate newCoord, int newPointNumber, boolean isSecondPanel){
         Coordinate c1 = referenceCoords.get(newPointNumber-1);
         Coordinate c2 = referenceCoords.get(newPointNumber+1);
         double distanceC1_newCoord = c1.distance(newCoord);
         //total distance between the points that a coordinate was added between in the original panel
         double totalDistance = c1.distance(c2);
         double c1_newCoordRatio = (100.0*distanceC1_newCoord)/totalDistance;
+        System.out.println("c1 ratio:"+c1_newCoordRatio);
         
         Coordinate c1Target = coordsToAddNewPoint.get(newPointNumber-1);
         Coordinate c2Target = coordsToAddNewPoint.get(newPointNumber);//point hasnt been added yet!
+        System.out.println("c1t: "+c1Target.x + ", " + c1Target.y);
+        System.out.println("c2t: "+c2Target.x + ", " + c2Target.y);
         double totalTargetDistance = c1Target.distance(c2Target);
         double distanceC1_target = (totalTargetDistance*c1_newCoordRatio) / 100;
+        System.out.println("c1 distance: "+distanceC1_target);
+        
+        
         
         LineSegment l = new LineSegment();
         l.setCoordinates(c1Target, c2Target);
-        if(distanceC1_target > 60){
+        
+        Coordinate aproxCoordOtherPanel;
+        if(c1_newCoordRatio > 60){
             //the new point is closer do point c2
              LineSegment midLine = new LineSegment();
              midLine.setCoordinates(c2, l.midPoint());
-             return midLine.midPoint();
+             aproxCoordOtherPanel = midLine.midPoint();
         }
-        if(distanceC1_target < 40){
+        else if(c1_newCoordRatio < 40){
             //the new point is closer do point c1
              LineSegment midLine = new LineSegment();
              midLine.setCoordinates(c1, l.midPoint());
-             return midLine.midPoint();
+             aproxCoordOtherPanel = midLine.midPoint();
         }
         else{
             //its more or less in the middle (40 to 60% closer to c1)
-            return l.midPoint();
+            aproxCoordOtherPanel = l.midPoint();
+        }
+        
+        Point p = new GeometryFactory().createPoint(aproxCoordOtherPanel);
+        
+        Polygon corrGeometryInOtherPanel = getPanelCorrGeometry(!isSecondPanel);//get the other panel
+        DistanceOp dOP = new DistanceOp(corrGeometryInOtherPanel, p);
+        System.out.println(Arrays.toString(dOP.nearestPoints()));
+        
+        
+        return dOP.nearestPoints()[0];
+    }
+    
+    //returns the polygon read from the corr file in the panel
+    public Polygon getPanelCorrGeometry(boolean isSecondPanel){
+        GeometryFactory gf = new GeometryFactory();
+        if (isSecondPanel){
+            return gf.createPolygon(corrGeometry2.toArray(new Coordinate[corrGeometry2.size()]));   
+        }
+        else{
+            return gf.createPolygon(corrGeometry1.toArray(new Coordinate[corrGeometry1.size()]));   
         }
     }
     
