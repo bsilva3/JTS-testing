@@ -11,8 +11,10 @@
  */
 package org.locationtech.jtstest.testbuilder.ui.tools;
 
+import java.util.Arrays;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jtstest.testbuilder.AppCorrGeometries;
 import org.locationtech.jtstest.testbuilder.geom.GeometryBoxDeleter;
 
 
@@ -38,6 +40,7 @@ public class DeleteVertexTool extends BoxBandTool {
     Envelope env = getBox().getEnvelopeInternal();
     Geometry g = geomModel().getGeometry();
     Geometry edit = GeometryBoxDeleter.delete(g, env);
+    AppCorrGeometries.getInstance().deleteListOfPointsInBothCorrGeometries(Arrays.asList(edit.getCoordinates()), getClickedPanel().isSecondPanel());
     geomModel().setGeometry(edit);
   }
 

@@ -81,6 +81,7 @@ public class JTSTestBuilderMenuBar
     menuLoadCorrFilesFolder.addActionListener(
       new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent e) {
+          tbFrame.resetZoom();
           tbFrame.menuLoadCorrFilesFolder_actionPerformed(e);
         }
       });

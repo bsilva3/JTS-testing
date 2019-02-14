@@ -109,7 +109,6 @@ extends IndicatorTool
             geoModel.setGeometry(geomLoc.insert());
             if(correspondingCoord != null){
                 GeometryEditPanel editPanelMouseNotIn = JTSTestBuilderFrame.getOtherGeometryEditPanel(editPanelMouseIn);
-                GeometryLocation geomLocOtherPanel = editPanelMouseNotIn.getGeomModel().locateNonVertexPoint(correspondingCoord, 0);
                 editPanelMouseNotIn.getGeomModel().setGeometry(AppCorrGeometries.getInstance().getPanelCorrGeometry(editPanelMouseNotIn.isSecondPanel()));
             }
         }

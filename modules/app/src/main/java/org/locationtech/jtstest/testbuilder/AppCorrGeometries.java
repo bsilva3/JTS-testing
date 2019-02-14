@@ -264,6 +264,27 @@ public class AppCorrGeometries {
         }
     }
     
+    //remove from both lists of coordinates the coordinates that are not in the list of coorinates passed to this function
+    //the function receives the list of coordinates that were not deleted in the interacted panel
+    public void deleteListOfPointsInBothCorrGeometries(List<Coordinate> coords, boolean isSecondPanel){
+        List<Coordinate> interactedPanel;
+        List<Coordinate> otherPanel;
+        if (isSecondPanel){
+            interactedPanel = this.corrGeometry2;
+            otherPanel = this.corrGeometry1;
+        }
+        else{
+            interactedPanel = this.corrGeometry1;
+            otherPanel = this.corrGeometry2;
+        }
+        //maintain in both lists only the points that weren't removed from the corr geometry by the user 
+        interactedPanel.retainAll(coords);
+        //remove points on the other panel!
+        
+        System.out.println("size: "+coords.size());
+        System.out.println("size geo1: "+this.corrGeometry1.size());
+    }
+    
     //give a new coordinate for a panel, add that coordinate to the list (between the 2 points)
     //and find a corresponding coordinate to add in the other panel. Returns this corresponding coordinate
     public Coordinate addPointToCorrGeometries(GeometryLocation loc, boolean isSecondPanel){
