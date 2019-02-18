@@ -92,6 +92,11 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 
 ---> todo:
  - eventual refactoring -> acaba aqui v0.2
+ - versão 0.3:
+	comunicar com libraria em C++ que, dado uma geometria no instante t e outra no instante t+x, retorna 
+	a geometria prevista num instante entre t e t+x.
+	apresentar essa geometria num painel.
+
  - a precisao apos a ediçao de um vertice é baixa (as coordenadas sao arredondadas)
  - area e perimetro ao selecionar 
 

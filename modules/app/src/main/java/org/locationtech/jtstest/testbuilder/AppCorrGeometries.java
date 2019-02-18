@@ -23,7 +23,6 @@ import org.locationtech.jts.geom.CoordinateUtils;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jtstest.testbuilder.geom.GeometryLocation;
-import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 import org.locationtech.jts.operation.distance.DistanceOp;
 import org.locationtech.jts.geom.Point;
@@ -34,9 +33,12 @@ import org.locationtech.jts.geom.Polygon;
  * @author Bruno Silva
  */
 //stores the List of Coordinates taken from the corr files.
-//one List of Coordinates is from the right panel, and the other is from the left
+//the coordinates in the geometries read from the corr files (corr geometry) are modified if the user add/removes/ moves them
+//one List of Coordinates is from the right panel, and the other is from the left one
 public class AppCorrGeometries {
     
+    //these list of coordinates are set when the geometries are drawn from the first time 
+    //(after reading the coordinates from the file)
     private List<Coordinate> corrGeometry1;
     
     private List<Coordinate> corrGeometry2;
@@ -56,7 +58,7 @@ public class AppCorrGeometries {
     private int editIndex = -1;
     
     //flag to indicate if user manually edited, added, or deleted a point from on of the geometries
-    //any changed made to one of the geometries will be equally made in the other geometry
+    //any changed made to one of the geometries will be equally made in the other geometry in the other panel
     private boolean isCorrGeometryEdited = false;
     
     private static AppCorrGeometries instance;
@@ -70,6 +72,8 @@ public class AppCorrGeometries {
         return instance;
     }
     
+    //returns the coordinates of a geometry in one panel.
+    //if the coordinates were edited
     public List<Coordinate> getListOfCoords(GeometryEditPanel editPanel){
         if (isCorrGeometryEdited){
             if (editPanel.isSecondPanel()){
@@ -84,6 +88,7 @@ public class AppCorrGeometries {
         }
     }
     
+    //corrects the coordinates in the corr file according to the size of the viewport
     private List<Coordinate> correctCoordinates(Coordinate[] coord, GeometryEditPanel editPanel){
         AppImage appImage = AppImage.getInstance();
         Point2D viewOrigin = editPanel.getViewport().toView(new Coordinate(0, 0));
@@ -188,8 +193,8 @@ public class AppCorrGeometries {
         drawPoints(editPanel);
     }
     
-    //draws a red dot on all points in the list in the panel
-    //(this function is called on the render manager of the panel to be drawn the dots after a 
+    //draws a red dot on all points in the list of edited points in the panel the user is not interacting
+    //This function is called on the render manager of the panel to be drawn the dots, after a 
     //"force repaint" happens, because this method is asynchronous and this way the dots are not deleted.
     public void drawPoints(GeometryEditPanel editPanel){
         Graphics2D g2 = (Graphics2D) editPanel.getGraphics();
@@ -221,6 +226,7 @@ public class AppCorrGeometries {
         drawnPoints.clear();        
     }
     
+    //indicate that the user is editing a point (used when the user presses the mouse and is moving a point)
     public void savePointIfExistInCorrGeometry(Coordinate c, boolean isSecondPanel){
         int index = getCordIndex(c, isSecondPanel);
         if (index > -1){
@@ -264,8 +270,9 @@ public class AppCorrGeometries {
         }
     }
     
-    
-    public void deleteListOfPointsInBothCorrGeometries(List<Coordinate> coords, boolean isSecondPanel){
+    // given a lista of coordinates removed by the user in one of the geometries in one panel, if they belong
+    //to a corr geometry, delete that coordinate from both corr geometries
+    public Coordinate[] deleteListOfPointsInBothCorrGeometries(List<Coordinate> coords, boolean isSecondPanel){
         List<Coordinate> interactedPanel;
         List<Coordinate> otherPanel;
         if (isSecondPanel){
@@ -276,7 +283,6 @@ public class AppCorrGeometries {
             interactedPanel = this.corrGeometry1;
             otherPanel = this.corrGeometry2;
         }
-        //maintain in both lists only the points that weren't removed from the corr geometry by the user 
         
         for(Coordinate c : coords){
             if (interactedPanel.contains(c)){
@@ -286,9 +292,10 @@ public class AppCorrGeometries {
                 otherPanel.remove(index);
             }
         }
+        return otherPanel.toArray(new Coordinate[otherPanel.size()]);
     }
     
-    //give a new coordinate for a panel, add that coordinate to the list (between the 2 points)
+    //given a new coordinate for a panel, add that coordinate to the list (between the 2 points)
     //and find a corresponding coordinate to add in the other panel. Returns this corresponding coordinate
     public Coordinate addPointToCorrGeometries(GeometryLocation loc, boolean isSecondPanel){
         List<Coordinate> interactedPanelCoords;
@@ -319,8 +326,8 @@ public class AppCorrGeometries {
             interactedPanelCoords.add(indexForNewCoord, newCoordinate);
             Coordinate newCoordinateOtherPanel = findPointInLine(interactedPanelCoords, otherPanelCoords, 
                     newCoordinate, indexForNewCoord, isSecondPanel);
+            //add the new coordinate found in the respective line segment for the other geometry
             otherPanelCoords.add(indexForNewCoord, newCoordinateOtherPanel);
-            System.out.println("new coord: "+newCoordinateOtherPanel.x+", "+newCoordinateOtherPanel.y);
             return newCoordinateOtherPanel;
         }
         return null;
@@ -335,17 +342,9 @@ public class AppCorrGeometries {
         //total distance between the points that a coordinate was added between in the original panel
         double totalDistance = c1.distance(c2);
         double c1_newCoordRatio = (100.0*distanceC1_newCoord)/totalDistance;
-        System.out.println("c1 ratio:"+c1_newCoordRatio);
         
         Coordinate c1Target = coordsToAddNewPoint.get(newPointNumber-1);
         Coordinate c2Target = coordsToAddNewPoint.get(newPointNumber);//point hasnt been added yet!
-        System.out.println("c1t: "+c1Target.x + ", " + c1Target.y);
-        System.out.println("c2t: "+c2Target.x + ", " + c2Target.y);
-        double totalTargetDistance = c1Target.distance(c2Target);
-        double distanceC1_target = (totalTargetDistance*c1_newCoordRatio) / 100;
-        System.out.println("c1 distance: "+distanceC1_target);
-        
-        
         
         LineSegment l = new LineSegment();
         l.setCoordinates(c1Target, c2Target);
@@ -372,8 +371,6 @@ public class AppCorrGeometries {
         
         Polygon corrGeometryInOtherPanel = getPanelCorrGeometry(!isSecondPanel);//get the other panel
         DistanceOp dOP = new DistanceOp(corrGeometryInOtherPanel, p);
-        System.out.println(Arrays.toString(dOP.nearestPoints()));
-        
         
         return dOP.nearestPoints()[0];
     }
@@ -400,16 +397,17 @@ public class AppCorrGeometries {
         return corrGeometry1;
     }
 
-    public void setCorrGeometry1(List<Coordinate> corrGeometry1) {
-        this.corrGeometry1 = corrGeometry1;
+    public void setCorrGeometry(List<Coordinate> corrGeometry, boolean isSecondPanel) {
+        if (isSecondPanel){
+         this.corrGeometry2 = corrGeometry;   
+        }
+        else{
+         this.corrGeometry1 = corrGeometry;   
+        }
     }
 
     public List<Coordinate> getCorrGeometry2() {
         return corrGeometry2;
-    }
-
-    public void setCorrGeometry2(List<Coordinate> corrGeometry2) {
-        this.corrGeometry2 = corrGeometry2;
     }
     
     public void setFrame(JTSTestBuilderFrame frame){

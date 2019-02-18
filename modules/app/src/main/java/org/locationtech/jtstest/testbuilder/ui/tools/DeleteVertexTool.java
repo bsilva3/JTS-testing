@@ -17,7 +17,9 @@ import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jtstest.testbuilder.AppCorrGeometries;
+import org.locationtech.jtstest.testbuilder.GeometryEditPanel;
 import org.locationtech.jtstest.testbuilder.JTSTestBuilderFrame;
 import org.locationtech.jtstest.testbuilder.geom.GeometryBoxDeleter;
 
@@ -47,10 +49,18 @@ public class DeleteVertexTool extends BoxBandTool {
     
     //get list of removed coordinates
     List<Coordinate> removedCoords = getRemovedCoords(g.getCoordinates(), edit.getCoordinates());
-            
-    AppCorrGeometries.getInstance().deleteListOfPointsInBothCorrGeometries(removedCoords, getClickedPanel().isSecondPanel());
-    geomModel().setGeometry(edit);
-    JTSTestBuilderFrame.instance().reloadBothPanels();
+    
+    GeometryEditPanel editPanel = getClickedPanel();
+    Coordinate[] removedCoordsOtherPanel = AppCorrGeometries.getInstance().deleteListOfPointsInBothCorrGeometries(removedCoords, editPanel.isSecondPanel());
+    
+    //update the geometry in the interacted panel with the removed coords
+    editPanel.getGeomModel().setGeometry(edit);
+    
+    //draw the other geometry in the other panel with the corresponding coordinates now deleted
+    GeometryFactory fact = new GeometryFactory();
+    Geometry otherPanelGeomAfterDeletion = fact.createPolygon(removedCoordsOtherPanel);
+    JTSTestBuilderFrame.getOtherGeometryEditPanel(editPanel).getGeomModel().setGeometry(otherPanelGeomAfterDeletion);
+    //JTSTestBuilderFrame.instance().reloadBothPanels();
   }
   
     //returns a list of coordinates removed by the user

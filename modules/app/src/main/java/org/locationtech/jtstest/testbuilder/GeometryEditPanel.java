@@ -286,11 +286,8 @@ public class GeometryEditPanel extends JPanel {
         //tbModel.getGeometryEditModel().clear();
         tbModel.getGeometryEditModel().addComponent(coord);
         this.updateGeom();        
-        //store this coordinates
-        if (this.isSecondPanel)
-            AppCorrGeometries.getInstance().setCorrGeometry2(coord);
-        else
-            AppCorrGeometries.getInstance().setCorrGeometry1(coord);
+        //store these coordinates
+        AppCorrGeometries.getInstance().setCorrGeometry(coord, isSecondPanel);
     }
     
     //draw a square whose size is the same as the background image in the panel
