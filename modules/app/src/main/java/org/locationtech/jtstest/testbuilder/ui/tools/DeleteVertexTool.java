@@ -12,9 +12,13 @@
 package org.locationtech.jtstest.testbuilder.ui.tools;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jtstest.testbuilder.AppCorrGeometries;
+import org.locationtech.jtstest.testbuilder.JTSTestBuilderFrame;
 import org.locationtech.jtstest.testbuilder.geom.GeometryBoxDeleter;
 
 
@@ -40,9 +44,23 @@ public class DeleteVertexTool extends BoxBandTool {
     Envelope env = getBox().getEnvelopeInternal();
     Geometry g = geomModel().getGeometry();
     Geometry edit = GeometryBoxDeleter.delete(g, env);
-    AppCorrGeometries.getInstance().deleteListOfPointsInBothCorrGeometries(Arrays.asList(edit.getCoordinates()), getClickedPanel().isSecondPanel());
+    
+    //get list of removed coordinates
+    List<Coordinate> removedCoords = getRemovedCoords(g.getCoordinates(), edit.getCoordinates());
+            
+    AppCorrGeometries.getInstance().deleteListOfPointsInBothCorrGeometries(removedCoords, getClickedPanel().isSecondPanel());
     geomModel().setGeometry(edit);
+    JTSTestBuilderFrame.instance().reloadBothPanels();
   }
+  
+    //returns a list of coordinates removed by the user
+    private List<Coordinate> getRemovedCoords(Coordinate[] coordsBeforeDelete, Coordinate[] coordsAfterDelete){
+        List<Coordinate> coordsBeforeDeleteLinked = new LinkedList<>(Arrays.asList(coordsBeforeDelete));
+        List<Coordinate> coordsAfterDeleteLinked = new LinkedList<>(Arrays.asList(coordsAfterDelete));
+        //return the diference between the 2 lists, i.e., the removed coordinates
+        coordsBeforeDeleteLinked.removeAll(coordsAfterDeleteLinked);
+        return coordsBeforeDeleteLinked;
+    }
 
 
 }
