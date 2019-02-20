@@ -20,6 +20,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jtstest.testbuilder.geom.GeometryLocation;
@@ -27,6 +28,8 @@ import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 import org.locationtech.jts.operation.distance.DistanceOp;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
+import org.locationtech.jtstest.testbuilder.model.GeometryType;
 
 /**
  *
@@ -384,6 +387,21 @@ public class AppCorrGeometries {
         else{
             return gf.createPolygon(corrGeometry1.toArray(new Coordinate[corrGeometry1.size()]));   
         }
+    }
+    
+    //returns an array with the wkt of the corr geometries in both panels
+    //index 0 contains the wkt string of the corr geometry in the left (first) panel 
+    //index 1 contains the wkt string of the corr geometry in the right (second) panel 
+    public String[] getWKTextFromGeometriesInPanels(){
+        //get geometry in the left panel
+        Geometry g1 = getPanelCorrGeometry(false);
+        String wkt1 = GeometryEditModel.getText(g1, GeometryType.WELLKNOWNTEXT);
+        
+        //get geometry in the right panel
+        Geometry g2 = getPanelCorrGeometry(true);
+        String wkt2 = GeometryEditModel.getText(g2, GeometryType.WELLKNOWNTEXT);
+        
+        return new String[] {wkt1, wkt2};
     }
     
     public void clearCoords(){

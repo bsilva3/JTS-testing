@@ -31,6 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import jni_test.Main;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
@@ -288,6 +289,7 @@ public class GeometryEditPanel extends JPanel {
         this.updateGeom();        
         //store these coordinates
         AppCorrGeometries.getInstance().setCorrGeometry(coord, isSecondPanel);
+        
     }
     
     //draw a square whose size is the same as the background image in the panel

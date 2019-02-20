@@ -15,34 +15,25 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.MouseInfo;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import javax.imageio.ImageIO;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -56,7 +47,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.util.LineStringExtracter;
 import org.locationtech.jts.geom.util.LinearComponentExtracter;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.util.Assert;
@@ -127,6 +117,11 @@ public class JTSTestBuilderFrame extends JFrame
   ResultValuePanel resultValuePanel = new ResultValuePanel();
   StatsPanel statsPanel = new StatsPanel();
   InfoPanel logPanel = new InfoPanel();
+  
+  //
+  JTabbedPane tabbedPane = new JTabbedPane();
+  MorphingGeometryOptionsPanel morphingPanel = new MorphingGeometryOptionsPanel();
+  
   private ZoomTool zoomTool;
   private final ImageIcon appIcon = new ImageIcon(this.getClass().getResource("app-icon.gif"));
 
@@ -998,9 +993,22 @@ public class JTSTestBuilderFrame extends JFrame
     jSplitPane1.add(jPanel1, JSplitPane.TOP);
     jPanel1.add(testCasePanel);
     jPanel1.add(testCasePanel2);
-    jSplitPane1.add(jPanel2, JSplitPane.BOTTOM);
+    
+    //try to add tabbed pane with the jpanel2
+    jSplitPane1.add(tabbedPane, JSplitPane.BOTTOM);
+    
+    //load the icons for the tabs
+    ImageIcon wktPanelIcon = new ImageIcon(this.getClass().getResource("wkt_info_panel.png"));
+    ImageIcon morphingIcon = new ImageIcon(this.getClass().getResource("morphing_icon.png"));
+    tabbedPane.addTab("WKT Panel", wktPanelIcon, jPanel2, "WKT Panel and other related operations");
+
+    tabbedPane.addTab("Morphing", morphingIcon, morphingPanel, "Morphing for the geometries shown above");
+    
+    //previously, before the tabbed pane:
+    //jSplitPane1.add(jPanel2, JSplitPane.BOTTOM);
+    
     jPanel2.add(tbToolBar.getToolBar(), BorderLayout.NORTH);
-    //jPanel2 contains the results and other statistics (bottom)
+    //jPanel2 contains the wkt panel results and other statistics (bottom)
     jPanel2.add(inputTabbedPane, BorderLayout.CENTER);
     jSplitPane1.setBorder(new EmptyBorder(2,2,2,2));
     jSplitPane1.setResizeWeight(0.5);

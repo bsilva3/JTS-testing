@@ -95,7 +95,8 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
  - versão 0.3:
 	comunicar com libraria em C++ que, dado uma geometria no instante t e outra no instante t+x, retorna 
 	a geometria prevista num instante entre t e t+x.
-	apresentar essa geometria num painel.
+	apresentar essa geometria num painel (por agora, apresentar no painel da esquerda)
+	Criar menu em baixo que permite definir o tempo no morphing da geometria
 
  - a precisao apos a ediçao de um vertice é baixa (as coordenadas sao arredondadas)
  - area e perimetro ao selecionar 

@@ -56,7 +56,7 @@ import org.locationtech.jtstest.util.io.MultiFormatReader;
  */
 public class WKTPanel extends JPanel 
 {
-	TestBuilderModel tbModel;
+    TestBuilderModel tbModel;
 	
     GridBagLayout gridBagLayout1 = new GridBagLayout();
     Box panelButtons = Box.createVerticalBox();
