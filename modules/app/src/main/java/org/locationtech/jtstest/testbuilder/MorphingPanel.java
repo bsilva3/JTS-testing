@@ -30,6 +30,8 @@ import javax.swing.event.ChangeListener;
  *
  * @author Bruno Silva
  */
+
+//not being used currently!!!
 public class MorphingPanel extends JPanel{
     
     private JPanel optionsPanel;

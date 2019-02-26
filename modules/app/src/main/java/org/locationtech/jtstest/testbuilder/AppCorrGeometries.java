@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
@@ -28,6 +30,8 @@ import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 import org.locationtech.jts.operation.distance.DistanceOp;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 import org.locationtech.jtstest.testbuilder.model.GeometryType;
 
@@ -45,6 +49,12 @@ public class AppCorrGeometries {
     private List<Coordinate> corrGeometry1;
     
     private List<Coordinate> corrGeometry2;
+    
+    private List<Coordinate> originalCorrGeometry1;
+    
+    private List<Coordinate> originalCorrGeometry2;
+    
+    private List<Coordinate> morphingGeometry;
     
     private List<Coordinate> drawnPoints = new ArrayList<>();
     
@@ -76,7 +86,7 @@ public class AppCorrGeometries {
     }
     
     //returns the coordinates of a geometry in one panel.
-    //if the coordinates were edited
+    //if the coordinates were edited, returns the array of coordinates with the edited points
     public List<Coordinate> getListOfCoords(GeometryEditPanel editPanel){
         if (isCorrGeometryEdited){
             if (editPanel.isSecondPanel()){
@@ -86,13 +96,25 @@ public class AppCorrGeometries {
         }
         else{
             CorrToGeometryUtils corrToGeomUtils = new CorrToGeometryUtils(AppImage.getInstance().getCurrentCorrFile());
-            //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
-            return correctCoordinates(corrToGeomUtils.getCoordsFromFile(editPanel.isSecondPanel()), editPanel);
+            List<Coordinate> corrsFromFile = corrToGeomUtils.getCoordsFromFile(editPanel.isSecondPanel());
+            
+            if (editPanel.isSecondPanel()){
+                //store the coordinates read from file WITHOUT any correction to fit the screen
+                this.originalCorrGeometry2 = corrsFromFile;
+                //store the coordinates changed to fit the screen, inside the panel
+                this.corrGeometry2 = correctCoordinates(corrsFromFile, editPanel);
+                return corrGeometry2;
+            }
+            else{
+                this.originalCorrGeometry1 = corrsFromFile;
+                this.corrGeometry1 = correctCoordinates(corrsFromFile, editPanel);
+                return corrGeometry1;
+            }
         }
     }
     
     //corrects the coordinates in the corr file according to the size of the viewport
-    private List<Coordinate> correctCoordinates(Coordinate[] coord, GeometryEditPanel editPanel){
+    private List<Coordinate> correctCoordinates(List<Coordinate> coord, GeometryEditPanel editPanel){
         AppImage appImage = AppImage.getInstance();
         Point2D viewOrigin = editPanel.getViewport().toView(new Coordinate(0, 0));
         double vOriginX = viewOrigin.getX();
@@ -389,6 +411,17 @@ public class AppCorrGeometries {
         }
     }
     
+    //returns the polygon read from the corr file, with the original pixels in the file, without any change to fit the screen
+    public Polygon getCorrGeometry(boolean isSecondPanel){
+        GeometryFactory gf = new GeometryFactory();
+        if (isSecondPanel){
+            return gf.createPolygon(originalCorrGeometry2.toArray(new Coordinate[corrGeometry2.size()]));   
+        }
+        else{
+            return gf.createPolygon(originalCorrGeometry1.toArray(new Coordinate[corrGeometry1.size()]));   
+        }
+    }
+    
     //returns an array with the wkt of the corr geometries in both panels
     //index 0 contains the wkt string of the corr geometry in the left (first) panel 
     //index 1 contains the wkt string of the corr geometry in the right (second) panel 
@@ -402,6 +435,21 @@ public class AppCorrGeometries {
         String wkt2 = GeometryEditModel.getText(g2, GeometryType.WELLKNOWNTEXT);
         
         return new String[] {wkt1, wkt2};
+    }
+    
+    public Geometry WktToGeometry(String wkt){
+        WKTReader reader = new WKTReader();
+        Geometry g = null;
+        try {
+            g = reader.read(wkt);
+        } catch (ParseException ex) {
+            Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return g;
+    }
+    
+    public void activateMorphingGeometry(Geometry mGeometry){
+        this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
     }
     
     public void clearCoords(){

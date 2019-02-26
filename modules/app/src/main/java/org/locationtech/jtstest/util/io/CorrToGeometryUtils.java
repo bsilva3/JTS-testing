@@ -6,6 +6,8 @@
 package org.locationtech.jtstest.util.io;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
@@ -27,8 +29,8 @@ public class CorrToGeometryUtils {
         this.corrReader = new CorrReader(new File(corrFile));
     }
     
-    public Coordinate[] getCoordsFromFile(boolean secondSetCoordinates){
-        return corrReader.readAndGetPoints(secondSetCoordinates);
+    public List<Coordinate> getCoordsFromFile(boolean secondSetCoordinates){
+        return Arrays.asList(corrReader.readAndGetPoints(secondSetCoordinates));
     }
     
     //the coordinates read from the file are not closed, and a polygon cannot be formed. 

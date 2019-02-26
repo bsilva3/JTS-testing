@@ -31,7 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import jni_test.Main;
+import jni_st_mesh.Main;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
@@ -227,7 +227,6 @@ public class GeometryEditPanel extends JPanel {
     {
           renderMgr.setDirty(true);
           getGeomModel().geomChanged();
-
     }
 
     public String getToolTipText(MouseEvent event) {
@@ -287,8 +286,6 @@ public class GeometryEditPanel extends JPanel {
         //tbModel.getGeometryEditModel().clear();
         tbModel.getGeometryEditModel().addComponent(coord);
         this.updateGeom();        
-        //store these coordinates
-        AppCorrGeometries.getInstance().setCorrGeometry(coord, isSecondPanel);
         
     }
     
