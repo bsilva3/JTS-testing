@@ -84,6 +84,7 @@ import org.opengis.filter.FilterFactory;
 public class Main {
 	//native String atinstant(double ts, double tf, String P, String Q, double t); 
 		
+        //returns he result of the morphing of a polygon in a certain instant. Returns only one polygon
 	public native String at_instant_poly(
 		double b,					// begin instant
 		double e,					// end instant
@@ -91,7 +92,8 @@ public class Main {
 		String target_wkt,			// Q
 		double t	
 	);
-
+        
+        //returns the result of the morphing of a polygon in a certain period. Returns multiple polygons
 	public native String during_period_poly
 	(
 		double b,					// begin instant
@@ -103,6 +105,8 @@ public class Main {
 		int num_samples			// number of samples
 	);
 	
+        //returns the result of the morphing of a polygon in a certain instant. Returns one polygon represented by a mesh of
+        //triangules in an array of doubles, and every 3 elements is the coordinate of 1 triangule 
 	public native double[] at_instant_mesh
 	(
 		double b,					// begin instant
@@ -112,7 +116,8 @@ public class Main {
 		double t					// at instant
 	);
 
-	
+	//returns the result of the morphing of a polygon in a certain instant. Returns one polygon represented by a mesh of
+        //triangules in a multyplogon, with triangules 
 	public native String at_instant_mesh_2
 	(
 		double b,					// begin instant
@@ -122,6 +127,9 @@ public class Main {
 		double t					// at instant
 	);
 	
+        //returns the result of the morphing of a polygon in a certain instant. Returns several polygons, each one
+        //represented by a mesh of triangules in an array of doubles, and every 3 elements represents the
+        //coordinates of 1 triangule. The last element indicates the number of triangules in each polygon
 	public native double[] during_period_mesh
 	(
 		double b,					// begin instant
@@ -133,6 +141,7 @@ public class Main {
 		int num_samples				// number of samples
 	);
 	
+        //returns the evolution of the area of the polygon over time
 	public native double[] area_EV
 	(
 		double b,
@@ -329,30 +338,30 @@ public class Main {
 		System.out.println(s);
 		
 		try {
-			MultiPolygon polygon = (MultiPolygon) reader.read(s);
+                    MultiPolygon polygon = (MultiPolygon) reader.read(s);
 
-	        BufferedImage image = new BufferedImage(800, 600, BufferedImage.TYPE_3BYTE_BGR);
-	        Graphics2D gr = image.createGraphics();
-	        gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	        gr.setColor(Color.WHITE);
-	        gr.fillRect(0, 0, image.getWidth(), image.getHeight());
-	        //gr.setColor(Color.blue);
-	        gr.setStroke(new BasicStroke(1));
-	        
-	        AffineTransform at = new AffineTransform();
-	        at.translate(100, 400);
-	        at.scale(20, -20);
-	        
-            gr.setColor(Color.blue);
-            //gr.fill(new LiteShape(polygon, at, false));
-	        gr.draw(new LiteShape(polygon, at, false));
-	        
-	        gr.dispose();
+                    BufferedImage image = new BufferedImage(800, 600, BufferedImage.TYPE_3BYTE_BGR);
+                    Graphics2D gr = image.createGraphics();
+                    gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    gr.setColor(Color.WHITE);
+                    gr.fillRect(0, 0, image.getWidth(), image.getHeight());
+                    //gr.setColor(Color.blue);
+                    gr.setStroke(new BasicStroke(1));
 
-	        JFrame frame = new JFrame("Mesh");
-	        frame.setContentPane(new JLabel(new ImageIcon(image)));
-	        frame.pack();
-	        frame.setVisible(true);
+                    AffineTransform at = new AffineTransform();
+                    at.translate(100, 400);
+                    at.scale(20, -20);
+
+                    gr.setColor(Color.blue);
+                    //gr.fill(new LiteShape(polygon, at, false));
+                    gr.draw(new LiteShape(polygon, at, false));
+	        
+                    gr.dispose();
+
+                    JFrame frame = new JFrame("Mesh");
+                    frame.setContentPane(new JLabel(new ImageIcon(image)));
+                    frame.pack();
+                    frame.setVisible(true);
 	        
 			//System.out.println(wkt);
 			
@@ -443,34 +452,34 @@ public class Main {
             {
 
                 try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (UnsupportedLookAndFeelException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (UnsupportedLookAndFeelException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 
                 Main m = new Main();
-        		GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
-        		WKTReader reader = new WKTReader( geometryFactory );
-                
-        		String s = m.during_period_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000, 2000, 1000);
-        		
-        		MultiPolygon m_polygon = null;
-        		
-        		try {
-        			m_polygon = (MultiPolygon) reader.read(s);        			
-        		}catch(Exception e) {
-        			
-        		}
+                GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
+                WKTReader reader = new WKTReader( geometryFactory );
+
+                String s = m.during_period_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000, 2000, 1000);
+
+                MultiPolygon m_polygon = null;
+
+                try {
+                    m_polygon = (MultiPolygon) reader.read(s);        			
+                }catch(Exception e) {
+
+                }
 
                 JFrame frame = new JFrame("Morphing");
                 frame.getContentPane().setBackground(Color.white);
@@ -522,18 +531,18 @@ public class Main {
         {
             super.paintComponent(g);
             
-        	Polygon p = (Polygon) col.getGeometryN(geom);
-        	geom++;
+            Polygon p = (Polygon) col.getGeometryN(geom);
+            geom++;
         	
             Graphics2D gr = (Graphics2D) g.create();
             
-	        AffineTransform at = new AffineTransform();
-	        at.translate(100, 400);
-	        at.scale(20, -20);
+	    AffineTransform at = new AffineTransform();
+	    at.translate(100, 400);
+	    at.scale(20, -20);
 	        
             gr.setColor(Color.blue);
             gr.fill(new LiteShape(p, at, false));
-	        gr.draw(new LiteShape(p, at, false));     
+	    gr.draw(new LiteShape(p, at, false));     
 	        
             gr.dispose();
             

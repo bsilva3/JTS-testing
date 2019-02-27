@@ -277,15 +277,38 @@ public class GeometryEditPanel extends JPanel {
     public void drawGeometry(){
         //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
         AppImage.getInstance().resizeImageDimension(this.getSize(), isSecondPanel);
-        drawImagePolygon();
+        AppCorrGeometries appCorr = AppCorrGeometries.getInstance();
+        List<Coordinate> coord;
         
-        List<Coordinate> coord = AppCorrGeometries.getInstance().getListOfCoords(this);
-        
+        if (!this.isSecondPanel && appCorr.showMorphingGeometry()){
+            //this is the first panel and will draw the result of the morphing of a geometry
+            //and will not draw the image as background
+            coord = appCorr.getMorphingGeometry();
+            
+            //remove any background image that may exist
+            tbModel.getGeometryEditModel().setEditGeomIndex(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+            tbModel.getGeometryEditModel().clear();
+            
+            //remove any other geometries previously drawn
+            tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+            tbModel.getGeometryEditModel().clear();
+        }
+        else{
+            //this panel will draw the geometry read from the file or from the cache if previously edited
+            //and draw the image as background
+            drawImagePolygon();
+            
+            coord = appCorr.getCordsFromFileOrEdited(this);
+            
+            //remove any other geometries previously drawn
+            tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+            tbModel.getGeometryEditModel().clear();
+        }
         tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
         //tbModel.getGeometryEditModel().clear();
         tbModel.getGeometryEditModel().addComponent(coord);
-        this.updateGeom();        
+        this.updateGeom();   
         
     }
     

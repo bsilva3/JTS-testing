@@ -44,17 +44,21 @@ import org.locationtech.jtstest.testbuilder.model.GeometryType;
 //one List of Coordinates is from the right panel, and the other is from the left one
 public class AppCorrGeometries {
     
-    //these list of coordinates are set when the geometries are drawn from the first time 
+    //these lists of coordinates are set when the geometries are drawn from the first time 
     //(after reading the coordinates from the file)
     private List<Coordinate> corrGeometry1;
     
     private List<Coordinate> corrGeometry2;
     
+    //stores the original coordinates read from the corr file
     private List<Coordinate> originalCorrGeometry1;
     
     private List<Coordinate> originalCorrGeometry2;
     
+    //stores the coordinates of a morphed geometry
     private List<Coordinate> morphingGeometry;
+    
+    private boolean showMorphingGeometry = false;
     
     private List<Coordinate> drawnPoints = new ArrayList<>();
     
@@ -87,7 +91,7 @@ public class AppCorrGeometries {
     
     //returns the coordinates of a geometry in one panel.
     //if the coordinates were edited, returns the array of coordinates with the edited points
-    public List<Coordinate> getListOfCoords(GeometryEditPanel editPanel){
+    public List<Coordinate> getCordsFromFileOrEdited(GeometryEditPanel editPanel){
         if (isCorrGeometryEdited){
             if (editPanel.isSecondPanel()){
                 return this.corrGeometry2;
@@ -415,23 +419,24 @@ public class AppCorrGeometries {
     public Polygon getCorrGeometry(boolean isSecondPanel){
         GeometryFactory gf = new GeometryFactory();
         if (isSecondPanel){
-            return gf.createPolygon(originalCorrGeometry2.toArray(new Coordinate[corrGeometry2.size()]));   
+            return gf.createPolygon(originalCorrGeometry2.toArray(new Coordinate[originalCorrGeometry2.size()]));   
         }
         else{
-            return gf.createPolygon(originalCorrGeometry1.toArray(new Coordinate[corrGeometry1.size()]));   
+            return gf.createPolygon(originalCorrGeometry1.toArray(new Coordinate[originalCorrGeometry1.size()]));   
         }
     }
     
-    //returns an array with the wkt of the corr geometries in both panels
+    //returns an array with the wkt of the corr geometries in both panels (with original coords from tht corr file, wihtout
+    //correction to fit the screen
     //index 0 contains the wkt string of the corr geometry in the left (first) panel 
     //index 1 contains the wkt string of the corr geometry in the right (second) panel 
     public String[] getWKTextFromGeometriesInPanels(){
         //get geometry in the left panel
-        Geometry g1 = getPanelCorrGeometry(false);
+        Geometry g1 = getCorrGeometry(false);
         String wkt1 = GeometryEditModel.getText(g1, GeometryType.WELLKNOWNTEXT);
         
         //get geometry in the right panel
-        Geometry g2 = getPanelCorrGeometry(true);
+        Geometry g2 = getCorrGeometry(true);
         String wkt2 = GeometryEditModel.getText(g2, GeometryType.WELLKNOWNTEXT);
         
         return new String[] {wkt1, wkt2};
@@ -448,8 +453,30 @@ public class AppCorrGeometries {
         return g;
     }
     
-    public void activateMorphingGeometry(Geometry mGeometry){
+    //draw in the left panel (1st panel) the result of the morphing of a geometry
+    public void drawAndShowMorphingGeometry(String wktGeometry){
+        WKTReader reader = new WKTReader();
+        Geometry mGeometry = null;
+        try {
+            mGeometry = reader.read(wktGeometry);
+        } catch (ParseException ex) {
+            Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
+        
+        showMorphingGeometryInPanel();
+    }
+    
+    public void showMorphingGeometryInPanel(){
+        this.showMorphingGeometry = true;
+        //draw on the 1st panel
+        JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
+    }
+    
+    public void hideMorphingGeometryInPanel(){
+        this.showMorphingGeometry = false;
+        //draw back the normal geometry on the 1st panel
+        JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
     }
     
     public void clearCoords(){
@@ -487,7 +514,13 @@ public class AppCorrGeometries {
     public void setGeometriesEdited(boolean b){
         this.isCorrGeometryEdited = b;
     }
-    
-    
+
+    public boolean showMorphingGeometry() {
+        return showMorphingGeometry;
+    }
+
+    public List<Coordinate> getMorphingGeometry() {
+        return morphingGeometry;
+    }
     
 }

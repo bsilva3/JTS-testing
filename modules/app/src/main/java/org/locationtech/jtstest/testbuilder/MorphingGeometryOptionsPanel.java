@@ -7,6 +7,8 @@ package org.locationtech.jtstest.testbuilder;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -86,6 +88,22 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
                 toolTip.setVisible(false);
             }
         });
+        
+        //start the showMorphedGeometry in panel checkbox deactivated
+        showMorphedGeometryCheckBox.setEnabled(false);
+        //add listener for checkbox (to show or hide the result of the morphing of the geometry in the panel)
+        showMorphedGeometryCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == ItemEvent.SELECTED) {//checkbox has been selected
+                    //show in the panel the result of the morphing
+                    AppCorrGeometries.getInstance().showMorphingGeometryInPanel();
+                } else {//checkbox has been deselected
+                    //remove from the panel the result of the morphing and show the normal geometry
+                    AppCorrGeometries.getInstance().hideMorphingGeometryInPanel();
+                };
+            }
+        });
     }
     
     public void updateToolTip(MouseEvent me) {
@@ -120,6 +138,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         filler5 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
         jScrollPane1 = new javax.swing.JScrollPane();
         resultTextArea = new javax.swing.JTextArea();
+        showMorphedGeometryCheckBox = new java.awt.Checkbox();
 
         setFocusTraversalPolicyProvider(true);
         setLayout(new java.awt.GridBagLayout());
@@ -138,6 +157,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -182,11 +202,20 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 9, 0);
         add(jScrollPane1, gridBagConstraints);
+
+        showMorphedGeometryCheckBox.setLabel("show Morphing Geometry");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(showMorphedGeometryCheckBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // calls the c++ library that, given a time interval, given a previous geometry and a target geometry,
@@ -199,13 +228,26 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         // call here the morphing function from the c++ library
         System.loadLibrary(AppConstants.DLL_LIBRARY);
         Main m = new Main();
-        System.out.println("wkt 1st geometry: "+wkts[0]);
-        System.out.println("wkt 2nd geometry: "+wkts[1]);
+        /*System.out.println("wkt 1st geometry: "+wkts[0]);
+        System.out.println("wkt 2nd geometry: "+wkts[1]);*/
         
-        String result = m.at_instant_mesh_2(1000.0, 2000.0, wkts[0], wkts[1], timeSlider.getValue());
+        //String result = m.at_instant_mesh_2(1000.0, 2000.0, wkts[0], wkts[1], timeSlider.getValue());
+        String result = m.at_instant_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", timeSlider.getValue());
         //add the result in the text area
-        resultTextArea.setText(result);
-        //for now, draw this geometry in the left panel
+        
+        System.out.println("result --> "+result);
+        if (!result.equals(AppConstants.MORPHING_ERR_STRING)){
+            //morphing was succesfull
+            resultTextArea.setText(result);
+            //for now, draw the result of the morphing geometry in the left panel (1st panel)
+            AppCorrGeometries.getInstance().drawAndShowMorphingGeometry(result);
+            
+            //enable the show morphing geometry in panel checkbox and check it
+            showMorphedGeometryCheckBox.setEnabled(true);
+            showMorphedGeometryCheckBox.setState(true);
+        }
+        
+        
     }//GEN-LAST:event_playBtnActionPerformed
 
 
@@ -217,6 +259,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JButton playBtn;
     private javax.swing.JLabel resultLabel;
     private javax.swing.JTextArea resultTextArea;
+    private java.awt.Checkbox showMorphedGeometryCheckBox;
     private javax.swing.JSlider timeSlider;
     // End of variables declaration//GEN-END:variables
 }

@@ -31,6 +31,8 @@ public class AppConstants
     
     //the name of the java library with the C++ methods for the morphing of a geometry
     public static final String DLL_LIBRARY = "java_mesh";
+    
+    public static final String MORPHING_ERR_STRING = "ERR";
   
     public static double TOPO_STRETCH_VIEW_DIST = 5;
 
