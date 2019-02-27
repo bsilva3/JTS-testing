@@ -7,6 +7,7 @@ package org.locationtech.jtstest.testbuilder;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -19,12 +20,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import jni_st_mesh.IFrame;
+import jni_st_mesh.Main;
 import org.apache.commons.lang3.ArrayUtils;
+import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jtstest.testbuilder.geom.GeometryLocation;
 import org.locationtech.jtstest.util.io.CorrToGeometryUtils;
 import org.locationtech.jts.operation.distance.DistanceOp;
@@ -462,9 +470,49 @@ public class AppCorrGeometries {
         } catch (ParseException ex) {
             Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
+        if (mGeometry.getGeometryType().equals("MultiPolygon")){
+            //several polygons for a certain interval of time
+            GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
+
+            MultiPolygon mPolygon = null;
+
+            try {
+                mPolygon = (MultiPolygon) reader.read(wktGeometry);        			
+            }catch(Exception e) {   }
+            
+            animation(mPolygon);
+        }
+        else if(mGeometry.getGeometryType().equals("Polygon")){
+            //one polygon for one instant
+            
+            this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
         
-        showMorphingGeometryInPanel();
+            showMorphingGeometryInPanel();
+        }
+    }
+    
+    public void animation(MultiPolygon multiPolygon) {
+            EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() 
+            {
+
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+                JFrame frame = new JFrame("Morphing");
+                frame.getContentPane().setBackground(Color.white);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.add(new IFrame(multiPolygon));
+                frame.pack();
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            }
+        });
     }
     
     public void showMorphingGeometryInPanel(){

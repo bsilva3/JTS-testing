@@ -66,5 +66,18 @@ public class AppStrings {
   static final String TIP_PASTE_DATA = "Paste from WKT, WKB, or GML";
 
   static final String TIP_COPY_DATA = "Copy as WKT (Ctl-click for formatted)";
+  
+    //the message error that shows if a morphing operation fails
+    public static final String MORPHING_ERR_STRING = "ERR";
+    
+    //names of the methods in the c++ library
+    public static final String POLY_AT_INSTANT_METHOD_STRING = "at_instant_poly";
+    public static final String POLY_DURING_PERIOD_METHOD_STRING = "during_period_poly";
+    
+    //options for the combo box for the selection of the method to call in the c++ library
+    public static final String[] METHOD_SELECTION_STRINGS = {POLY_AT_INSTANT_METHOD_STRING, POLY_DURING_PERIOD_METHOD_STRING};
+    
+    //the name of the java library with the C++ methods for the morphing of a geometry
+    public static final String DLL_LIBRARY = "java_mesh";
 
 }

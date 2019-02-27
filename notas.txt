@@ -100,7 +100,7 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	comunicar com libraria em C++ que, dado uma geometria no instante t e outra no instante t+x, retorna 
 	a geometria prevista num instante entre t e t+x.
 	apresentar essa geometria num painel (por agora, apresentar no painel da esquerda)
-	Criar menu em baixo que permite definir o tempo no morphing da geometria.
+	Criar menu em baixo que permite definir o tempo no morphing da geometria. (talvez nao seja preciso)
 	ComboBox em que o utilizador defina qual dos métodos quer chamar.
 	Em métodos que retornam vários poligonos ao longo do tempo, apresentar na UI a evolução da geometria
 
@@ -113,6 +113,7 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
  - area e perimetro ao selecionar 
 
 - bugs:
+	- show morphing geometry: se existir zoom a geometria nao fica corretamente alinhada na imagem
 	- ao editar um vertice, a geometria desloca-se e deixa de estar alinhada com a imagem de fundo!
 	-no 2º painel, por vezes o zoom deixa de funcionar
 	-streampolygon e polygon desaparecem apos uma ação qualquer

@@ -117,10 +117,10 @@ public class JTSTestBuilderFrame extends JFrame
   ResultValuePanel resultValuePanel = new ResultValuePanel();
   StatsPanel statsPanel = new StatsPanel();
   InfoPanel logPanel = new InfoPanel();
-  
   //
   JTabbedPane tabbedPane = new JTabbedPane();
   MorphingGeometryOptionsPanel morphingPanel = new MorphingGeometryOptionsPanel();
+  ChartsPanel chartsPanel = new ChartsPanel();
   
   private ZoomTool zoomTool;
   private final ImageIcon appIcon = new ImageIcon(this.getClass().getResource("app-icon.gif"));
@@ -1003,6 +1003,8 @@ public class JTSTestBuilderFrame extends JFrame
     tabbedPane.addTab("WKT Panel", wktPanelIcon, jPanel2, "WKT Panel and other related operations");
 
     tabbedPane.addTab("Morphing", morphingIcon, morphingPanel, "Morphing for the geometries shown above");
+    
+    tabbedPane.addTab("Charts", morphingIcon, chartsPanel, "Morphing for the geometries shown above");
     
     //previously, before the tabbed pane:
     //jSplitPane1.add(jPanel2, JSplitPane.BOTTOM);

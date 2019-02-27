@@ -441,31 +441,23 @@ public class Main {
 		//map.put(key, value)
 		
 		// Animation of a polygon.
-		m.Animation();
+		
 	}
 	
 	
 	public void Animation() {
-        EventQueue.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() 
             {
 
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (UnsupportedLookAndFeelException e) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                
 
                 Main m = new Main();
                 GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
@@ -492,64 +484,4 @@ public class Main {
         });
     }
 	
-    public class IFrame extends JPanel 
-    {
-        /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		
-		private int geom = 0;
-        private int N = 0;
-        private MultiPolygon col = null;
-        Timer timer = null;
-
-        public IFrame(MultiPolygon m_polygon) 
-        {
-        	col = m_polygon;
-        	N = col.getNumGeometries();
-        	
-        	super.setBackground(Color.white);
-        	
-            timer = new Timer(16, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    repaint();
-                }
-            });
-            
-            timer.start();
-        }
-
-        @Override
-        public Dimension getPreferredSize() {
-            return new Dimension(800, 600);
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) 
-        {
-            super.paintComponent(g);
-            
-            Polygon p = (Polygon) col.getGeometryN(geom);
-            geom++;
-        	
-            Graphics2D gr = (Graphics2D) g.create();
-            
-	    AffineTransform at = new AffineTransform();
-	    at.translate(100, 400);
-	    at.scale(20, -20);
-	        
-            gr.setColor(Color.blue);
-            gr.fill(new LiteShape(p, at, false));
-	    gr.draw(new LiteShape(p, at, false));     
-	        
-            gr.dispose();
-            
-            if(geom >= N) {
-            	timer.stop();
-            	return;    	
-            }
-        }
-    }
 }

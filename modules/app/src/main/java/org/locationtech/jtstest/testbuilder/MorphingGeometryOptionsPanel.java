@@ -12,6 +12,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import javax.swing.ComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JWindow;
@@ -104,6 +105,9 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
                 };
             }
         });
+        
+        //set the text for the combo box
+        this.methodSelectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.METHOD_SELECTION_STRINGS));
     }
     
     public void updateToolTip(MouseEvent me) {
@@ -139,6 +143,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         resultTextArea = new javax.swing.JTextArea();
         showMorphedGeometryCheckBox = new java.awt.Checkbox();
+        methodSelectionComboBox = new javax.swing.JComboBox<>();
 
         setFocusTraversalPolicyProvider(true);
         setLayout(new java.awt.GridBagLayout());
@@ -191,10 +196,11 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 5;
         add(filler5, gridBagConstraints);
 
-        resultTextArea.setColumns(50);
-        resultTextArea.setRows(3);
+        resultTextArea.setColumns(40);
+        resultTextArea.setRows(10);
         resultTextArea.setTabSize(4);
         resultTextArea.setToolTipText("");
+        resultTextArea.setWrapStyleWord(true);
         resultTextArea.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         jScrollPane1.setViewportView(resultTextArea);
 
@@ -212,10 +218,21 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         showMorphedGeometryCheckBox.setLabel("show Morphing Geometry");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(showMorphedGeometryCheckBox, gridBagConstraints);
+
+        methodSelectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
+        add(methodSelectionComboBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // calls the c++ library that, given a time interval, given a previous geometry and a target geometry,
@@ -224,20 +241,32 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         // get wkt of the corr geometries in both panels.
         //index 0 has the wkt of the corr geometry in panel 1 and index 1 has the wkt of the corr geometry in panel 2
         String[] wkts = AppCorrGeometries.getInstance().getWKTextFromGeometriesInPanels();
-        
-        // call here the morphing function from the c++ library
-        System.loadLibrary(AppConstants.DLL_LIBRARY);
-        Main m = new Main();
         /*System.out.println("wkt 1st geometry: "+wkts[0]);
         System.out.println("wkt 2nd geometry: "+wkts[1]);*/
         
-        //String result = m.at_instant_mesh_2(1000.0, 2000.0, wkts[0], wkts[1], timeSlider.getValue());
-        String result = m.at_instant_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", timeSlider.getValue());
-        //add the result in the text area
+        String result = "";
         
+        //load c++ libraries
+        System.loadLibrary(AppStrings.DLL_LIBRARY);
+        Main m = new Main();
+        
+        //find which method to call:
+        String selectedItem = this.methodSelectionComboBox.getSelectedItem().toString();
+        if (selectedItem.equals(AppStrings.POLY_AT_INSTANT_METHOD_STRING)){
+            result = m.at_instant_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", timeSlider.getValue());
+        }
+        else if (selectedItem.equals(AppStrings.POLY_DURING_PERIOD_METHOD_STRING)){
+            result = m.during_period_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1500.0, 2000.0, 500);
+        }
+        
+        
+        //String result = m.at_instant_mesh_2(1000.0, 2000.0, wkts[0], wkts[1], timeSlider.getValue());
         System.out.println("result --> "+result);
-        if (!result.equals(AppConstants.MORPHING_ERR_STRING)){
+        
+        if (!result.equals(AppStrings.MORPHING_ERR_STRING)){
             //morphing was succesfull
+
+            //add the result in the text area
             resultTextArea.setText(result);
             //for now, draw the result of the morphing geometry in the left panel (1st panel)
             AppCorrGeometries.getInstance().drawAndShowMorphingGeometry(result);
@@ -256,6 +285,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
     private javax.swing.Box.Filler filler5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> methodSelectionComboBox;
     private javax.swing.JButton playBtn;
     private javax.swing.JLabel resultLabel;
     private javax.swing.JTextArea resultTextArea;

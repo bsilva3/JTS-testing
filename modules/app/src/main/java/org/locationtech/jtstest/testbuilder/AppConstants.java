@@ -29,11 +29,7 @@ public class AppConstants
     public static double HIGHLIGHT_SIZE = 50.0;
     public static double VERTEX_SHADOW_SIZE = 100;
     
-    //the name of the java library with the C++ methods for the morphing of a geometry
-    public static final String DLL_LIBRARY = "java_mesh";
     
-    public static final String MORPHING_ERR_STRING = "ERR";
-  
     public static double TOPO_STRETCH_VIEW_DIST = 5;
 
     public static double  MASK_WIDTH_FRAC = 0.3333;
