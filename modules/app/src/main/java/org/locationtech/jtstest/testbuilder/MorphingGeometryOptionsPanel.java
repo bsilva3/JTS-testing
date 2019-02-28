@@ -5,6 +5,7 @@
  */
 package org.locationtech.jtstest.testbuilder;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ItemEvent;
@@ -20,6 +21,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import jni_st_mesh.Main;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  *
@@ -139,11 +145,11 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
         resultLabel = new javax.swing.JLabel();
-        filler5 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
         jScrollPane1 = new javax.swing.JScrollPane();
         resultTextArea = new javax.swing.JTextArea();
         showMorphedGeometryCheckBox = new java.awt.Checkbox();
         methodSelectionComboBox = new javax.swing.JComboBox<>();
+        chartPanel = new javax.swing.JPanel();
 
         setFocusTraversalPolicyProvider(true);
         setLayout(new java.awt.GridBagLayout());
@@ -155,9 +161,10 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         add(playBtn, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -172,7 +179,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
@@ -186,15 +193,11 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(resultLabel, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
-        add(filler5, gridBagConstraints);
 
         resultTextArea.setColumns(40);
         resultTextArea.setRows(10);
@@ -233,6 +236,17 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(methodSelectionComboBox, gridBagConstraints);
+
+        chartPanel.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridheight = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(chartPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // calls the c++ library that, given a time interval, given a previous geometry and a target geometry,
@@ -265,7 +279,10 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         
         if (!result.equals(AppStrings.MORPHING_ERR_STRING)){
             //morphing was succesfull
-
+            
+            //draw the chart with the area evolution
+            double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
+            createLineChartAreaEV(areaEV, 1000.0, 2000.0);
             //add the result in the text area
             resultTextArea.setText(result);
             //for now, draw the result of the morphing geometry in the left panel (1st panel)
@@ -279,10 +296,30 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         
     }//GEN-LAST:event_playBtnActionPerformed
 
+    private void createLineChartAreaEV(double[] areaEV, double beginTime, double endTime){
+        JFreeChart lineChart = ChartFactory.createLineChart("area evolution", "Time", "Area",
+         createDataset(areaEV, 1000.0, 2000.0, 500), PlotOrientation.VERTICAL, true,true,false);
+        ChartPanel cp = new ChartPanel(lineChart);
+        
+        //add the panel to the frame
+        this.chartPanel.add(cp, BorderLayout.CENTER);
+        chartPanel.validate();
+    }
+    
+    private DefaultCategoryDataset createDataset(double[] areaEV, double beginTime, double endTime, int increment) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+        double v = beginTime;
+        for (double d : areaEV){
+            System.out.println("->"+d);
+            dataset.addValue( d , "Area" , v+"" );
+            v+=increment;
+        }
+        return dataset;
+   }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel chartPanel;
     private javax.swing.Box.Filler filler2;
-    private javax.swing.Box.Filler filler5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox<String> methodSelectionComboBox;

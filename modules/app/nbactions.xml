@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-JTS_GOALS</actionName>
+            <displayName>JTS_GOALS</displayName>
+            <goals>
+                <goal>clean:clean</goal>
+                <goal>resources:resources</goal>
+                <goal>compiler:compile</goal>
+                <goal>jar:jar</goal>
+                <goal>install:install</goal>
+                <goal>-DskipTest:true</goal>
+            </goals>
+        </action>
+    </actions>
