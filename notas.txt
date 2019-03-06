@@ -107,9 +107,12 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	Nao existe ainda método que converte as coordenadas da geometria no painel para as coordenadas em pixeis do wkt,
 	e assim, se houver qualquer ediçao em alguma das geometrias esta nao sera considerada para o morphing e apenas é
 	considerado as coordenadas originais do ficheiro corr
-	- na conta (c/original) * panel --> o que fazer se original = 0 ??
 
- - a precisao apos a ediçao de um vertice é baixa (as coordenadas sao arredondadas)
+	-graficos de barras e tabelas com as medidas de qualidade
+	-janela com animação: adicionar slider botao de guardar e pausar animação
+	-3ª combobox em que o utilizador seleciona as metricas
+	-mudar o slider para 1 ou 2 timepicker
+
  - area e perimetro ao selecionar 
 
 - bugs:

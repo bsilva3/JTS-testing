@@ -7,16 +7,21 @@ package org.locationtech.jtstest.testbuilder;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import javax.swing.ComboBoxModel;
+import java.util.Arrays;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JWindow;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -24,8 +29,13 @@ import jni_st_mesh.Main;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *
@@ -33,69 +43,17 @@ import org.jfree.data.category.DefaultCategoryDataset;
  */
 public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
      
-    //for the tooltip on the slider
-    private JWindow toolTip = new JWindow();
-    private JLabel toolTipLabel = new JLabel("", SwingConstants.CENTER);
-    private Dimension size = new Dimension(30, 20);
-    private int prevValue = -1;
     /**
      * Creates new form MorphingGeometryOptionsPanel
      */
     public MorphingGeometryOptionsPanel() {
         initComponents();
-        //labels for slider:
-        timeSlider.setMaximum(2000);
-        timeSlider.setMinimum(1000);
-        timeSlider.setValue(1000);
-        timeSlider.setMajorTickSpacing(200);
-        timeSlider.setMinorTickSpacing(100);
-        timeSlider.setPaintTicks(true);
-        timeSlider.setPaintLabels(true);
-        
-        //set up slider tooltip elements
-        toolTipLabel.setOpaque(false);
-        toolTipLabel.setBackground(UIManager.getColor("ToolTip.background"));
-        toolTipLabel.setBorder(UIManager.getBorder("ToolTip.border"));
-        toolTip.add(toolTipLabel);
-        toolTip.setSize(size);
-        
-        //listeners to show a tooltip for the slider
-        
-        timeSlider.addMouseMotionListener(new MouseMotionListener(){
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                updateToolTip(e);
-            }
 
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                updateToolTip(e);
-            }
-            
-        });
-        timeSlider.addMouseListener(new MouseListener(){
-            @Override
-            public void mouseClicked(MouseEvent e) { }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                toolTip.setVisible(true);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {}
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                toolTip.setVisible(true);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                toolTip.setVisible(false);
-            }
-        });
-        
+        this.playBtn.setText(AppStrings.START_MORPHING_BTN_STRING);
+        this.timeLabel.setText(AppStrings.INSTANT_LABEL_STRING);
+        this.initialTimeSpinner.setModel(new SpinnerNumberModel(1000, 1000, 2000, 10));//set default, min max and increment value
+        this.endTimeSpinner.setModel(new SpinnerNumberModel(2000, 1000, 2000, 10));//set default, min max and increment value
+        this.remove(endTimeSpinner);
         //start the showMorphedGeometry in panel checkbox deactivated
         showMorphedGeometryCheckBox.setEnabled(false);
         //add listener for checkbox (to show or hide the result of the morphing of the geometry in the panel)
@@ -112,24 +70,33 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             }
         });
         
-        //set the text for the combo box
+        //set the text for the combo boxes
         this.methodSelectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.METHOD_SELECTION_STRINGS));
+        this.meshOrPolygonComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.MESH_OR_POLY_STRINGS));
+        this.metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.METRICS_STRINGS));
+        
+        methodSelectionComboBox.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                //if user wants to get the morphing at an instant, hide the spinner for the end time
+                if(methodSelectionComboBox.getSelectedItem().toString().equals(AppStrings.AT_INSTANT_METHOD_STRING)){
+                    timeLabel.setText(AppStrings.INSTANT_LABEL_STRING);
+                    remove(endTimeSpinner);
+                }
+                else{
+                    //if user wants the morphing for period of time show the end time spinner in order for him to select the end period
+                    timeLabel.setText(AppStrings.DURING_PERIOD_METHOD_STRING);
+                    //add the spinner for end period
+                    GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                    gridBagConstraints.gridx = 2;
+                    gridBagConstraints.gridy = 1;
+                    gridBagConstraints.weightx = 1.0;
+                    gridBagConstraints.weighty = 1.0;
+                    add(endTimeSpinner, gridBagConstraints);
+                }
+            }
+        });
     }
     
-    public void updateToolTip(MouseEvent me) {
-        JSlider slider = (JSlider) me.getComponent();
-        int intValue = (int) slider.getValue();
-        if (prevValue != intValue) {
-            toolTipLabel.setText(String.format("%03d", slider.getValue()));
-            Point pt = me.getPoint();
-            pt.y = -size.height;
-            SwingUtilities.convertPointToScreen(pt, me.getComponent());
-            pt.translate(-size.width / 2, 0);
-            toolTip.setLocation(pt);
-        }
-        prevValue = intValue;
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -141,8 +108,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         playBtn = new javax.swing.JButton();
-        timeSlider = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
+        timeLabel = new javax.swing.JLabel();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
         resultLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -150,6 +116,13 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         showMorphedGeometryCheckBox = new java.awt.Checkbox();
         methodSelectionComboBox = new javax.swing.JComboBox<>();
         chartPanel = new javax.swing.JPanel();
+        meshOrPolygonComboBox = new javax.swing.JComboBox<>();
+        initialTimeSpinner = new javax.swing.JSpinner();
+        endTimeSpinner = new javax.swing.JSpinner();
+        meshOrPolygonLabel = new javax.swing.JLabel();
+        methodLabel = new javax.swing.JLabel();
+        metricLabel = new javax.swing.JLabel();
+        metricsComboBox = new javax.swing.JComboBox<>();
 
         setFocusTraversalPolicyProvider(true);
         setLayout(new java.awt.GridBagLayout());
@@ -163,27 +136,19 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(playBtn, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(timeSlider, gridBagConstraints);
 
-        jLabel1.setText("time");
+        timeLabel.setText("time");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        add(jLabel1, gridBagConstraints);
+        add(timeLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -193,7 +158,6 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
@@ -209,19 +173,20 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weightx = 4.0;
+        gridBagConstraints.weighty = 2.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 9, 0);
         add(jScrollPane1, gridBagConstraints);
 
         showMorphedGeometryCheckBox.setLabel("show Morphing Geometry");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
@@ -229,24 +194,83 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
 
         methodSelectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         add(methodSelectionComboBox, gridBagConstraints);
 
         chartPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 5.0;
+        gridBagConstraints.weighty = 5.0;
+        add(chartPanel, gridBagConstraints);
+
+        meshOrPolygonComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(chartPanel, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        add(meshOrPolygonComboBox, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(initialTimeSpinner, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(endTimeSpinner, gridBagConstraints);
+
+        meshOrPolygonLabel.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(meshOrPolygonLabel, gridBagConstraints);
+
+        methodLabel.setText("jLabel2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(methodLabel, gridBagConstraints);
+
+        metricLabel.setText("jLabel3");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(metricLabel, gridBagConstraints);
+
+        metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        add(metricsComboBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // calls the c++ library that, given a time interval, given a previous geometry and a target geometry,
@@ -258,24 +282,41 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         /*System.out.println("wkt 1st geometry: "+wkts[0]);
         System.out.println("wkt 2nd geometry: "+wkts[1]);*/
         
-        String result = "";
+        String[] result = new String[1];
         
         //load c++ libraries
         System.loadLibrary(AppStrings.DLL_LIBRARY);
         Main m = new Main();
         
         //find which method to call:
-        String selectedItem = this.methodSelectionComboBox.getSelectedItem().toString();
-        if (selectedItem.equals(AppStrings.POLY_AT_INSTANT_METHOD_STRING)){
-            result = m.at_instant_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", timeSlider.getValue());
-        }
-        else if (selectedItem.equals(AppStrings.POLY_DURING_PERIOD_METHOD_STRING)){
-            result = m.during_period_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1500.0, 2000.0, 500);
-        }
+        String selectedMethod = this.methodSelectionComboBox.getSelectedItem().toString();
+        String selectedType = this.meshOrPolygonComboBox.getSelectedItem().toString();
+        boolean duringPeriod = false;
         
+        if (selectedMethod.equals(AppStrings.AT_INSTANT_METHOD_STRING)){
+            duringPeriod = false;
+            if(selectedType.equals(AppStrings.POLY_STRING)){
+                result[0] = m.at_instant_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 
+                        Double.parseDouble(initialTimeSpinner.getValue().toString()));
+            }
+            else if(selectedType.equals(AppStrings.MESH_STRING)){
+                result[0] = m.at_instant_mesh_2(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 
+                        Double.parseDouble(initialTimeSpinner.getValue().toString()));
+            }
+            
+        }
+        else if (selectedMethod.equals(AppStrings.DURING_PERIOD_METHOD_STRING)){
+            duringPeriod = true;
+            if(selectedType.equals(AppStrings.POLY_STRING)){
+                result[0] = m.during_period_poly(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000.0, 2000.0, 1000);
+            }
+            else if(selectedType.equals(AppStrings.MESH_STRING)){
+                result = m.during_period_mesh_2(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000.0, 2000.0, 1000);
+            }
+        }
         
         //String result = m.at_instant_mesh_2(1000.0, 2000.0, wkts[0], wkts[1], timeSlider.getValue());
-        System.out.println("result --> "+result);
+        System.out.println("result --> "+Arrays.toString(result));
         
         if (!result.equals(AppStrings.MORPHING_ERR_STRING)){
             //morphing was succesfull
@@ -284,49 +325,72 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
             createLineChartAreaEV(areaEV, 1000.0, 2000.0);
             //add the result in the text area
-            resultTextArea.setText(result);
+            resultTextArea.setText(Arrays.toString(result));
             //for now, draw the result of the morphing geometry in the left panel (1st panel)
-            AppCorrGeometries.getInstance().drawAndShowMorphingGeometry(result);
+            AppCorrGeometries.getInstance().drawAndShowMorphingGeometry(result, duringPeriod);
             
             //enable the show morphing geometry in panel checkbox and check it
             showMorphedGeometryCheckBox.setEnabled(true);
             showMorphedGeometryCheckBox.setState(true);
         }
         
-        
     }//GEN-LAST:event_playBtnActionPerformed
 
     private void createLineChartAreaEV(double[] areaEV, double beginTime, double endTime){
-        JFreeChart lineChart = ChartFactory.createLineChart("area evolution", "Time", "Area",
-         createDataset(areaEV, 1000.0, 2000.0, 500), PlotOrientation.VERTICAL, true,true,false);
-        ChartPanel cp = new ChartPanel(lineChart);
+        JFreeChart lineChart = ChartFactory.createXYLineChart("area evolution", "Area", "Time",
+        createDataset(areaEV, 1000.0, 2000.0), PlotOrientation.HORIZONTAL, true,true,false);
+                
+        // Assign it to the chart
+        XYPlot plot = (XYPlot) lineChart.getPlot();
+        //plot.setDomainAxis(xAxis);
         
+        NumberAxis xAxis = (NumberAxis) plot.getRangeAxis();
+        //xAxis.setTickUnit(new NumberTickUnit( NUMBER_OF_TICKS_X_AXIS ));
+        xAxis.setRange(beginTime, endTime);
+        //xAxis.setAutoRangeMinimumSize(beginTime);
+        
+        NumberAxis yAxis = (NumberAxis) plot.getDomainAxis();
+        //get max min value of area
+        double min = Arrays.stream(areaEV).min().getAsDouble();
+        double max = Arrays.stream(areaEV).max().getAsDouble();
+        yAxis.setRange(0, max+5);
+        //yAxis.setTickUnit(new NumberTickUnit(10));
+
+        ChartPanel cp = new ChartPanel(lineChart);
         //add the panel to the frame
         this.chartPanel.add(cp, BorderLayout.CENTER);
         chartPanel.validate();
     }
     
-    private DefaultCategoryDataset createDataset(double[] areaEV, double beginTime, double endTime, int increment) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
-        double v = beginTime;
-        for (double d : areaEV){
-            System.out.println("->"+d);
-            dataset.addValue( d , "Area" , v+"" );
-            v+=increment;
+    //add the data to show in the chart
+    private XYSeriesCollection createDataset(double[] areaEV, double beginTime, double endTime) {
+        XYSeries dataset = new XYSeries("Area");
+        //DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+        double time = beginTime;
+        for (double area : areaEV){
+            dataset.add( area, ++time  );
+            //dataset.addValue( d , "Area", ++v+"" );
         }
-        return dataset;
+        return new XYSeriesCollection(dataset);
    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel chartPanel;
+    private javax.swing.JSpinner endTimeSpinner;
     private javax.swing.Box.Filler filler2;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JSpinner initialTimeSpinner;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> meshOrPolygonComboBox;
+    private javax.swing.JLabel meshOrPolygonLabel;
+    private javax.swing.JLabel methodLabel;
     private javax.swing.JComboBox<String> methodSelectionComboBox;
+    private javax.swing.JLabel metricLabel;
+    private javax.swing.JComboBox<String> metricsComboBox;
     private javax.swing.JButton playBtn;
     private javax.swing.JLabel resultLabel;
     private javax.swing.JTextArea resultTextArea;
     private java.awt.Checkbox showMorphedGeometryCheckBox;
-    private javax.swing.JSlider timeSlider;
+    private javax.swing.JLabel timeLabel;
     // End of variables declaration//GEN-END:variables
+    private final int NUMBER_OF_TICKS_X_AXIS = 10;
 }

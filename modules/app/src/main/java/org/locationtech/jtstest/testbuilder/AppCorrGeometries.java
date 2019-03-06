@@ -462,31 +462,48 @@ public class AppCorrGeometries {
     }
     
     //draw in the left panel (1st panel) the result of the morphing of a geometry
-    public void drawAndShowMorphingGeometry(String wktGeometry){
+    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod){
         WKTReader reader = new WKTReader();
-        Geometry mGeometry = null;
-        try {
-            mGeometry = reader.read(wktGeometry);
-        } catch (ParseException ex) {
-            Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (mGeometry.getGeometryType().equals("MultiPolygon")){
+
+        if (duringPeriod){
             //several polygons for a certain interval of time
-            GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
 
-            MultiPolygon mPolygon = null;
+            if(wktGeometry.length == 1){
+                //a multipolygon, each polygon representing one period in time
+                MultiPolygon mPolygon = null;
 
-            try {
-                mPolygon = (MultiPolygon) reader.read(wktGeometry);        			
-            }catch(Exception e) {   }
-            
-            animation(mPolygon);
+                try {
+                    //array has length 1, with the multipolygon
+                    mPolygon = (MultiPolygon) reader.read(wktGeometry[0]);        			
+                }catch(Exception e) {   }
+
+                animation(mPolygon);
+            }
+            else{
+                //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
+                List<MultiPolygon> mpList = new ArrayList<>();
+                for (String wkt : wktGeometry){
+                    try { 
+                        MultiPolygon mp = (MultiPolygon) reader.read(wkt);
+                        mpList.add(mp);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                animation(mpList);
+            }
         }
-        else if(mGeometry.getGeometryType().equals("Polygon")){
-            //one polygon for one instant
-            
+        else {
+            //one polygon or a multipolygon of triangules for one instant
+            Geometry mGeometry = null;
+            try {
+                mGeometry = reader.read(wktGeometry[0]);
+            } catch (ParseException ex) {
+                Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            //store this coordinates to be redrawn on the first panel when panel repaint occurs
             this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
-        
+
             showMorphingGeometryInPanel();
         }
     }
@@ -496,7 +513,6 @@ public class AppCorrGeometries {
             @Override
             public void run() 
             {
-
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
@@ -506,8 +522,31 @@ public class AppCorrGeometries {
                 
                 JFrame frame = new JFrame("Morphing");
                 frame.getContentPane().setBackground(Color.white);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
                 frame.add(new IFrame(multiPolygon));
+                frame.pack();
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            }
+        });
+    }
+    
+    public void animation(List<MultiPolygon> multiPolygonList) {
+            EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() 
+            {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+                JFrame frame = new JFrame("Morphing");
+                frame.getContentPane().setBackground(Color.white);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
+                frame.add(new IFrame(multiPolygonList));
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
