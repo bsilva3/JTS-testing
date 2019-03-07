@@ -520,10 +520,8 @@ public class AppCorrGeometries {
                     e.printStackTrace();
                 }
                 
-                JFrame frame = new JFrame("Morphing");
-                frame.getContentPane().setBackground(Color.white);
+                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(multiPolygon);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
-                frame.add(new IFrame(multiPolygon));
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -543,10 +541,8 @@ public class AppCorrGeometries {
                     e.printStackTrace();
                 }
                 
-                JFrame frame = new JFrame("Morphing");
-                frame.getContentPane().setBackground(Color.white);
+                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(multiPolygonList);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
-                frame.add(new IFrame(multiPolygonList));
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);

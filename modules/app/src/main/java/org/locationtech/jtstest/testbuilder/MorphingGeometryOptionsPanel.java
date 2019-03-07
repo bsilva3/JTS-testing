@@ -51,6 +51,10 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
 
         this.playBtn.setText(AppStrings.START_MORPHING_BTN_STRING);
         this.timeLabel.setText(AppStrings.INSTANT_LABEL_STRING);
+        this.metricLabel.setText(AppStrings.STATISTIC_LABEL_STRING);
+        this.meshOrPolygonLabel.setText(AppStrings.GEOMETRY_TYPE_LABEL_STRING);
+        this.methodLabel.setText(AppStrings.METHOD_LABEL_STRING);
+        
         this.initialTimeSpinner.setModel(new SpinnerNumberModel(1000, 1000, 2000, 10));//set default, min max and increment value
         this.endTimeSpinner.setModel(new SpinnerNumberModel(2000, 1000, 2000, 10));//set default, min max and increment value
         this.remove(endTimeSpinner);

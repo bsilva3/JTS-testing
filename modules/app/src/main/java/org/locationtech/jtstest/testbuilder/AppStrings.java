@@ -88,6 +88,12 @@ public class AppStrings {
     
     public static final String BEGIN_END_LABEL_STRING = "Begin and End Time";
     
+    public static final String GEOMETRY_TYPE_LABEL_STRING = "Geometry type:";
+    
+    public static final String METHOD_LABEL_STRING = "Method:";
+    
+    public static final String STATISTIC_LABEL_STRING = "Statistic:";
+    
     public static final String PLAY_STRING = "Play";
     
     public static final String SAVE_AS_IMAGE_STRING = "Save as image";

@@ -110,8 +110,6 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 
 	-graficos de barras e tabelas com as medidas de qualidade
 	-janela com animação: adicionar slider botao de guardar e pausar animação
-	-3ª combobox em que o utilizador seleciona as metricas
-	-mudar o slider para 1 ou 2 timepicker
 
  - area e perimetro ao selecionar 
 
