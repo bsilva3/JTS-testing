@@ -71,5 +71,7 @@ public class AppConstants
   
     public final static Font FONT_LABEL = new Font(FontGlyphReader.FONT_SANSSERIF, Font.BOLD, 12);
 
-
+    //name of the property change, in this case, the frame of the animation in the morphing geometry
+    public final static String PROPERTY_CHANGED_NAME = "animationFrame";
+    
 }

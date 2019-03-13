@@ -1,52 +1,70 @@
 package org.locationtech.jtstest.testbuilder;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.List;
-import javax.swing.JFrame;
-import jni_st_mesh.IFrame;
+import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import jni_st_mesh.Main;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.locationtech.jts.geom.MultiPolygon;
 
 /**
- *
- * @author Bruno Silva
+ *This frame shows an animation of a geometry throught a period of time. It is possible to pause and play the animation
+ * as well as manually animate the geometry, see charts with quality metrics and save the geometry
  */
 public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
 
     private MorphingGeometryPanel morphingGeoPanel;
+    private boolean userChangedSlider = true;
     
-    private MorphingGeometryViewerFrame() {
+    private MorphingGeometryViewerFrame(String[] wktGeometry) {
         initComponents();
+        Main m = new Main();
+        //TODO: replace with this one (to use the geometries on both panels)
+        //double[] areaEV = m.area_EV(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000);
+        double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
+        createLineChartAreaEV(areaEV, 1000.0, 2000.0);
     }
     
-    public MorphingGeometryViewerFrame(MultiPolygon mp) {
-        this();
-        //add here the panel
+    /**
+     *
+     * @param wktGeometry - array with wkt as string with the geometry on the first panel and the wkt of the geometry
+     * in the second panel
+     * @param mp - the result of the morphing of the geometries as a multipolygon, each polygon in an instant
+     */
+    public MorphingGeometryViewerFrame(String[] wktGeometry, MultiPolygon mp) {
+        this(wktGeometry);
         this.morphingGeoPanel = new MorphingGeometryPanel(mp);
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getContentPane().add(morphingGeoPanel, gridBagConstraints);
+        startComponents();
+        initMorphingPanel();
     }
     
-    public MorphingGeometryViewerFrame(List<MultiPolygon> mpList) {
-        this();
-        //add here the panel
+    /**
+     * @param wktGeometry - array with wkt as string with the geometry on the first panel and the wkt of the geometry
+     * in the second panel
+     * @param mpList - the result of the morphing of the geometries as a list of multipolygon, 
+     * each multipolygon being a mesh of triangles in an instant
+     */
+    public MorphingGeometryViewerFrame(String[] wktGeometry, List<MultiPolygon> mpList) {
+        this(wktGeometry);
         this.morphingGeoPanel = new MorphingGeometryPanel(mpList);
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getContentPane().add(morphingGeoPanel, gridBagConstraints);
+        startComponents();
+        initMorphingPanel();
+        
     }
     
     /**
@@ -59,100 +77,238 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jPanel2 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jSlider1 = new javax.swing.JSlider();
+        chartPanel = new javax.swing.JPanel();
+        playBtn = new javax.swing.JButton();
+        saveAsBtn = new javax.swing.JButton();
+        timeSlider = new javax.swing.JSlider();
+        pauseBtn = new javax.swing.JButton();
+        metricsComboBox = new javax.swing.JComboBox<>();
+        metricsLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
+        chartPanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 5.0;
+        gridBagConstraints.weighty = 5.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 15);
+        getContentPane().add(chartPanel, gridBagConstraints);
+
+        playBtn.setText("jButton1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        getContentPane().add(jPanel2, gridBagConstraints);
+        getContentPane().add(playBtn, gridBagConstraints);
 
-        jButton1.setText("jButton1");
+        saveAsBtn.setText("jButton2");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 15);
-        getContentPane().add(jButton1, gridBagConstraints);
-
-        jButton2.setText("jButton2");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(15, 0, 15, 0);
-        getContentPane().add(jButton2, gridBagConstraints);
+        getContentPane().add(saveAsBtn, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.insets = new java.awt.Insets(15, 10, 15, 10);
-        getContentPane().add(jSlider1, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 15);
+        getContentPane().add(timeSlider, gridBagConstraints);
+
+        pauseBtn.setText("jButton1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(pauseBtn, gridBagConstraints);
+
+        metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(metricsComboBox, gridBagConstraints);
+
+        metricsLabel.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(metricsLabel, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
+    private void initMorphingPanel(){
+        //add here the panel
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridheight = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        gridBagConstraints.weightx = 5.0;
+        gridBagConstraints.weighty = 6.0;
+        try{
+            getContentPane().add(morphingGeoPanel, gridBagConstraints);
+        } catch (NullPointerException ex){ }
+    }
+    
+    /** Add text, values and listeners to the components of this panel.
+     * 
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    private void startComponents(){
+        //initialize buttons
+        this.saveAsBtn.setText(AppStrings.SAVE_AS_IMAGE_STRING);
+        this.playBtn.setText(AppStrings.PLAY_STRING);
+        this.pauseBtn.setText(AppStrings.PAUSE_STRING);
+        //initialize combo box
+        this.metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.METRICS_STRINGS));
+        //initialize labels
+        this.metricsLabel.setText(AppStrings.STATISTIC_LABEL_STRING);
+        
+        saveAsBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //your actions
+                Main m = new Main();
+                double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
+                createLineChartAreaEV(areaEV, 1000.0, 2000.0);
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MorphingGeometryViewerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MorphingGeometryViewerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MorphingGeometryViewerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MorphingGeometryViewerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
+        });
+        
+        playBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                morphingGeoPanel.play();
+            }
+        });
+        
+        pauseBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                morphingGeoPanel.pause();
+            }
+        });
+        
+        timeSlider.setModel(new DefaultBoundedRangeModel(1000, 1, 1000, 2000));//<-- temporary values!
+        timeSlider.setMajorTickSpacing(2000/5);
+        timeSlider.setPaintTicks(true);
+        timeSlider.setPaintTicks(true);
+        timeSlider.setPaintLabels(true);
+        timeSlider.setLabelTable(timeSlider.createStandardLabels(2000/5));
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MorphingGeometryViewerFrame().setVisible(true);
+        timeSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (userChangedSlider)
+                    morphingGeoPanel.paintAtInstant(convertSliderValueToValue(timeSlider.getValue()));
+            }
+        });
+        
+        //add listener for when a frame in the animation changes and update the slider with the value for the new frame
+        this.morphingGeoPanel.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+                if (e.getPropertyName().equals(AppConstants.PROPERTY_CHANGED_NAME)) {
+                    userChangedSlider = false;
+                    int value = Integer.parseInt(e.getNewValue().toString());
+                    timeSlider.setValue(convertValueToSliderValue(value));
+                    userChangedSlider = true;
+                }
             }
         });
     }
+    
+    private void createLineChartAreaEV(double[] areaEV, double beginTime, double endTime){
+        JFreeChart lineChart = ChartFactory.createXYLineChart("area evolution", "Area", "Time",
+        createDataset(areaEV, 1000.0, 2000.0), PlotOrientation.HORIZONTAL, true,true,false);
+                
+        // Assign it to the chart
+        XYPlot plot = (XYPlot) lineChart.getPlot();
+        //plot.setDomainAxis(xAxis);
+        
+        NumberAxis xAxis = (NumberAxis) plot.getRangeAxis();
+        //xAxis.setTickUnit(new NumberTickUnit( NUMBER_OF_TICKS_X_AXIS ));
+        xAxis.setRange(beginTime, endTime);
+        //xAxis.setAutoRangeMinimumSize(beginTime);
+        
+        NumberAxis yAxis = (NumberAxis) plot.getDomainAxis();
+        //get max min value of area
+        //double min = Arrays.stream(areaEV).min().getAsDouble();
+        double max = Arrays.stream(areaEV).max().getAsDouble();
+        yAxis.setRange(0, max+5);
+        //yAxis.setTickUnit(new NumberTickUnit(10));
 
+        ChartPanel cp = new ChartPanel(lineChart);
+        //add the panel to the frame
+        this.chartPanel.add(cp, BorderLayout.CENTER);
+        chartPanel.validate();
+    }
+    
+    //add the data to show in the chart
+    private XYSeriesCollection createDataset(double[] areaEV, double beginTime, double endTime) {
+        XYSeries dataset = new XYSeries("Area");
+        //DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+        double time = beginTime;
+        for (double area : areaEV){
+            dataset.add( area, ++time  );
+            //dataset.addValue( d , "Area", ++v+"" );
+        }
+        return new XYSeriesCollection(dataset);
+   }
+    
+    /**
+     * Convert a value (representing a frame) to a Slider value (representing an instant in time),
+     * used to control the frame of the animation.
+     * The values in the slider represent an instant in time and the frame of animation start at 0, so this method makes
+     * the apropriate conversion so that the frame value becomes a time value
+     * @param v - the frame number shown in the animation
+     * @return - the instant in time that the frame belongs to
+     */
+    private int convertValueToSliderValue(int v){
+        return 1000+v;
+    }
+    
+    /**
+     * Convert a Slider value (representing an instant in time) to a normal value (representing a frame),
+     * used to control the frame of the animation.
+     * The values in the slider represent an instant in time and the frame of animation start at 0, so this method makes
+     * the apropriate conversion so that the time value becomes a frame value
+     * @param v - the instant in time selected in the slider
+     * @return - the frame number to be shown in the animation
+     */
+    private int convertSliderValueToValue(int v){
+        return Math.abs(1000-v);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JSlider jSlider1;
+    private javax.swing.JPanel chartPanel;
+    private javax.swing.JComboBox<String> metricsComboBox;
+    private javax.swing.JLabel metricsLabel;
+    private javax.swing.JButton pauseBtn;
+    private javax.swing.JButton playBtn;
+    private javax.swing.JButton saveAsBtn;
+    private javax.swing.JSlider timeSlider;
     // End of variables declaration//GEN-END:variables
 }

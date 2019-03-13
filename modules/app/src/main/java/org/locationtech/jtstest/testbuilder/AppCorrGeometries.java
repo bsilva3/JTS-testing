@@ -477,7 +477,7 @@ public class AppCorrGeometries {
                     mPolygon = (MultiPolygon) reader.read(wktGeometry[0]);        			
                 }catch(Exception e) {   }
 
-                animation(mPolygon);
+                animation(wktGeometry, mPolygon);
             }
             else{
                 //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
@@ -490,7 +490,7 @@ public class AppCorrGeometries {
                         Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                animation(mpList);
+                animation(wktGeometry, mpList);
             }
         }
         else {
@@ -508,7 +508,7 @@ public class AppCorrGeometries {
         }
     }
     
-    public void animation(MultiPolygon multiPolygon) {
+    public void animation(String[] wktGeometry, MultiPolygon multiPolygon) {
             EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() 
@@ -519,17 +519,19 @@ public class AppCorrGeometries {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                
-                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(multiPolygon);
+                //start frame to show the animation for the morphing geometry
+                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(wktGeometry, multiPolygon);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
                 frame.pack();
+                frame.validate();
                 frame.setLocationRelativeTo(null);
+                frame.setTitle(AppStrings.MORPHING_PANEL_TITLE);
                 frame.setVisible(true);
             }
         });
     }
     
-    public void animation(List<MultiPolygon> multiPolygonList) {
+    public void animation(String[] wktGeometry, List<MultiPolygon> multiPolygonList) {
             EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() 
@@ -541,7 +543,7 @@ public class AppCorrGeometries {
                     e.printStackTrace();
                 }
                 
-                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(multiPolygonList);
+                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(wktGeometry, multiPolygonList);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
                 frame.pack();
                 frame.setLocationRelativeTo(null);

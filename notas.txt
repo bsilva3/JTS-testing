@@ -101,8 +101,6 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	a geometria prevista num instante entre t e t+x.
 	apresentar essa geometria num painel (por agora, apresentar no painel da esquerda)
 	Criar menu em baixo que permite definir o tempo no morphing da geometria. (talvez nao seja preciso)
-	ComboBox em que o utilizador defina qual dos métodos quer chamar.
-	Em métodos que retornam vários poligonos ao longo do tempo, apresentar na UI a evolução da geometria
 
 	Nao existe ainda método que converte as coordenadas da geometria no painel para as coordenadas em pixeis do wkt,
 	e assim, se houver qualquer ediçao em alguma das geometrias esta nao sera considerada para o morphing e apenas é
@@ -110,6 +108,7 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 
 	-graficos de barras e tabelas com as medidas de qualidade
 	-janela com animação: adicionar slider botao de guardar e pausar animação
+	-indicar tempo de inicio e tempo de fim
 
  - area e perimetro ao selecionar 
 
