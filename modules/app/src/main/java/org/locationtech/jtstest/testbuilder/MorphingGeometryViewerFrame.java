@@ -1,17 +1,27 @@
 package org.locationtech.jtstest.testbuilder;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import jni_st_mesh.Main;
+import jni_st_mesh.ScreenImage;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -27,12 +37,14 @@ import org.locationtech.jts.geom.MultiPolygon;
  * as well as manually animate the geometry, see charts with quality metrics and save the geometry
  */
 public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
-
+    
     private MorphingGeometryPanel morphingGeoPanel;
     private boolean userChangedSlider = true;
     
     private MorphingGeometryViewerFrame(String[] wktGeometry) {
         initComponents();
+        
+        //get statistics and build a chart
         Main m = new Main();
         //TODO: replace with this one (to use the geometries on both panels)
         //double[] areaEV = m.area_EV(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000);
@@ -56,7 +68,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     /**
      * @param wktGeometry - array with wkt as string with the geometry on the first panel and the wkt of the geometry
      * in the second panel
-     * @param mpList - the result of the morphing of the geometries as a list of multipolygon, 
+     * @param mpList - the result of the morphing of the geometries as a list of multipolygon,
      * each multipolygon being a mesh of triangles in an instant
      */
     public MorphingGeometryViewerFrame(String[] wktGeometry, List<MultiPolygon> mpList) {
@@ -149,14 +161,14 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(metricsLabel, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void initMorphingPanel(){
         //add here the panel
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -175,7 +187,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     }
     
     /** Add text, values and listeners to the components of this panel.
-     * 
+     *
      */
     private void startComponents(){
         //initialize buttons
@@ -190,10 +202,12 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         saveAsBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //your actions
-                Main m = new Main();
-                double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
-                createLineChartAreaEV(areaEV, 1000.0, 2000.0);
+                try {
+                    //capture the panel with the chart and save as image
+                    ScreenImage.writeImage(ScreenImage.createImage(chartPanel), "C:\\Users\\bjpsi\\Desktop\\img.jpeg");
+                } catch (IOException ex) {
+                    Logger.getLogger(MorphingGeometryViewerFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         
@@ -217,7 +231,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         timeSlider.setPaintTicks(true);
         timeSlider.setPaintLabels(true);
         timeSlider.setLabelTable(timeSlider.createStandardLabels(2000/5));
-
+        
         timeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -242,8 +256,8 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     
     private void createLineChartAreaEV(double[] areaEV, double beginTime, double endTime){
         JFreeChart lineChart = ChartFactory.createXYLineChart("area evolution", "Area", "Time",
-        createDataset(areaEV, 1000.0, 2000.0), PlotOrientation.HORIZONTAL, true,true,false);
-                
+                createDataset(areaEV, 1000.0, 2000.0), PlotOrientation.HORIZONTAL, true,true,false);
+        
         // Assign it to the chart
         XYPlot plot = (XYPlot) lineChart.getPlot();
         //plot.setDomainAxis(xAxis);
@@ -259,7 +273,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         double max = Arrays.stream(areaEV).max().getAsDouble();
         yAxis.setRange(0, max+5);
         //yAxis.setTickUnit(new NumberTickUnit(10));
-
+        
         ChartPanel cp = new ChartPanel(lineChart);
         //add the panel to the frame
         this.chartPanel.add(cp, BorderLayout.CENTER);
@@ -276,7 +290,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
             //dataset.addValue( d , "Area", ++v+"" );
         }
         return new XYSeriesCollection(dataset);
-   }
+    }
     
     /**
      * Convert a value (representing a frame) to a Slider value (representing an instant in time),
@@ -302,6 +316,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         return Math.abs(1000-v);
     }
     
+        
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel chartPanel;
     private javax.swing.JComboBox<String> metricsComboBox;

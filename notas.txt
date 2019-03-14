@@ -4,7 +4,7 @@ ou, no netbeans, clicando com o botao direito do rato sobre o projeto > maven > 
 na barra de texto o seguinte: clean:clean resources:resources compiler:compile jar:jar install:install -DskipTest:true
 
 - o projeto precisa de ser executado num JDK de 32 bits e com os DLL's na pasta bin dentro do diretorio do JDK usado
-
+- Os dll's da libraria em C++ sao colocados em C:\Program Files (x86)\Java\jdk1.8.0_144\bin (ou outro jdk de 32 bits)
 -------------------------------Isto é um relatório ordenado do trabalho feito, os pontos em baixo indicam o que foi feito
 mais recentemente ---------------------------------------------------------------
 
@@ -109,6 +109,8 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	-graficos de barras e tabelas com as medidas de qualidade
 	-janela com animação: adicionar slider botao de guardar e pausar animação
 	-indicar tempo de inicio e tempo de fim
+	-criar janela para guardar imagem
+	-guardar apenas a foto no dado momento, ou criar gif ou até guardar todas as fotos
 
  - area e perimetro ao selecionar 
 

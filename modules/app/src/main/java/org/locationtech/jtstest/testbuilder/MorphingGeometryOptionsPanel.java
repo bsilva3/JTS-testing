@@ -308,7 +308,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             }
         }
         //System.out.println(Arrays.toString(m.quality_measures(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000)));
-        //String result = m.at_instant_mesh_2(1000.0, 2000.0, wkts[0], wkts[1], timeSlider.getValue());
+
         //System.out.println("result --> "+Arrays.toString(result));
         
         if (!result.equals(AppStrings.MORPHING_ERR_STRING)){
