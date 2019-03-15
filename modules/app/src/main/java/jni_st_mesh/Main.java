@@ -156,18 +156,15 @@ public class Main
 		int num_samples
 	);
 	
-	public native double[] quality_measures
-	(
-		double b,
-		double e,
-		String source_wkt,
-		String target_wkt,
-		int num_samples
-	);
+	public native HashMap<String, Double> quality_measures_2
+        (
+            String geometry_wkt
+        );
+
 		
 	public Main() 
-    {
-    }
+        {
+        }
 		
 	public static void main(String[] args) 
 	{

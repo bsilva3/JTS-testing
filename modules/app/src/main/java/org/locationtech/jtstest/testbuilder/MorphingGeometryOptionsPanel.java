@@ -17,6 +17,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JWindow;
@@ -307,7 +311,18 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
                 result = m.during_period_mesh_2(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000.0, 2000.0, 1000);
             }
         }
-        //System.out.println(Arrays.toString(m.quality_measures(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000)));
+        Map<String, Double> d = m.quality_measures_2("POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))");
+        if(d != null){
+            Iterator<Entry<String, Double>> it = d.entrySet().iterator();
+
+            while (it.hasNext()) 
+            {
+                Map.Entry<String, Double> pair = (Map.Entry<String, Double>) it.next();
+
+                System.out.println(pair.getKey() + ": " + pair.getValue());
+                //it.remove();
+            }
+        }
 
         //System.out.println("result --> "+Arrays.toString(result));
         

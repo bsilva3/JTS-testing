@@ -20,6 +20,7 @@ import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import jni_st_mesh.ChartMaker;
 import jni_st_mesh.Main;
 import jni_st_mesh.ScreenImage;
 import org.jfree.chart.ChartFactory;
@@ -49,7 +50,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         //TODO: replace with this one (to use the geometries on both panels)
         //double[] areaEV = m.area_EV(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000);
         double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
-        createLineChartAreaEV(areaEV, 1000.0, 2000.0);
+        this.showAreaEVChart(areaEV, 1000.0, 2000.0);
     }
     
     /**
@@ -204,6 +205,8 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     //capture the panel with the chart and save as image
+                    //TODO: create window prompt to save file:
+                    //http://www.java2s.com/Code/Java/Swing-JFC/DemonstrationofFiledialogboxes.htm
                     ScreenImage.writeImage(ScreenImage.createImage(chartPanel), "C:\\Users\\bjpsi\\Desktop\\img.jpeg");
                 } catch (IOException ex) {
                     Logger.getLogger(MorphingGeometryViewerFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -254,42 +257,11 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         });
     }
     
-    private void createLineChartAreaEV(double[] areaEV, double beginTime, double endTime){
-        JFreeChart lineChart = ChartFactory.createXYLineChart("area evolution", "Area", "Time",
-                createDataset(areaEV, 1000.0, 2000.0), PlotOrientation.HORIZONTAL, true,true,false);
-        
-        // Assign it to the chart
-        XYPlot plot = (XYPlot) lineChart.getPlot();
-        //plot.setDomainAxis(xAxis);
-        
-        NumberAxis xAxis = (NumberAxis) plot.getRangeAxis();
-        //xAxis.setTickUnit(new NumberTickUnit( NUMBER_OF_TICKS_X_AXIS ));
-        xAxis.setRange(beginTime, endTime);
-        //xAxis.setAutoRangeMinimumSize(beginTime);
-        
-        NumberAxis yAxis = (NumberAxis) plot.getDomainAxis();
-        //get max min value of area
-        //double min = Arrays.stream(areaEV).min().getAsDouble();
-        double max = Arrays.stream(areaEV).max().getAsDouble();
-        yAxis.setRange(0, max+5);
-        //yAxis.setTickUnit(new NumberTickUnit(10));
-        
-        ChartPanel cp = new ChartPanel(lineChart);
+    private void showAreaEVChart(double[] areaEV, double beginTime, double endTime){
+        ChartPanel cp = ChartMaker.createLineChartAreaEV(areaEV, beginTime, endTime);
         //add the panel to the frame
         this.chartPanel.add(cp, BorderLayout.CENTER);
         chartPanel.validate();
-    }
-    
-    //add the data to show in the chart
-    private XYSeriesCollection createDataset(double[] areaEV, double beginTime, double endTime) {
-        XYSeries dataset = new XYSeries("Area");
-        //DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
-        double time = beginTime;
-        for (double area : areaEV){
-            dataset.add( area, ++time  );
-            //dataset.addValue( d , "Area", ++v+"" );
-        }
-        return new XYSeriesCollection(dataset);
     }
     
     /**

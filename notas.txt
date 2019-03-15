@@ -111,6 +111,8 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	-indicar tempo de inicio e tempo de fim
 	-criar janela para guardar imagem
 	-guardar apenas a foto no dado momento, ou criar gif ou até guardar todas as fotos
+	- colocar quality measures numa tabela. 
+	-combo box para indicar se queremos area ou a
 
  - area e perimetro ao selecionar 
 

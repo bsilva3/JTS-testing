@@ -32,7 +32,6 @@ public class MorphingGeometryPanel extends JPanel{
     {
         multiPolygon = m_polygon;
         nGeometries = multiPolygon.getNumGeometries();
-        System.out.println(nGeometries);
         super.setBackground(Color.white);
 
         timer = new Timer(10, new ActionListener() {
