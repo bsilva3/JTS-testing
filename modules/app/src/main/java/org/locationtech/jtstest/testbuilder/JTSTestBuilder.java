@@ -165,7 +165,10 @@ public class JTSTestBuilder
         //AppImage.getInstance().setAndLoadCorrDirFiles(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\JTS-testing\\corr\\"));
     	
         readArgs(args);
-    	setLookAndFeel();
+    	//setLookAndFeel();
+        try { 
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
+        } catch(Exception ignored){}
         app = new JTSTestBuilder();
         app.initFrame();
         //now that the frame has been initialized, draw the geometry

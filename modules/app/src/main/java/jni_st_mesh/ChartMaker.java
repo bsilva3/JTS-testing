@@ -13,10 +13,11 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.locationtech.jtstest.testbuilder.AppStrings;
 
 /**
  *
- * @author Bruno Silva
+ * Utility class that, given a data set, creates a chart with it.
  */
 public class ChartMaker {
     
@@ -63,21 +64,27 @@ public class ChartMaker {
         return new XYSeriesCollection(dataset);
     }
     
-    public static JTable createTable(Map<String, Double> data, String[] columnNames){
-        //JTable jtable = new JTable(data, columnNames);
-        Object[][] arr = new Object[data.size()][2];
-        Set entries = data.entrySet();
-        Iterator entriesIterator = entries.iterator();
+        
+    public static JTable createJTable(Map<String, ?> dataset){
+        //headers for the table
+        String[] columns = new String[] {
+            AppStrings.QUALITY_METRICS_TABLE_STRING, AppStrings.QUALITY_METRICS_RESULTS_STRING
+        };
+        Object[][] data;
+        
+        data = new Object[dataset.size()][columns.length];
+        Iterator<Map.Entry<String, ?>> it = (Iterator<Map.Entry<String, ?>>) dataset.entrySet().iterator();
         int i = 0;
-        while(entriesIterator.hasNext()){
+        while (it.hasNext()) 
+        {
+            Map.Entry<String, ?> pair = (Map.Entry<String, ?>) it.next();
 
-            Map.Entry mapping = (Map.Entry) entriesIterator.next();
-
-            arr[i][0] = mapping.getKey();
-            arr[i][1] = mapping.getValue();
-
+            data[i][0] = pair.getKey();
+            data[i][1] = pair.getValue();
             i++;
         }
-        return null;
+
+        //create table with data
+        return new JTable(data, columns);
     }
 }

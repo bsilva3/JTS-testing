@@ -79,11 +79,16 @@ public class AppStrings {
     public static final String MESH_STRING = "Mesh";
     public static final String POLY_STRING = "Polygon";
     public static final String AREA_STRING = "Area";
+    public static final String QUALITY_METRICS_STRING = "Quality Metrics";
+    
+    //for the name of the rows on the quality metrics table
+    public static final String QUALITY_METRICS_TABLE_STRING = "Metric";
+    public static final String QUALITY_METRICS_RESULTS_STRING = "Result";
     
     //options for the combo box for the selection of the method to call in the c++ library
     public static final String[] METHOD_SELECTION_STRINGS = {AT_INSTANT_METHOD_STRING, DURING_PERIOD_METHOD_STRING};
     public static final String[] MESH_OR_POLY_STRINGS = {POLY_STRING, MESH_STRING};
-    public static final String[] METRICS_STRINGS = {AREA_STRING};
+    public static final String[] METRICS_STRINGS = {AREA_STRING, QUALITY_METRICS_STRING};
     
     public static final String INSTANT_LABEL_STRING = "Instant";
     
@@ -99,7 +104,13 @@ public class AppStrings {
     
     public static final String PAUSE_STRING = "Pause";
     
-    public static final String SAVE_AS_IMAGE_STRING = "Save as image";
+    public static final String SAVE_CURRENT_GEOMETRY_STRING = "Save current geometry as image";
+    
+    public static final String SAVE_ANIMATION_STRING = "Save Animation as GIF";
+    
+    public static final String SAVE_CURRENT_STATISTICS_STRING = "Save shown statistics as image";
+    
+    public static final String EXPORT_QUALITY_MEASURES_STRING = "Export quality measures";
     
     public static final String MORPHING_PANEL_TITLE = "Morphing Animation and Statistics";
     

@@ -7,9 +7,9 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import org.geotools.geometry.jts.LiteShape;
@@ -104,11 +104,13 @@ public class MorphingGeometryPanel extends JPanel{
         if (multiPolygon != null){
             geometry = multiPolygon.getGeometryN(currentGeometryNumber);
             currentGeometryNumber++;
+            //to update the slider in the ui
             firePropertyChange(AppConstants.PROPERTY_CHANGED_NAME, currentGeometryNumber-1, currentGeometryNumber);
         }
         else if (!multiPolygonList.isEmpty() && multiPolygonList != null){
             mGeometry = multiPolygonList.get(currentGeometryNumber);
             currentGeometryNumber++;
+            //to update the slider in the ui
             firePropertyChange(AppConstants.PROPERTY_CHANGED_NAME, currentGeometryNumber-1, currentGeometryNumber);
         }
         
@@ -150,5 +152,45 @@ public class MorphingGeometryPanel extends JPanel{
             currentGeometryNumber = 0;
             return;    	
         }
+    }
+    
+    public List<BufferedImage> generateImagesFromAnimation(){
+        List<BufferedImage> images = new ArrayList<>();
+        
+        AffineTransform at = new AffineTransform();
+        at.translate(100, 400);
+        at.scale(20, -20);
+        
+        Geometry geometry = null;
+        MultiPolygon mGeometry = null;
+        if (multiPolygon != null){
+            for (int i = 0; i <multiPolygon.getNumGeometries(); i++ ){
+                System.out.println(i);
+                BufferedImage bImg = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
+                Graphics2D gr = bImg.createGraphics();
+                
+                gr.setColor(Color.blue);
+                
+                geometry = multiPolygon.getGeometryN(i);
+                gr.fill(new LiteShape(geometry, at, false));
+                gr.draw(new LiteShape(geometry, at, false));    
+                images.add(bImg);
+            }
+        }
+        
+        else if (multiPolygonList != null){
+            for (int i = 0; i <multiPolygonList.size(); i++ ){
+                BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics2D gr = bImg.createGraphics();
+                
+                gr.setColor(Color.blue);
+                
+                mGeometry = multiPolygonList.get(currentGeometryNumber);
+                //gr.fill(new LiteShape(mGeometry, at, false));
+                gr.draw(new LiteShape(mGeometry, at, false));         
+                images.add(bImg);
+            }
+        }
+        return images;
     }
 }

@@ -1,45 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.locationtech.jtstest.testbuilder;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.JLabel;
-import javax.swing.JSlider;
-import javax.swing.JWindow;
-import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import jni_st_mesh.Main;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.NumberTickUnit;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *
@@ -309,18 +280,6 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             }
             else if(selectedType.equals(AppStrings.MESH_STRING)){
                 result = m.during_period_mesh_2(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000.0, 2000.0, 1000);
-            }
-        }
-        Map<String, Double> d = m.quality_measures_2("POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))");
-        if(d != null){
-            Iterator<Entry<String, Double>> it = d.entrySet().iterator();
-
-            while (it.hasNext()) 
-            {
-                Map.Entry<String, Double> pair = (Map.Entry<String, Double>) it.next();
-
-                System.out.println(pair.getKey() + ": " + pair.getValue());
-                //it.remove();
             }
         }
 

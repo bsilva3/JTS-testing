@@ -1,36 +1,27 @@
 package org.locationtech.jtstest.testbuilder;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
+import java.util.Map;
 import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import jni_st_mesh.CSVUtils;
 import jni_st_mesh.ChartMaker;
+import jni_st_mesh.GifSequenceWriter;
 import jni_st_mesh.Main;
 import jni_st_mesh.ScreenImage;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.locationtech.jts.geom.MultiPolygon;
 
 /**
@@ -41,16 +32,16 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     
     private MorphingGeometryPanel morphingGeoPanel;
     private boolean userChangedSlider = true;
+    private String[] wktGeometry;
+    private MultiPolygon mp;
+    private List<MultiPolygon> mpList;
+    private int beginTime = 1000; //<-----
+    private int endTime = 2000; //<-----
+    private Map<String, Double> qualityMetrics;
     
     private MorphingGeometryViewerFrame(String[] wktGeometry) {
+        this.wktGeometry = wktGeometry;
         initComponents();
-        
-        //get statistics and build a chart
-        Main m = new Main();
-        //TODO: replace with this one (to use the geometries on both panels)
-        //double[] areaEV = m.area_EV(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000);
-        double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
-        this.showAreaEVChart(areaEV, 1000.0, 2000.0);
     }
     
     /**
@@ -61,9 +52,11 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      */
     public MorphingGeometryViewerFrame(String[] wktGeometry, MultiPolygon mp) {
         this(wktGeometry);
+        this.mp = mp;
         this.morphingGeoPanel = new MorphingGeometryPanel(mp);
         startComponents();
         initMorphingPanel();
+        showAreaEVChart();
     }
     
     /**
@@ -74,10 +67,12 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      */
     public MorphingGeometryViewerFrame(String[] wktGeometry, List<MultiPolygon> mpList) {
         this(wktGeometry);
+        this.mpList = mpList;
         this.morphingGeoPanel = new MorphingGeometryPanel(mpList);
         startComponents();
         initMorphingPanel();
-        
+        //start by showing the area evolution chart
+        showAreaEVChart();
     }
     
     /**
@@ -92,11 +87,14 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
 
         chartPanel = new javax.swing.JPanel();
         playBtn = new javax.swing.JButton();
-        saveAsBtn = new javax.swing.JButton();
+        saveCurrentGeometryBtn = new javax.swing.JButton();
         timeSlider = new javax.swing.JSlider();
         pauseBtn = new javax.swing.JButton();
         metricsComboBox = new javax.swing.JComboBox<>();
         metricsLabel = new javax.swing.JLabel();
+        exportBtn = new javax.swing.JButton();
+        saveStatisticsBtn = new javax.swing.JButton();
+        saveAnimationBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -105,8 +103,8 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.gridheight = 6;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridheight = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 5.0;
         gridBagConstraints.weighty = 5.0;
@@ -117,22 +115,22 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_START;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(playBtn, gridBagConstraints);
 
-        saveAsBtn.setText("jButton2");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getContentPane().add(saveAsBtn, gridBagConstraints);
+        saveCurrentGeometryBtn.setText("jButton2");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(saveCurrentGeometryBtn, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -144,28 +142,55 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(pauseBtn, gridBagConstraints);
 
         metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(metricsComboBox, gridBagConstraints);
 
         metricsLabel.setText("jLabel1");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(metricsLabel, gridBagConstraints);
+
+        exportBtn.setText("jButton1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(exportBtn, gridBagConstraints);
+
+        saveStatisticsBtn.setText("jButton1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(saveStatisticsBtn, gridBagConstraints);
+
+        saveAnimationBtn.setText("jButton1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(saveAnimationBtn, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -175,7 +200,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.gridheight = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
@@ -192,28 +217,36 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      */
     private void startComponents(){
         //initialize buttons
-        this.saveAsBtn.setText(AppStrings.SAVE_AS_IMAGE_STRING);
         this.playBtn.setText(AppStrings.PLAY_STRING);
         this.pauseBtn.setText(AppStrings.PAUSE_STRING);
+        this.exportBtn.setText(AppStrings.EXPORT_QUALITY_MEASURES_STRING);
+        this.saveStatisticsBtn.setText(AppStrings.SAVE_CURRENT_STATISTICS_STRING);
+        this.saveCurrentGeometryBtn.setText(AppStrings.SAVE_CURRENT_GEOMETRY_STRING);
+        this.saveAnimationBtn.setText(AppStrings.SAVE_ANIMATION_STRING);
+        
         //initialize combo box
         this.metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.METRICS_STRINGS));
         //initialize labels
         this.metricsLabel.setText(AppStrings.STATISTIC_LABEL_STRING);
         
-        saveAsBtn.addActionListener(new ActionListener() {
+        metricsComboBox.addItemListener(new ItemListener(){
             @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    //capture the panel with the chart and save as image
-                    //TODO: create window prompt to save file:
-                    //http://www.java2s.com/Code/Java/Swing-JFC/DemonstrationofFiledialogboxes.htm
-                    ScreenImage.writeImage(ScreenImage.createImage(chartPanel), "C:\\Users\\bjpsi\\Desktop\\img.jpeg");
-                } catch (IOException ex) {
-                    Logger.getLogger(MorphingGeometryViewerFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    // new item selected
+                    //call the appropriate function to show the corresponding chart/table
+                    if (metricsComboBox.getSelectedItem().equals(AppStrings.AREA_STRING)){
+                        showAreaEVChart();
+                        exportBtn.setVisible(false);
+                    }
+                    else if(metricsComboBox.getSelectedItem().equals(AppStrings.QUALITY_METRICS_STRING)){
+                        showQualityMetricsTable();
+                        exportBtn.setVisible(true); //should only be visible on quality metrics, (for now)
+                    }
+                  }
             }
         });
-        
+           
         playBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -225,6 +258,45 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 morphingGeoPanel.pause();
+            }
+        });
+        
+        this.exportBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                //capture the panel with the chart and save as image
+                if(qualityMetrics != null){
+                    CSVUtils.exportAndSaveToCSV(qualityMetrics);
+                }
+            }
+        });
+        
+        saveCurrentGeometryBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                //capture the panel with the current geometry displayed and save as image
+                ScreenImage.printAndSaveAsImage(morphingGeoPanel);
+            }
+        });
+        
+        saveAnimationBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                //get list of all images corresponding to every frame of the animation
+                List<BufferedImage> imagesFromAnimation = morphingGeoPanel.generateImagesFromAnimation();
+                GifSequenceWriter.createGIFAndSave(imagesFromAnimation);
+            }
+        });
+        
+        saveStatisticsBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                //capture the panel with the chart or table and save as image
+                ScreenImage.printAndSaveAsImage(chartPanel);
             }
         });
         
@@ -243,6 +315,8 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
             }
         });
         
+        
+        
         //add listener for when a frame in the animation changes and update the slider with the value for the new frame
         this.morphingGeoPanel.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
@@ -255,13 +329,43 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
                 }
             }
         });
+        
     }
     
-    private void showAreaEVChart(double[] areaEV, double beginTime, double endTime){
+    private void showAreaEVChart(){
+        //clear any other element in the panel that show the charts
+        chartPanel.removeAll();
+        
+        System.loadLibrary(AppStrings.DLL_LIBRARY);
+        Main m = new Main();
+        //TODO: replace with this one (to use the geometries on both panels)
+        //double[] areaEV = m.area_EV(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000);
+        
+        double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
         ChartPanel cp = ChartMaker.createLineChartAreaEV(areaEV, beginTime, endTime);
         //add the panel to the frame
         this.chartPanel.add(cp, BorderLayout.CENTER);
         chartPanel.validate();
+    }
+    
+    private void showQualityMetricsTable(){
+        //clear any other element in the panel that show the charts
+        chartPanel.removeAll();
+        
+        System.loadLibrary(AppStrings.DLL_LIBRARY);
+        Main m = new Main();
+        //m.quality_measures_2(this.wktGeometry);
+        //TODO: replace with the previous comment;
+        this.qualityMetrics = m.quality_measures_2("POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))");
+        
+        //create table with data
+        if(qualityMetrics != null){
+            JTable table = ChartMaker.createJTable(qualityMetrics);
+
+            //add the table to the frame
+            this.chartPanel.add(new JScrollPane(table));
+            chartPanel.validate();
+        }
     }
     
     /**
@@ -291,11 +395,14 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel chartPanel;
+    private javax.swing.JButton exportBtn;
     private javax.swing.JComboBox<String> metricsComboBox;
     private javax.swing.JLabel metricsLabel;
     private javax.swing.JButton pauseBtn;
     private javax.swing.JButton playBtn;
-    private javax.swing.JButton saveAsBtn;
+    private javax.swing.JButton saveAnimationBtn;
+    private javax.swing.JButton saveCurrentGeometryBtn;
+    private javax.swing.JButton saveStatisticsBtn;
     private javax.swing.JSlider timeSlider;
     // End of variables declaration//GEN-END:variables
 }

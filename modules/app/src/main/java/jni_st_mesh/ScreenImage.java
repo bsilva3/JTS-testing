@@ -5,8 +5,11 @@ import java.awt.image.*;
 import java.io.*;
 import java.util.List;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /*
  *  Convenience class to create and optionally save to a file a
@@ -209,6 +212,42 @@ public class ScreenImage
 			}
 		}
 	}
+        
+        public static void printAndSaveAsImage(JComponent component){
+            BufferedImage printScreenImage = createImage(component);
+            
+            // parent component of the dialog
+            JFrame parentFrame = new JFrame();
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Select directory, name of the file and its extension");
+            
+            //set possible file extensions to save
+            fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter()); //remove "allFiles" option
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(".png", "png"));
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(".jpeg", "jpeg"));
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(".bmp", "bmp"));
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(".tiff", "tiff"));
+            // set default type
+            fileChooser.setFileFilter(fileChooser.getChoosableFileFilters()[1]);
+            
+            int userSelection = fileChooser.showSaveDialog(parentFrame);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                //System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+                String fileName = fileToSave.getAbsolutePath();
+                if (! fileName.contains(".")){
+                    //user did not add an extension, add the file extension filter currently selected in the window
+                    fileName += "." + ((FileNameExtensionFilter) fileChooser.getFileFilter()).getExtensions()[0];
+                }
+                try {
+                    writeImage(printScreenImage, fileName);
+                } catch (IOException ex) {
+                    Logger.getLogger(ScreenImage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
 
 
 }
