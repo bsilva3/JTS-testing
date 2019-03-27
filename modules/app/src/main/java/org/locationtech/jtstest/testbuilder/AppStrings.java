@@ -12,6 +12,8 @@
 
 package org.locationtech.jtstest.testbuilder;
 
+import jni_st_mesh.TriangulationMethod;
+
 public class AppStrings {
     
     public static final String LABEL_TEST_CASE = "Case";
@@ -85,10 +87,23 @@ public class AppStrings {
     public static final String QUALITY_METRICS_TABLE_STRING = "Metric";
     public static final String QUALITY_METRICS_RESULTS_STRING = "Result";
     
+    //colinear threshold label
+    public static final String COLINEAR_THRESHOLD_STRING = "Colinear Threshold: ";
+    
+    public static final String TRIANGULATION_LABEL_STRING = "Triangulation method: ";
+    
+    public static final String VERTICE_ORIENTATION_LABEL_STRING = "Vertice Orientation: ";
+    
+    //vertice orientation
+    public static final String CLOCK_WISE_STRING = "clock wise (cw)";
+    public static final String COUNTER_CLOCK_WISE_STRING = "counter-clock wise (ccw)";
+    
     //options for the combo box for the selection of the method to call in the c++ library
-    public static final String[] METHOD_SELECTION_STRINGS = {AT_INSTANT_METHOD_STRING, DURING_PERIOD_METHOD_STRING};
+    public static final String[] INSTANT_OR_PERIOD_STRINGS = {AT_INSTANT_METHOD_STRING, DURING_PERIOD_METHOD_STRING};
     public static final String[] MESH_OR_POLY_STRINGS = {POLY_STRING, MESH_STRING};
     public static final String[] METRICS_STRINGS = {AREA_STRING, QUALITY_METRICS_STRING};
+    public static final String[] TRIANGULATION_METHOD_STRINGS = {TriangulationMethod.COMPATIBLE.toString(), TriangulationMethod.EQUILATERAL.toString()};
+    public static final String[] VERTICE_ORIENTATION_STRINGS = {CLOCK_WISE_STRING, COUNTER_CLOCK_WISE_STRING};
     
     public static final String INSTANT_LABEL_STRING = "Instant";
     

@@ -115,8 +115,8 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	-combo box para indicar se qual a metrica que queremos, enviar pedido e receber
 	-oferecer a possibilidade de o utilizador escolher se quer ver a informação num grafico de barras, linha, 
 	ou tabela (quality measures vem sempre numa tabela)
-
-	-testar forma de chamar funçao de python apartir de java
+	- acabar CSV export!
+	- saltar x imagens ao chamar GIF 
 
 	-criar uma cache que guarda o diretorio das imagens e corrs que foram abertos anteriormente (para
 	o utilizador nao tenha que selecionar estes ficheiros sempre que abre a aplicação

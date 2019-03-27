@@ -99,11 +99,12 @@ public class JTSTestBuilder
     
     //Validate frames that have preset sizes
     //Pack frames that have useful preferred size info, e.g. from their layout
-    if (packFrame) {
+    /*if (packFrame) {
       frame.pack();
     } else {
       frame.validate();
-    }
+    }*/
+    frame.validate();
     //Center the window
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     Dimension frameSize = frame.getSize();
@@ -125,7 +126,7 @@ public class JTSTestBuilder
   {
     try {
         //file chooser window to select a directory of images
-        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        /*JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         jfc.setDialogTitle("Choose a directory with images to open: ");
            
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -159,10 +160,10 @@ public class JTSTestBuilder
             //no valid corr files folder selected, end the program
             return;
         }
-        AppImage.getInstance().setAndLoadCorrDirFiles(selectedDirectory);
+        AppImage.getInstance().setAndLoadCorrDirFiles(selectedDirectory);*/
         
-        //AppImage.getInstance().loadImages(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\JTS-testing\\img\\").listFiles());
-        //AppImage.getInstance().setAndLoadCorrDirFiles(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\JTS-testing\\corr\\"));
+        AppImage.getInstance().loadImages(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\JTS-testing\\img\\").listFiles());
+        AppImage.getInstance().setAndLoadCorrDirFiles(new File("C:\\Users\\bjpsi\\Desktop\\Investigacao\\JTS-testing\\ice1\\"));
     	
         readArgs(args);
     	//setLookAndFeel();

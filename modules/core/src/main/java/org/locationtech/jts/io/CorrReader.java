@@ -56,15 +56,16 @@ public class CorrReader {
         //the string has the following format: x_value y_value x_value y_value
         List<Coordinate> coordinates = new ArrayList<>();
         String[] pointsFromFile = operatorPattern.split(lines);
-        int startingCoord = 2;
+        int startingCoord = 1;
         //to get only the first set of coordinates, iterate every 2 values, but start from the second value.
         // to get the second set of coordinates, do the same, but start from the 4th value
         if (secondCoordinates){
-            startingCoord = 4;
+            startingCoord = 3;
         }
         for (int i = startingCoord; i <pointsFromFile.length; i+=4){
             double x = Double.parseDouble(pointsFromFile[i-1]);
             double y = Double.parseDouble(pointsFromFile[i]);
+            //System.out.println(x+", "+y);
             coordinates.add(new Coordinate(x, y));
         }
         Coordinate [] coords = new Coordinate[coordinates.size()];

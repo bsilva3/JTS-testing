@@ -9,6 +9,7 @@ import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultBoundedRangeModel;
@@ -23,6 +24,7 @@ import jni_st_mesh.Main;
 import jni_st_mesh.ScreenImage;
 import org.jfree.chart.ChartPanel;
 import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  *This frame shows an animation of a geometry throught a period of time. It is possible to pause and play the animation
@@ -33,8 +35,6 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     private MorphingGeometryPanel morphingGeoPanel;
     private boolean userChangedSlider = true;
     private String[] wktGeometry;
-    private MultiPolygon mp;
-    private List<MultiPolygon> mpList;
     private int beginTime = 1000; //<-----
     private int endTime = 2000; //<-----
     private Map<String, Double> qualityMetrics;
@@ -52,7 +52,6 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      */
     public MorphingGeometryViewerFrame(String[] wktGeometry, MultiPolygon mp) {
         this(wktGeometry);
-        this.mp = mp;
         this.morphingGeoPanel = new MorphingGeometryPanel(mp);
         startComponents();
         initMorphingPanel();
@@ -62,18 +61,18 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     /**
      * @param wktGeometry - array with wkt as string with the geometry on the first panel and the wkt of the geometry
      * in the second panel
-     * @param mpList - the result of the morphing of the geometries as a list of multipolygon,
-     * each multipolygon being a mesh of triangles in an instant
+     * @param geometryList - the result of the morphing of the geometries as a list of multipolygon, or polygon
+     * each multipolygon being a mesh of triangles in an instant or a polygon in each instant of time
      */
-    public MorphingGeometryViewerFrame(String[] wktGeometry, List<MultiPolygon> mpList) {
+    public MorphingGeometryViewerFrame(String[] wktGeometry, List<?> geometryList) {
         this(wktGeometry);
-        this.mpList = mpList;
-        this.morphingGeoPanel = new MorphingGeometryPanel(mpList);
+        this.morphingGeoPanel = new MorphingGeometryPanel(geometryList);
         startComponents();
         initMorphingPanel();
         //start by showing the area evolution chart
         showAreaEVChart();
     }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -286,7 +285,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 
                 //get list of all images corresponding to every frame of the animation
-                List<BufferedImage> imagesFromAnimation = morphingGeoPanel.generateImagesFromAnimation();
+                List<BufferedImage> imagesFromAnimation = morphingGeoPanel.generateImagesFromAnimation(10);
                 GifSequenceWriter.createGIFAndSave(imagesFromAnimation);
             }
         });
@@ -341,11 +340,18 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         //TODO: replace with this one (to use the geometries on both panels)
         //double[] areaEV = m.area_EV(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000);
         
-        double[] areaEV = m.area_EV(1000.0, 2000.0, "POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))", 1000);
-        ChartPanel cp = ChartMaker.createLineChartAreaEV(areaEV, beginTime, endTime);
+        HashMap<String, Double> statistics = m.ststistics(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000, 
+                2, true, 1.0, 0);
+        
+        for (Map.Entry<String, Double> entry : statistics.entrySet()) {
+            String key = entry.getKey();
+            double value = entry.getValue();
+            System.out.println(key+" -> "+value);
+        }
+        //ChartPanel cp = ChartMaker.createLineChartAreaEV(areaEV, beginTime, endTime);
         //add the panel to the frame
-        this.chartPanel.add(cp, BorderLayout.CENTER);
-        chartPanel.validate();
+        //this.chartPanel.add(cp, BorderLayout.CENTER);
+        //chartPanel.validate();
     }
     
     private void showQualityMetricsTable(){
@@ -356,7 +362,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         Main m = new Main();
         //m.quality_measures_2(this.wktGeometry);
         //TODO: replace with the previous comment;
-        this.qualityMetrics = m.quality_measures_2("POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))");
+        this.qualityMetrics = m.quality_measures("POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", 1, true, 1.0, 0);
         
         //create table with data
         if(qualityMetrics != null){

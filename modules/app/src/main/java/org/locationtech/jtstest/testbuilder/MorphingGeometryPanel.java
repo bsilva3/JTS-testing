@@ -9,12 +9,14 @@ import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import org.geotools.geometry.jts.LiteShape;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  *
@@ -25,6 +27,7 @@ public class MorphingGeometryPanel extends JPanel{
     private int nGeometries = 0;
     private MultiPolygon multiPolygon = null;
     private List<MultiPolygon> multiPolygonList;
+    private List<Polygon> polygonList;
     Timer timer = null;
 
     //for a multipolygon, each polygon in a certain instant
@@ -44,13 +47,20 @@ public class MorphingGeometryPanel extends JPanel{
         timer.start();
         
     }
-    
-    //for a list of mesh of triangules
-     public MorphingGeometryPanel(List<MultiPolygon> mPolygonList){
+     
+     //for a list of mesh of triangules or list of polygons
+     public MorphingGeometryPanel(List<?> geometryList){
+        if(geometryList.get(0) instanceof MultiPolygon){
+            multiPolygonList = (List<MultiPolygon>) geometryList;
+            System.out.println("-->multiPolygon");
+            nGeometries = multiPolygonList.size();
+        }
+        else if(geometryList.get(0) instanceof Polygon){
+            polygonList = (List<Polygon>) geometryList;
+            System.out.println("-->Polygon");
+            nGeometries = polygonList.size();
+        }
         
-        multiPolygonList = mPolygonList;
-        nGeometries = multiPolygonList.size();
-
         super.setBackground(Color.white);
 
         timer = new Timer(10, new ActionListener() {
@@ -98,50 +108,46 @@ public class MorphingGeometryPanel extends JPanel{
     protected void paintComponent(Graphics g) 
     {
         super.paintComponent(g);
+        
+        //draw geometry 
+        Graphics2D gr = (Graphics2D) g.create();
+        gr.setColor(Color.blue);
 
         Geometry geometry = null;
         MultiPolygon mGeometry = null;
+        Polygon pGeometry = null;
         if (multiPolygon != null){
             geometry = multiPolygon.getGeometryN(currentGeometryNumber);
             currentGeometryNumber++;
             //to update the slider in the ui
             firePropertyChange(AppConstants.PROPERTY_CHANGED_NAME, currentGeometryNumber-1, currentGeometryNumber);
+            
+            LiteShape lt = new LiteShape(geometry, null, false);
+            gr.fill(lt);
+            gr.draw(lt);
         }
-        else if (!multiPolygonList.isEmpty() && multiPolygonList != null){
+        else if (multiPolygonList != null && currentGeometryNumber < multiPolygonList.size()){
             mGeometry = multiPolygonList.get(currentGeometryNumber);
             currentGeometryNumber++;
             //to update the slider in the ui
             firePropertyChange(AppConstants.PROPERTY_CHANGED_NAME, currentGeometryNumber-1, currentGeometryNumber);
+            
+            LiteShape lt = new LiteShape(mGeometry, null, false);
+            //gr.fill(new LiteShape(mGeometry, at, false));
+            gr.draw(lt);  
         }
-        
-        //draw geometry and 
-        Graphics2D gr = (Graphics2D) g.create();
-
-        AffineTransform at = new AffineTransform();
-        //at.translate(100, 400);
-        
-        at.translate(this.getWidth()/2, this.getHeight()/2);
-        at.scale(20, -20);
-        //at.scale(this.getWidth()/20, -this.getHeight()/20);
-
-        gr.setColor(Color.blue);
-        
-        if (geometry != null){
-            LiteShape lt = new LiteShape(geometry, at, false);
-            //correct the position of the shape to be at center and update transform in shape
-            //at.translate(-lt.getBounds().width/2, -lt.getBounds().height/2);
-            //lt = new LiteShape(geometry, at, false);
+        else if (polygonList != null && currentGeometryNumber < polygonList.size()){
+            pGeometry = polygonList.get(currentGeometryNumber);
+            pGeometry = AppCorrGeometries.getInstance().makePolygonFitComponent(pGeometry, this);
+            currentGeometryNumber++;
+            
+            //to update the slider in the ui
+            firePropertyChange(AppConstants.PROPERTY_CHANGED_NAME, currentGeometryNumber-1, currentGeometryNumber);
+            //draw on the jpanel
+            LiteShape lt = new LiteShape(pGeometry, null, false);
             gr.fill(lt);
             gr.draw(lt);
             
-        }
-        else if (mGeometry != null){
-            LiteShape lt = new LiteShape(mGeometry, at, false);
-            //at.translate(-lt.getBounds().width/2, -lt.getBounds().height/2);
-            //correct the position of the shape to be at center and update transform in shape
-            //lt = new LiteShape(mGeometry, at, false);
-            //gr.fill(new LiteShape(mGeometry, at, false));
-            gr.draw(lt);  
         }
         
         gr.dispose();
@@ -154,7 +160,7 @@ public class MorphingGeometryPanel extends JPanel{
         }
     }
     
-    public List<BufferedImage> generateImagesFromAnimation(){
+    public List<BufferedImage> generateImagesFromAnimation(int nFrames){
         List<BufferedImage> images = new ArrayList<>();
         
         AffineTransform at = new AffineTransform();
@@ -163,8 +169,9 @@ public class MorphingGeometryPanel extends JPanel{
         
         Geometry geometry = null;
         MultiPolygon mGeometry = null;
+        Polygon pGeometry = null;
         if (multiPolygon != null){
-            for (int i = 0; i <multiPolygon.getNumGeometries(); i++ ){
+            for (int i = 0; i <multiPolygon.getNumGeometries(); i+=nFrames ){
                 System.out.println(i);
                 BufferedImage bImg = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
                 Graphics2D gr = bImg.createGraphics();
@@ -186,6 +193,19 @@ public class MorphingGeometryPanel extends JPanel{
                 gr.setColor(Color.blue);
                 
                 mGeometry = multiPolygonList.get(currentGeometryNumber);
+                //gr.fill(new LiteShape(mGeometry, at, false));
+                gr.draw(new LiteShape(mGeometry, at, false));         
+                images.add(bImg);
+            }
+        }
+        else if (polygonList != null){
+            for (int i = 0; i <polygonList.size(); i++ ){
+                BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics2D gr = bImg.createGraphics();
+                
+                gr.setColor(Color.blue);
+                
+                pGeometry = polygonList.get(currentGeometryNumber);
                 //gr.fill(new LiteShape(mGeometry, at, false));
                 gr.draw(new LiteShape(mGeometry, at, false));         
                 images.add(bImg);

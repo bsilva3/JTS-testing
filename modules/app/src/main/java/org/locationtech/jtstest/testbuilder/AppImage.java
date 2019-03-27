@@ -204,6 +204,7 @@ public class AppImage {
         (int) im.getHeight(null)), windowDimension );
         setImageHeightInPanel((int) Math.round(d.height), isSecondPanel);
         setImageWidthInPanel((int) Math.round(d.width), isSecondPanel);
+        //System.out.println("image width: "+d.width +", image height: "+d.height);
         return d;
     }
       

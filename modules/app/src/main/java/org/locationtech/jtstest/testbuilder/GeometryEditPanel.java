@@ -280,30 +280,19 @@ public class GeometryEditPanel extends JPanel {
         AppCorrGeometries appCorr = AppCorrGeometries.getInstance();
         List<Coordinate> coord;
         
+        drawImagePolygon();
         if (!this.isSecondPanel && appCorr.showMorphingGeometry()){
             //this is the first panel and will draw the result of the morphing of a geometry
-            //and will not draw the image as background
             coord = appCorr.getMorphingGeometry();
-            
-            //remove any background image that may exist
-            tbModel.getGeometryEditModel().setEditGeomIndex(BACKGROUND_IMAGE_GEOMETRY_INDEX);
-            tbModel.getGeometryEditModel().clear();
-            
-            //remove any other geometries previously drawn
-            tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
-            tbModel.getGeometryEditModel().clear();
         }
         else{
             //this panel will draw the geometry read from the file or from the cache if previously edited
-            //and draw the image as background
-            drawImagePolygon();
-            
             coord = appCorr.getCordsFromFileOrEdited(this);
-            
-            //remove any other geometries previously drawn
-            tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
-            tbModel.getGeometryEditModel().clear();
         }
+         //remove any other geometries previously drawn
+        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+        tbModel.getGeometryEditModel().clear();
+        
         tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
         //tbModel.getGeometryEditModel().clear();

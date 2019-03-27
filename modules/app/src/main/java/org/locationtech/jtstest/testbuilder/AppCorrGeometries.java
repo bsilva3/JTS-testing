@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import jni_st_mesh.IFrame;
-import jni_st_mesh.Main;
 import org.apache.commons.lang3.ArrayUtils;
-import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateUtils;
 import org.locationtech.jts.geom.Geometry;
@@ -128,23 +126,62 @@ public class AppCorrGeometries {
     //corrects the coordinates in the corr file according to the size of the viewport
     private List<Coordinate> correctCoordinates(List<Coordinate> coord, GeometryEditPanel editPanel){
         AppImage appImage = AppImage.getInstance();
-        Point2D viewOrigin = editPanel.getViewport().toView(new Coordinate(0, 0));
-        double vOriginX = viewOrigin.getX();
-        double currImageHeight = appImage.getImageHeightInPanel(editPanel.isSecondPanel());
-        double currImageWidth = appImage.getImageWidthInPanel(editPanel.isSecondPanel());
+
+        double currImageHeightInPanel = appImage.getImageHeightInPanel(editPanel.isSecondPanel());
+        double currImageWidthInPanel = appImage.getImageWidthInPanel(editPanel.isSecondPanel());
         List<Coordinate> transformedCoords = new ArrayList<>();
         CoordinateUtils coordUtils;
         for (Coordinate c : coord){
             coordUtils = new CoordinateUtils(c.getX(), c.getY() );
             
             coordUtils.transformCoords(appImage.getCurrentImageWidth(editPanel.isSecondPanel()), 
-                    appImage.getCurrentImageHeight(editPanel.isSecondPanel()), currImageWidth, currImageHeight);
+                    appImage.getCurrentImageHeight(editPanel.isSecondPanel()), currImageWidthInPanel, currImageHeightInPanel);
             
             //add the diference of the top of the panel and the image 
-            coordUtils.translate(new CoordinateUtils(vOriginX, (editPanel.getSize().getHeight() - currImageHeight) - 
-                    (editPanel.getSize().getHeight() - currImageHeight) ));
+            /*coordUtils.translate(new CoordinateUtils(0, -(editPanel.getSize().getHeight() - currImageHeightInPanel) - 
+                    (editPanel.getSize().getHeight() - currImageHeightInPanel) ));*/
+            
+            coordUtils.translate(new CoordinateUtils(0, -(editPanel.getSize().getHeight() - currImageHeightInPanel)));
             
             transformedCoords.add(coordUtils);
+        }
+        return transformedCoords;
+    }
+    
+    public Polygon makePolygonFitComponent(Polygon pol, JComponent comp){
+        Coordinate[] transformedCoords = correctCoordinates(pol.getCoordinates(), comp);
+        return new GeometryFactory().createPolygon(transformedCoords);
+    }
+    
+    /**
+     * Transform the coordinates of a geometry to fit inside a JPanel
+     * @param coord - the list of coordinates to transform
+     * @param comp - the Java swing component
+     * @return list of coordinates transformed to fits the Java swing component
+     */
+    public Coordinate[] correctCoordinates(Coordinate[] coord, JComponent comp){
+        
+        Coordinate[] transformedCoords = new Coordinate[coord.length];
+        CoordinateUtils coordUtils;
+        
+        //first pass to see maximum x and y coordinates
+        double maxX = 0;
+        double maxY = 0;
+        for (Coordinate c : coord){
+            if (c.x > maxX){
+                maxX = c.x;
+            }
+            if (c.y > maxY){
+                maxY = c.y;
+            }
+        }
+        int i = 0;
+        for (Coordinate c : coord){
+            coordUtils = new CoordinateUtils(c.getX(), c.getY() );
+            
+            coordUtils.transformCoords(maxX+200, maxY+200, comp.getWidth(), comp.getHeight());
+            transformedCoords[i] = coordUtils;
+            i++;
         }
         return transformedCoords;
     }
@@ -462,14 +499,15 @@ public class AppCorrGeometries {
     }
     
     //draw in the left panel (1st panel) the result of the morphing of a geometry
-    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod){
+    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod, boolean isPolygon){
         WKTReader reader = new WKTReader();
 
+        //set of geometries for each instant, showed in a new window
         if (duringPeriod){
             //several polygons for a certain interval of time
 
             if(wktGeometry.length == 1){
-                //a multipolygon, each polygon representing one period in time
+                //a multipolygon, each polygon representing one instant
                 MultiPolygon mPolygon = null;
 
                 try {
@@ -480,36 +518,65 @@ public class AppCorrGeometries {
                 animation(wktGeometry, mPolygon);
             }
             else{
-                //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
-                List<MultiPolygon> mpList = new ArrayList<>();
-                for (String wkt : wktGeometry){
-                    try { 
-                        MultiPolygon mp = (MultiPolygon) reader.read(wkt);
-                        mpList.add(mp);
-                    } catch (ParseException ex) {
-                        Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
+                
+                if(isPolygon){
+                    //a list of polygons, each representing one instant of time
+                    List<Polygon> pList = new ArrayList<>();
+                    for (String wkt : wktGeometry){
+                        try { 
+                            Polygon p = (Polygon) reader.read(wkt);
+                            pList.add(p);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
                     }
+                    animation(wktGeometry, pList);
                 }
-                animation(wktGeometry, mpList);
+                else{
+                    //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
+                    List<MultiPolygon> mpList = new ArrayList<>();
+                    for (String wkt : wktGeometry){
+                        try { 
+                            MultiPolygon mp = (MultiPolygon) reader.read(wkt);
+                            mpList.add(mp);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
+                    }
+                    animation(wktGeometry, mpList);
+                }
             }
         }
+        //at instant
         else {
             //one polygon or a multipolygon of triangules for one instant
             Geometry mGeometry = null;
             try {
                 mGeometry = reader.read(wktGeometry[0]);
+                //store this coordinates to be redrawn on the first panel when panel repaint occurs
+                this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
+                morphingGeometry = this.correctCoordinates(morphingGeometry, JTSTestBuilderFrame.getGeometryEditPanel());
+                showMorphingGeometryInPanel();
             } catch (ParseException ex) {
                 Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
             }
-            //store this coordinates to be redrawn on the first panel when panel repaint occurs
-            this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
-
-            showMorphingGeometryInPanel();
         }
     }
     
     public void animation(String[] wktGeometry, MultiPolygon multiPolygon) {
-            EventQueue.invokeLater(new Runnable() {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, multiPolygon);
+        openMorphingGeometryFrame(mframe);
+    }
+    
+    public void animation(String[] wktGeometry, List<?> geomList) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, geomList);
+        openMorphingGeometryFrame(mframe);
+    }
+    
+    private void openMorphingGeometryFrame(MorphingGeometryViewerFrame frame){
+        EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() 
             {
@@ -520,33 +587,11 @@ public class AppCorrGeometries {
                     e.printStackTrace();
                 }
                 //start frame to show the animation for the morphing geometry
-                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(wktGeometry, multiPolygon);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
                 frame.pack();
                 frame.validate();
                 frame.setLocationRelativeTo(null);
                 frame.setTitle(AppStrings.MORPHING_PANEL_TITLE);
-                frame.setVisible(true);
-            }
-        });
-    }
-    
-    public void animation(String[] wktGeometry, List<MultiPolygon> multiPolygonList) {
-            EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() 
-            {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                
-                MorphingGeometryViewerFrame frame = new MorphingGeometryViewerFrame(wktGeometry, multiPolygonList);
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
-                frame.pack();
-                frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
             }
         });

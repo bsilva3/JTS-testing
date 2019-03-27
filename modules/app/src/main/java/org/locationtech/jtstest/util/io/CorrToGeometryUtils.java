@@ -33,6 +33,7 @@ public class CorrToGeometryUtils {
         return Arrays.asList(corrReader.readAndGetPoints(secondSetCoordinates));
     }
     
+    /*
     //the coordinates read from the file are not closed, and a polygon cannot be formed. 
     //this method copies the first coordinate into the last position in the array
     public Coordinate[] closeCoordinates(Coordinate[] coord){
@@ -40,6 +41,6 @@ public class CorrToGeometryUtils {
         closedCoords = coord;
         closedCoords[closedCoords.length-1] = closedCoords[0];
         return closedCoords;
-    }
+    }*/
     
 }
