@@ -349,14 +349,11 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         }
         
         boolean cw;
-        if (verticeOrientationComboBox.getSelectedItem().toString().equals(AppStrings.CLOCK_WISE_STRING)){
-            cw = true;
-        }
-        else{
-            cw = false;
-        }
+        cw = verticeOrientationComboBox.getSelectedItem().toString().equals(AppStrings.CLOCK_WISE_STRING);
+        
         double initialTime = Double.parseDouble(initialTimeSpinner.getValue().toString());
         double threshold = Double.parseDouble(colinearThresholdSpinner.getValue().toString());
+        //System.out.println("initialTime: "+initialTime + "; colinearThreshold: "+threshold+ "cw: "+cw);
         //send the data as input to the corresponding c++ function
         if (selectedMethod.equals(AppStrings.AT_INSTANT_METHOD_STRING)){
             duringPeriod = false;
@@ -370,7 +367,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             //mesh, at instant
             else if(selectedType.equals(AppStrings.MESH_STRING)){
                 isPolygon = false;
-                result[0] = m.at_instant_mesh(1000.0, 2000.0, mesh1, mesh2, 
+                result[0] = m.at_instant_mesh(1000.0, 2000.0, wkts[0], wkts[1], 
                         initialTime, triangulationMethod, cw, threshold);
             }
             
@@ -387,18 +384,19 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             else if(selectedType.equals(AppStrings.MESH_STRING)){
                 //mesh, during period
                 isPolygon = false;
-                result = m.during_period_mesh(1000.0, 2000.0, mesh1, mesh2, initialTime, endTime, 1000, triangulationMethod, cw, threshold);
+                result = m.during_period_mesh(1000.0, 2000.0, wkts[0], wkts[1], initialTime, endTime, 1000, triangulationMethod, cw, threshold);
             }
         }
 
-        System.out.println("result --> "+Arrays.toString(result));
+        System.out.println("result --> "+result.length);
         
         String res = Arrays.toString(result);
         if (!res.contains(AppStrings.MORPHING_ERR_STRING)){
             //morphing was succesfull
             //add the wkt with result in the text area
-            resultTextArea.setText(res);
+            //resultTextArea.setText(res);
             //draw the result of the morphing geometry in the left panel (1st panel)
+            
             AppCorrGeometries.getInstance().drawAndShowMorphingGeometry(result, duringPeriod, isPolygon);
             
             //enable the show morphing geometry in panel checkbox and check it
@@ -407,7 +405,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         }
         else{
             //open error dialog box
-            JOptionPane.showMessageDialog(new JFrame(), "An error occured during morphing operation.",
+            JOptionPane.showMessageDialog(new JFrame(), "An error occurred during morphing operation.",
             "Error on Morphing", JOptionPane.ERROR_MESSAGE);
         }
         

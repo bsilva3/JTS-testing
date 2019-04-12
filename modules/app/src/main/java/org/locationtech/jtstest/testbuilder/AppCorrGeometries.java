@@ -148,6 +148,21 @@ public class AppCorrGeometries {
         return transformedCoords;
     }
     
+    public MultiPolygon makePolygonFitComponent(MultiPolygon multiPol, JComponent comp){
+        Polygon[] pol = new Polygon[multiPol.getNumGeometries()];
+        for (int i = 0; i <  multiPol.getNumGeometries(); i++){
+            Polygon p = (Polygon) multiPol.getGeometryN(i);
+            Coordinate[] transformedCoords = correctCoordinates(p.getCoordinates(), comp);
+            pol[i] = new GeometryFactory().createPolygon(transformedCoords);
+        }
+        return new GeometryFactory().createMultiPolygon(pol);
+    }
+    
+    public Polygon makePolygonFitComponent(Geometry geo, JComponent comp){
+        Coordinate[] transformedCoords = correctCoordinates(geo.getCoordinates(), comp);
+        return new GeometryFactory().createPolygon(transformedCoords);
+    }
+    
     public Polygon makePolygonFitComponent(Polygon pol, JComponent comp){
         Coordinate[] transformedCoords = correctCoordinates(pol.getCoordinates(), comp);
         return new GeometryFactory().createPolygon(transformedCoords);
@@ -176,10 +191,13 @@ public class AppCorrGeometries {
             }
         }
         int i = 0;
+        int componentHeight = comp.getHeight();
+        int componentWidth = comp.getWidth();
         for (Coordinate c : coord){
             coordUtils = new CoordinateUtils(c.getX(), c.getY() );
             
-            coordUtils.transformCoords(maxX+200, maxY+200, comp.getWidth(), comp.getHeight());
+            coordUtils.transformCoords(maxX, maxY, componentWidth, componentHeight);
+            coordUtils.translate(new Coordinate(-(componentWidth/2), componentHeight/2));
             transformedCoords[i] = coordUtils;
             i++;
         }
@@ -515,7 +533,7 @@ public class AppCorrGeometries {
                     mPolygon = (MultiPolygon) reader.read(wktGeometry[0]);        			
                 }catch(Exception e) {   }
 
-                animation(wktGeometry, mPolygon);
+                animation(wktGeometry, mPolygon, isPolygon);
             }
             else{
                 
@@ -531,7 +549,7 @@ public class AppCorrGeometries {
                         }
 
                     }
-                    animation(wktGeometry, pList);
+                    animation(wktGeometry, pList, isPolygon);
                 }
                 else{
                     //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
@@ -545,18 +563,20 @@ public class AppCorrGeometries {
                         }
 
                     }
-                    animation(wktGeometry, mpList);
+                    animation(wktGeometry, mpList, isPolygon);
                 }
             }
         }
         //at instant
         else {
             //one polygon or a multipolygon of triangules for one instant
-            Geometry mGeometry = null;
+            MultiPolygon multiPolygon = null;
             try {
-                mGeometry = reader.read(wktGeometry[0]);
+                multiPolygon = (MultiPolygon) reader.read(wktGeometry[0]);
+                System.out.println("wkt -> "+wktGeometry[0]);
+                //System.out.println("list of coords  " + Arrays.toString(multiPolygon.getGeometryN(0)));
                 //store this coordinates to be redrawn on the first panel when panel repaint occurs
-                this.morphingGeometry = Arrays.asList(mGeometry.getCoordinates());
+                this.morphingGeometry = Arrays.asList(multiPolygon.getCoordinates());
                 morphingGeometry = this.correctCoordinates(morphingGeometry, JTSTestBuilderFrame.getGeometryEditPanel());
                 showMorphingGeometryInPanel();
             } catch (ParseException ex) {
@@ -565,13 +585,13 @@ public class AppCorrGeometries {
         }
     }
     
-    public void animation(String[] wktGeometry, MultiPolygon multiPolygon) {
-        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, multiPolygon);
+    public void animation(String[] wktGeometry, MultiPolygon multiPolygon, boolean isPolygon) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, multiPolygon);
         openMorphingGeometryFrame(mframe);
     }
     
-    public void animation(String[] wktGeometry, List<?> geomList) {
-        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, geomList);
+    public void animation(String[] wktGeometry, List<?> geomList, boolean isPolygon) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, geomList);
         openMorphingGeometryFrame(mframe);
     }
     
@@ -590,6 +610,7 @@ public class AppCorrGeometries {
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //dont close entire project on window close
                 frame.pack();
                 frame.validate();
+                frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH); //start frame maximized
                 frame.setLocationRelativeTo(null);
                 frame.setTitle(AppStrings.MORPHING_PANEL_TITLE);
                 frame.setVisible(true);

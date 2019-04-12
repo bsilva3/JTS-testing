@@ -31,9 +31,9 @@ public class CoordinateUtils extends Coordinate{
         return (c/original) * panel;
     }
     
-    public void translate(CoordinateUtils coordUtil){
-        this.x+=coordUtil.getX();
-        this.y+=coordUtil.getY();
+    public void translate(Coordinate coord){
+        this.x+=coord.getX();
+        this.y+=coord.getY();
     }
     
 }

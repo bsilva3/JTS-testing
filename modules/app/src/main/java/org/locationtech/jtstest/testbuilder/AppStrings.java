@@ -12,6 +12,8 @@
 
 package org.locationtech.jtstest.testbuilder;
 
+import jni_st_mesh.ChartType;
+import jni_st_mesh.Ststistics;
 import jni_st_mesh.TriangulationMethod;
 
 public class AppStrings {
@@ -74,6 +76,8 @@ public class AppStrings {
     
     public static final String START_MORPHING_BTN_STRING = "Start Morphing";
     
+    public static final String MORPHING_BTN_STRING = "Morph Geometry";
+    
     //names of the methods in the c++ library
     public static final String AT_INSTANT_METHOD_STRING = "At instant";
     public static final String DURING_PERIOD_METHOD_STRING = "During period";
@@ -101,9 +105,14 @@ public class AppStrings {
     //options for the combo box for the selection of the method to call in the c++ library
     public static final String[] INSTANT_OR_PERIOD_STRINGS = {AT_INSTANT_METHOD_STRING, DURING_PERIOD_METHOD_STRING};
     public static final String[] MESH_OR_POLY_STRINGS = {POLY_STRING, MESH_STRING};
-    public static final String[] METRICS_STRINGS = {AREA_STRING, QUALITY_METRICS_STRING};
+    public static final String[] METRICS_STRINGS = {Ststistics.AREA_EVOLUTION.toString(), Ststistics.ROTATION_ANGLES.toString(),
+                                Ststistics.COLLINEAR_POINTS_BY_METHOD.toString(), Ststistics.QUALITY_MEASURES.toString()};
     public static final String[] TRIANGULATION_METHOD_STRINGS = {TriangulationMethod.COMPATIBLE.toString(), TriangulationMethod.EQUILATERAL.toString()};
     public static final String[] VERTICE_ORIENTATION_STRINGS = {CLOCK_WISE_STRING, COUNTER_CLOCK_WISE_STRING};
+    
+    public static final String[] CHART_TYPE_STRINGS = {ChartType.BAR_CHART.getValue(), ChartType.LINE_CHART.getValue(), ChartType.TABLE.getValue()};
+    
+    public static final String CHART_TYPE_LABEL_STRING = "Chart type:";
     
     public static final String INSTANT_LABEL_STRING = "Instant";
     
@@ -121,7 +130,9 @@ public class AppStrings {
     
     public static final String SAVE_CURRENT_GEOMETRY_STRING = "Save current geometry as image";
     
-    public static final String SAVE_ANIMATION_STRING = "Save Animation as GIF";
+    public static final String SHOW_STATISTIC_STRING = "Show statistic";
+    
+    public static final String SAVE_ANIMATION_STRING = "Save Animation as images";
     
     public static final String SAVE_CURRENT_STATISTICS_STRING = "Save shown statistics as image";
     
@@ -133,5 +144,12 @@ public class AppStrings {
     public static final String MORPHING_ERR_STRING = "ERR";
     //the name of the java library with the C++ methods for the morphing of a geometry
     public static final String DLL_LIBRARY = "java_mesh";
+    
+    public static final String SAVE_SET_IMAGES_CHOOSER_DIALOG = "Select directory and name of the folder to save images";
+    
+    public static final String NO_FILE_SELECTED_ERROR = "No folder selected";
+    
+    public static final String NO_FILE_SELECTED_SET_IMAGE_SAVE = "Please, select a directory and folder name to save the images.";
+    
     
 }

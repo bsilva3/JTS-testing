@@ -5,8 +5,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -64,7 +69,12 @@ public class CSVUtils {
         w.append(sb.toString());
     }
     
-    public static void exportAndSaveToCSV(Map<?, ?> dataset){
+    /**
+     * return 0 if sucess in saving file, 1 if error 2 if user canceled
+     * @param dataset
+     * @return 
+     */
+    public static int exportAndSaveToCSV(Map<String, ?> dataset){
         
         JFrame parentFrame = new JFrame();
 
@@ -92,16 +102,39 @@ public class CSVUtils {
             FileWriter writer;
             try {
                 writer = new FileWriter(csvFile);
-
                 
+                SortedSet<Integer> keys = sortMapKeys(dataset);
+        
+                for (Integer key : keys) { 
+                    CSVUtils.writeLine(writer, Arrays.asList(key+"", dataset.get(key.toString())+""));
+                }
 
                 writer.flush();
                 writer.close();
                 
             } catch (IOException ex) {
                 Logger.getLogger(CSVUtils.class.getName()).log(Level.SEVERE, null, ex);
+                return 1;
             }
+            //success
+            return 0;
         }
+        else if (userSelection == JFileChooser.CANCEL_OPTION){
+            //do not consider  a failure or a success
+            return 2;
+        }
+        //file not saved
+        return 1;
+    }
+
+    private static SortedSet<Integer> sortMapKeys(Map<String, ?> map){
+        //sort the key (by instant)and convert to int
+        Set<String> keys = new HashSet<>(map.keySet());
+        SortedSet<Integer> sortedKeys = new TreeSet<>();
+        for (String inst : keys){
+            sortedKeys.add(Integer.parseInt(inst));
+        }
+        return sortedKeys;
     }
 
 }

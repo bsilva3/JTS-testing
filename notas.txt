@@ -94,6 +94,8 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 
 -JTSTestBuilderToolBar: contem o botao next e previous, entre outros
 
+- Janela com a animaçao do morphing e graficos: iniciada em AppCorrGeometries, metodo #openMorphingGeometryFrame
+
 ---> todo:
  - eventual refactoring -> acaba aqui v0.2
  - versão 0.3:
@@ -106,21 +108,22 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	e assim, se houver qualquer ediçao em alguma das geometrias esta nao sera considerada para o morphing e apenas é
 	considerado as coordenadas originais do ficheiro corr
 
-	-graficos de barras e tabelas com as medidas de qualidade
-	-janela com animação: adicionar slider botao de guardar e pausar animação
-	-indicar tempo de inicio e tempo de fim
 	-guardar imagem -> caixa de indicaçao de estado de operaçao (sucesso, falha a guardar)..
 	-guardar apenas a foto no dado momento, ou criar gif ou até guardar todas as fotos
 	- guardar imagens como gif -> PROBLEMA: ficamos sem heap space...
-	-combo box para indicar se qual a metrica que queremos, enviar pedido e receber
 	-oferecer a possibilidade de o utilizador escolher se quer ver a informação num grafico de barras, linha, 
 	ou tabela (quality measures vem sempre numa tabela)
 	- acabar CSV export!
-	- saltar x imagens ao chamar GIF 
+	- saltar x imagens ao chamar GIF e ao guardar imagem a imagem ? (geometria n aparece ainda..)
+	-aplicar translação as coordenadas da geometria resultante do morphing na janela morphingGeometryPanel
 
 	-criar uma cache que guarda o diretorio das imagens e corrs que foram abertos anteriormente (para
 	o utilizador nao tenha que selecionar estes ficheiros sempre que abre a aplicação
-	
+	- escolher as imagens nas quais se quer fazer morphing.
+	- normalizar dados do grafico
+	- diminuir a precisao das casas decimais
+	- problema na forma como se desenha as geometrias
+	- Nao desenhar graficos de area quando temos mesh!
 
  - area e perimetro ao selecionar 
 
