@@ -180,7 +180,7 @@ public class MorphingGeometryPanel extends JPanel{
 
         }
         else if (polygonList != null && currentGeometryNumber < polygonList.size()){
-            System.out.println("--> geo paint: " + currentGeometryNumber);
+            //System.out.println("--> geo paint: " + currentGeometryNumber);
             pGeometry = polygonList.get(currentGeometryNumber);
             //pGeometry = AppCorrGeometries.getInstance().makePolygonFitComponent(pGeometry, this);
             Point p = pGeometry.getCentroid();

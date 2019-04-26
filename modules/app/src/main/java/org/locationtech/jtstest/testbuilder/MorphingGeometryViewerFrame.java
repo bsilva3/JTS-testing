@@ -435,7 +435,6 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         this.cwComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.VERTICE_ORIENTATION_STRINGS));
         this.geomTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.MESH_OR_POLY_STRINGS));
         
-        
         //initialize spinner
         this.colinearThresholdSpinner.setModel(new SpinnerNumberModel(0.5, 0, 1, 0.1));
         
@@ -676,15 +675,18 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         String headerLegend = "";
         String xAxisLegend = "";
         String yAxisLegend = "";
+        boolean keysAreNumbers; //flag to check if sort by key is needed to display data in the charts
         if (statistic == Ststistics.QUALITY_MEASURES.get_value()){
             statistics = m.quality_measures(wktGeometry[0], triangulationMethod, cw, threshold, 1);
             headerLegend = "Quality Measures";
             xAxisLegend = "Quality";
             yAxisLegend = "Value";
+            keysAreNumbers = false;
         }
         else{
             statistics = m.ststistics(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000, 
                 triangulationMethod, cw, threshold, statistic);
+            keysAreNumbers = true;
             if (statistic == Ststistics.AREA_EVOLUTION.get_value()){
                 headerLegend = "Area Evolution";
                 xAxisLegend = "Instant";
@@ -716,7 +718,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
             cp = chartMaker.createLineChart(statistics, headerLegend, xAxisLegend, yAxisLegend);
         }
         else if (chart.equals(ChartType.TABLE.getValue())){
-            JTable table = chartMaker.createJTable(statistics, xAxisLegend, yAxisLegend);
+            JTable table = chartMaker.createJTable(statistics, xAxisLegend, yAxisLegend, keysAreNumbers);
             this.chartPanel.add(new JScrollPane(table), BorderLayout.CENTER);
             chartPanel.validate();
             return;

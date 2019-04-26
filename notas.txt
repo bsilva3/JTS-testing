@@ -8,6 +8,14 @@ na barra de texto o seguinte: clean:clean resources:resources compiler:compile j
 -------------------------------Isto é um relatório ordenado do trabalho feito, os pontos em baixo indicam o que foi feito
 mais recentemente ---------------------------------------------------------------
 
+---->Instalar livraria McKenney
+necessário primeiro instalar python 2.7 e pip: https://www.python.org/downloads/release/python-2716/
+Documentaçao para instalar:
+https://pypi.org/project/pyspatiotemporalgeom/
+Download:
+https://bitbucket.org/marmcke/pyspatiotemporalgeom/downloads/
+
+
 - modulo jts-app contém a gui
 - modulo test contem o test runner (um programa que permite carregar fihceiros .wkt e apresentar a geometria neles definida
 - modulo example contém exemplos de código para criação de formas (polyline, polygon...) 
@@ -120,8 +128,9 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	-criar uma cache que guarda o diretorio das imagens e corrs que foram abertos anteriormente (para
 	o utilizador nao tenha que selecionar estes ficheiros sempre que abre a aplicação
 	- escolher as imagens nas quais se quer fazer morphing.
-	- normalizar dados do grafico
-	- diminuir a precisao das casas decimais
+	- problema ao chamar quality measures
+	-colocar legenda em cima dos paineis a indicar o nmr da imagem
+	-desenhar a geometria morphed com uma cor diferente
 	- problema na forma como se desenha as geometrias
 	- Nao desenhar graficos de area quando temos mesh!
 

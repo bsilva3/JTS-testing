@@ -1,5 +1,6 @@
 package jni_st_mesh;
 
+
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Map;
@@ -68,9 +69,16 @@ public class ChartMaker {
         //double min = statistics.values().stream().min(Double::compare).get();
         double max = statistics.get(instants.last().toString());
         double min = statistics.get(instants.first().toString());
-        DecimalFormat newFormat = new DecimalFormat("0.0");
+        
+        DecimalFormat newFormat = new DecimalFormat("0.00");
+        int offset = getChartOffset((int) max);
+        int bottomOffset = offset;
         yAxis.setNumberFormatOverride(newFormat);
-        yAxis.setRange(0, max+5);
+        if (min > 0.0){
+            min = 0;
+            bottomOffset = 0;
+        }
+        yAxis.setRange(min+bottomOffset, max+offset);
         //yAxis.setAutoRange(true);
         //yAxis.setTickUnit(new NumberTickUnit(statistics.size()/2));
         
@@ -121,22 +129,30 @@ public class ChartMaker {
         
     }
     
-    public JTable createJTable(Map<String, ?> dataset, String xAxisLegend, String yAxisLegend){
+    public JTable createJTable(Map<String, ?> dataset, String xAxisLegend, String yAxisLegend, boolean keysAreNumbers){
         //headers for the table
         String[] columns = new String[] {xAxisLegend, yAxisLegend };
-        Object[][] data;
+        Object[][] data = new Object[dataset.size()][columns.length];
         
-        //sort the key
-        SortedSet<Integer> statKeys = sortMapKeys(dataset);
-        
-        data = new Object[dataset.size()][columns.length];
-        int i = 0;
-        for (Integer statKey : statKeys) {
-            data[i][0] = statKey;
-            data[i][1] = dataset.get(statKey.toString());
-            i++;
+        if (keysAreNumbers){
+            //sort the key
+            SortedSet<Integer> statKeys = sortMapKeys(dataset);
+            int i = 0;
+            for (Integer statKey : statKeys) {
+                data[i][0] = statKey;
+                data[i][1] = dataset.get(statKey.toString());
+                i++;
+            }
         }
-        
+        else{
+            //keys are not numbers and should not be sorted
+            int i = 0;
+            for (Map.Entry<String, ?> entry : dataset.entrySet()) {
+                data[i][0] = entry.getKey();
+                data[i][1] = entry.getValue();
+                i++;
+            }
+        }
         //create table with data
         return new JTable(data, columns);
     }
@@ -149,5 +165,15 @@ public class ChartMaker {
             sortedKeys.add(Integer.parseInt(inst));
         }
         return sortedKeys;
+    }
+    
+    //get an offset to add to the top (and maybe bottom) of the chart so the lines are visible
+    private int getChartOffset(int number){
+        String numberString = number+"";
+        String offsetString = "1";
+        for (int i = 1; i < numberString.length(); i++){
+            offsetString += "0";
+        }
+        return Integer.parseInt(offsetString);
     }
 }

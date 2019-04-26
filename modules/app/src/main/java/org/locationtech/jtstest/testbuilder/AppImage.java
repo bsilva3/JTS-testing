@@ -68,7 +68,13 @@ public class AppImage {
     
     public void setAndLoadCorrDirFiles(File corrDir){
         this.corrDir = corrDir;
+        storeCoordsOfAllFiles();
         loadCorrFiles();
+    }
+    
+    public void storeCoordsOfAllFiles(){
+        File[] files = corrDir.listFiles();
+        AppCorrGeometries.getInstance().setCoordinates(files);
     }
     
     //select the correct corr files for the currently selected image on panel 1
@@ -81,7 +87,6 @@ public class AppImage {
         for (File corrFile : files){
             Matcher matcher = pattern.matcher(corrFile.getName());
             if (matcher.find()){
-                //System.out.println(corrFile.getName());
                 corrFiles.add(corrFile);
             }
         }
@@ -251,4 +256,5 @@ public class AppImage {
     public File getCurrentCorrFile(){
         return this.corrFiles.get(0);
     }
+
 }

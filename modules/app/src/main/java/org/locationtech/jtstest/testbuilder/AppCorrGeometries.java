@@ -11,6 +11,7 @@ import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,14 +57,26 @@ public class AppCorrGeometries {
     
     private List<Coordinate> corrGeometry2;
     
+    //all the polygons in the left side of the corr file (shown in the left panel)
+    private List<Polygon> geometries1;
+    
+    //all the polygons in the right side of the corr file (shown in the right panel)
+    private List<Polygon> geometries2;
+    
     //stores the original coordinates read from the corr file
     private List<Coordinate> originalCorrGeometry1;
     
     private List<Coordinate> originalCorrGeometry2;
     
-    //stores the coordinates of a morphed geometry
-    private List<Coordinate> morphingGeometry;
+    private List<String> geoDates = new ArrayList<>();
     
+    //stores the coordinates of a morphed polygon
+    private List<Coordinate> morphingPolygon;
+    
+    //stores the coordinates of a morphed multipolygon (a mesh of triangules)
+    private List<List<Coordinate>> morphingMultiPolygon;
+    
+    //used to toogle morphing geometry on and off in the panel
     private boolean showMorphingGeometry = false;
     
     private List<Coordinate> drawnPoints = new ArrayList<>();
@@ -86,13 +99,36 @@ public class AppCorrGeometries {
     
     private static AppCorrGeometries instance;
     
-    private AppCorrGeometries() {}
+    private AppCorrGeometries() {
+        morphingMultiPolygon = new ArrayList<>();
+        morphingPolygon = new ArrayList<>();
+        geometries1 = new ArrayList<>();
+        geometries2 = new ArrayList<>();
+    }
     
     public static AppCorrGeometries getInstance(){
         if(instance == null){
             instance = new AppCorrGeometries();
         }
         return instance;
+    }
+    
+    public void setCoordinates(File[] files){
+        geoDates.clear();
+        int i = 1;
+        for (File corrFile : files){
+            geoDates.add("Geometry "+i);
+            CorrToGeometryUtils corrToGeomUtils = new CorrToGeometryUtils(corrFile);
+            //add source geometry 
+            List<Coordinate> corrsFromFile = corrToGeomUtils.getCoordsFromFile(false);
+            Polygon p = new GeometryFactory().createPolygon(corrsFromFile.toArray(new Coordinate[corrsFromFile.size()]));
+            geometries1.add(p);
+            //add source geometry 
+            corrsFromFile = corrToGeomUtils.getCoordsFromFile(true);
+            p = new GeometryFactory().createPolygon(corrsFromFile.toArray(new Coordinate[corrsFromFile.size()]));
+            geometries2.add(p);
+            i++;
+        }
     }
     
     //returns the coordinates of a geometry in one panel.
@@ -122,6 +158,11 @@ public class AppCorrGeometries {
             }
         }
     }
+    
+    /*public String getWKTOfGeomSourceByIndex(int index){
+        Polygon p = new GeometryFactory().createPolygon(corrGeometry1.get(index));
+        return p.toText();
+    }*/
     
     //corrects the coordinates in the corr file according to the size of the viewport
     private List<Coordinate> correctCoordinates(List<Coordinate> coord, GeometryEditPanel editPanel){
@@ -197,7 +238,7 @@ public class AppCorrGeometries {
             coordUtils = new CoordinateUtils(c.getX(), c.getY() );
             
             coordUtils.transformCoords(maxX, maxY, componentWidth, componentHeight);
-            coordUtils.translate(new Coordinate(-(componentWidth/2), componentHeight/2));
+            coordUtils.translate(new CoordinateUtils(-(componentWidth/2), componentHeight/2));
             transformedCoords[i] = coordUtils;
             i++;
         }
@@ -516,74 +557,6 @@ public class AppCorrGeometries {
         return g;
     }
     
-    //draw in the left panel (1st panel) the result of the morphing of a geometry
-    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod, boolean isPolygon){
-        WKTReader reader = new WKTReader();
-
-        //set of geometries for each instant, showed in a new window
-        if (duringPeriod){
-            //several polygons for a certain interval of time
-
-            if(wktGeometry.length == 1){
-                //a multipolygon, each polygon representing one instant
-                MultiPolygon mPolygon = null;
-
-                try {
-                    //array has length 1, with the multipolygon
-                    mPolygon = (MultiPolygon) reader.read(wktGeometry[0]);        			
-                }catch(Exception e) {   }
-
-                animation(wktGeometry, mPolygon, isPolygon);
-            }
-            else{
-                
-                if(isPolygon){
-                    //a list of polygons, each representing one instant of time
-                    List<Polygon> pList = new ArrayList<>();
-                    for (String wkt : wktGeometry){
-                        try { 
-                            Polygon p = (Polygon) reader.read(wkt);
-                            pList.add(p);
-                        } catch (ParseException ex) {
-                            Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    }
-                    animation(wktGeometry, pList, isPolygon);
-                }
-                else{
-                    //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
-                    List<MultiPolygon> mpList = new ArrayList<>();
-                    for (String wkt : wktGeometry){
-                        try { 
-                            MultiPolygon mp = (MultiPolygon) reader.read(wkt);
-                            mpList.add(mp);
-                        } catch (ParseException ex) {
-                            Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    }
-                    animation(wktGeometry, mpList, isPolygon);
-                }
-            }
-        }
-        //at instant
-        else {
-            //one polygon or a multipolygon of triangules for one instant
-            MultiPolygon multiPolygon = null;
-            try {
-                multiPolygon = (MultiPolygon) reader.read(wktGeometry[0]);
-                System.out.println("wkt -> "+wktGeometry[0]);
-                //System.out.println("list of coords  " + Arrays.toString(multiPolygon.getGeometryN(0)));
-                //store this coordinates to be redrawn on the first panel when panel repaint occurs
-                this.morphingGeometry = Arrays.asList(multiPolygon.getCoordinates());
-                morphingGeometry = this.correctCoordinates(morphingGeometry, JTSTestBuilderFrame.getGeometryEditPanel());
-                showMorphingGeometryInPanel();
-            } catch (ParseException ex) {
-                Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
     
     public void animation(String[] wktGeometry, MultiPolygon multiPolygon, boolean isPolygon) {
         MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, multiPolygon);
@@ -618,10 +591,42 @@ public class AppCorrGeometries {
         });
     }
     
-    public void showMorphingGeometryInPanel(){
+    public void showMorphingGeometryInPanel(Polygon p){
+        morphingPolygon.clear(); //remove any previous coordinates
+        //store this coordinates to be redrawn on the first panel when panel repaint occurs
+        this.morphingPolygon = Arrays.asList(p.getCoordinates());
+        morphingPolygon = this.correctCoordinates(morphingPolygon, JTSTestBuilderFrame.getGeometryEditPanel());
         this.showMorphingGeometry = true;
+        morphingMultiPolygon.clear();//avoid conflicts with previous types of morphing geometry
         //draw on the 1st panel
         JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
+    }
+    
+    public void showMorphingGeometryInPanel(MultiPolygon mp){
+        morphingMultiPolygon.clear(); //remove any previous coordinates
+        //store this coordinates to be redrawn on the first panel when panel repaint occurs
+        for (int i = 0; i < mp.getNumGeometries(); i++){
+            List <Coordinate> polygonCoords = Arrays.asList(mp.getGeometryN(i).getCoordinates());
+            this.morphingMultiPolygon.add(polygonCoords);
+        }
+        
+        //correct every coordinate to fit the screen and align with the image
+        for (int i = 0; i < morphingMultiPolygon.size(); i++){
+            List <Coordinate> polygonCoordsCorrected = this.correctCoordinates(morphingMultiPolygon.get(i), JTSTestBuilderFrame.getGeometryEditPanel());
+            morphingMultiPolygon.set(i, polygonCoordsCorrected);
+        }
+        this.showMorphingGeometry = true;
+        //draw on the 1st panel
+        morphingPolygon.clear();//avoid conflicts with previous types of morphing geometry
+        JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
+    }
+    
+    public void showMorphingGeometryInPanel(){
+        if ( morphingPolygon.isEmpty() && morphingMultiPolygon.isEmpty()){//one has to have values
+            this.showMorphingGeometry = true;
+            //draw on the 1st panel
+            JTSTestBuilderFrame.getGeometryEditPanel().drawGeometry();
+        }
     }
     
     public void hideMorphingGeometryInPanel(){
@@ -670,8 +675,22 @@ public class AppCorrGeometries {
         return showMorphingGeometry;
     }
 
-    public List<Coordinate> getMorphingGeometry() {
-        return morphingGeometry;
+    public List<Coordinate> getMorphingPolygon() {
+        return this.morphingPolygon;
     }
     
+    public List<List<Coordinate>> getMorphingMultiPolygon() {
+        return this.morphingMultiPolygon;
+    }
+    
+    public List<String> getGeoDates() {
+        return geoDates;
+    }
+    
+    public Polygon getPolySourceByIndex(int index){
+        return this.geometries1.get(index);
+    }
+    public Polygon getPolyTargetByIndex(int index){
+        return this.geometries2.get(index);
+    }
 }

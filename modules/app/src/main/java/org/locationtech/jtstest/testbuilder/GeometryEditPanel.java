@@ -26,6 +26,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -278,27 +280,56 @@ public class GeometryEditPanel extends JPanel {
         //call this just to make sure that the variables with the image dimensions in the panel are not null or zero
         AppImage.getInstance().resizeImageDimension(this.getSize(), isSecondPanel);
         AppCorrGeometries appCorr = AppCorrGeometries.getInstance();
-        List<Coordinate> coord;
+        List<Coordinate> coord;//for polygon or normal geometry read from corr file
+        List<List<Coordinate>> coords; //for multipolygon
         
+         //remove any other geometries previously drawn
+        
+        //tbModel.getGeometryEditModel().clear();
+         
         drawImagePolygon();
         if (!this.isSecondPanel && appCorr.showMorphingGeometry()){
             //this is the first panel and will draw the result of the morphing of a geometry
-            coord = appCorr.getMorphingGeometry();
+            coord = appCorr.getMorphingPolygon();
+            coords = appCorr.getMorphingMultiPolygon();
+            if (!coord.isEmpty()){
+                //this chunk of code has to be repeated every time we add a component... else it throws an exception
+                //remove any other geometries previously drawn
+                tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+                tbModel.getGeometryEditModel().clear();
+
+                tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+                tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+                tbModel.getGeometryEditModel().addComponent(coord);//draw a polygon from the morphing operation
+            }
+            else if (!coords.isEmpty()){
+                //this chunk of code has to be repeated every time we add a component... else it throws an exception
+                //remove any other geometries previously drawn
+                tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+                tbModel.getGeometryEditModel().clear();
+
+                tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+                tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+                for (List<Coordinate> mesh : coords){
+                    tbModel.getGeometryEditModel().addComponent(mesh);
+                }
+            }
         }
         else{
             //this panel will draw the geometry read from the file or from the cache if previously edited
             coord = appCorr.getCordsFromFileOrEdited(this);
+            //this chunk of code has to be repeated every time we add a component... else it throws an exception
+            //remove any other geometries previously drawn
+            tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+            tbModel.getGeometryEditModel().clear();
+
+            tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
+            tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
+            //tbModel.getGeometryEditModel().clear();
+            tbModel.getGeometryEditModel().addComponent(coord);
         }
-         //remove any other geometries previously drawn
-        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
-        tbModel.getGeometryEditModel().clear();
         
-        tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
-        tbModel.getGeometryEditModel().setEditGeomIndex(OBJECT_GEOMETRY_INDEX);
-        //tbModel.getGeometryEditModel().clear();
-        tbModel.getGeometryEditModel().addComponent(coord);
         this.updateGeom();   
-        
     }
     
     //draw a square whose size is the same as the background image in the panel
@@ -314,8 +345,10 @@ public class GeometryEditPanel extends JPanel {
         coord.add( new Coordinate(currImageWidth, currImageHeight));
         coord.add( new Coordinate(0, currImageHeight));
         
-        // clear the current square and update (to be accordingly with the size of the panel)
-        tbModel.getGeometryEditModel().clear(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+        // clear the current square and update, if any (to be accordingly with the size of the panel)
+        try{
+            tbModel.getGeometryEditModel().clear(BACKGROUND_IMAGE_GEOMETRY_INDEX);
+        } catch (NullPointerException ex){ Logger.getLogger(GeometryEditPanel.class.getName()).log(Level.SEVERE, null, ex);}
 
         tbModel.getGeometryEditModel().setGeometryType(GeometryType.POLYGON);
         tbModel.getGeometryEditModel().setEditGeomIndex(BACKGROUND_IMAGE_GEOMETRY_INDEX);

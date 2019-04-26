@@ -98,6 +98,10 @@ public class AppStrings {
     
     public static final String VERTICE_ORIENTATION_LABEL_STRING = "Vertice Orientation: ";
     
+    public static final String STARTER_GEOM_LABEL = "Source: ";
+    
+    public static final String END_GEOM_LABEL = "Target: ";
+    
     //vertice orientation
     public static final String CLOCK_WISE_STRING = "clock wise (cw)";
     public static final String COUNTER_CLOCK_WISE_STRING = "counter-clock wise (ccw)";
