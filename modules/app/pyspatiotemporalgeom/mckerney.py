@@ -83,13 +83,13 @@ if len(sys.argv) != 6: #counting the name of the file as an argument
     print "Usage: python mckerney.py <wkt source geom> <wkt target geom> <begin time> <end time> <query time>"
     sys.exit(0)
 
-#geom1 = wktToSegmentList(sys.argv[1])
-#geom2 = wktToSegmentList(sys.argv[2])
+geom1 = wktToSegmentList(sys.argv[1])
+geom2 = wktToSegmentList(sys.argv[2])
 sr1 = structureRegion.structuralRegion()
-geom1 = [((2,1),(4,1)),((4,1),(3,4)),((3,4),(2,1))]
+#geom1 = [((2,1),(4,1)),((4,1),(3,4)),((3,4),(2,1))]
 sr1f1ID = sr1.addFace( geom1 )
 sr2 = structureRegion.structuralRegion()
-geom2 = [((4,2),(5,2)),((5,2),(5,3)),((5,3),(4,2))]
+#geom2 = [((4,2),(5,2)),((5,2),(5,3)),((5,3),(4,2))]
 sr2f1ID = sr2.addFace( geom2 )
 
 interReg1 = intervalRegion.cIntervalRegion()

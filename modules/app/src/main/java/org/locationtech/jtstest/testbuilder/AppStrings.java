@@ -98,6 +98,8 @@ public class AppStrings {
     
     public static final String VERTICE_ORIENTATION_LABEL_STRING = "Vertice Orientation: ";
     
+    public static final String METHOD_SELECTION_LABEL_STRING = "Morphing Method Selection: ";
+    
     public static final String STARTER_GEOM_LABEL = "Source: ";
     
     public static final String END_GEOM_LABEL = "Target: ";
@@ -115,6 +117,12 @@ public class AppStrings {
     public static final String[] VERTICE_ORIENTATION_STRINGS = {CLOCK_WISE_STRING, COUNTER_CLOCK_WISE_STRING};
     
     public static final String[] CHART_TYPE_STRINGS = {ChartType.BAR_CHART.getValue(), ChartType.LINE_CHART.getValue(), ChartType.TABLE.getValue()};
+    
+    public static final String MORPHING_METHOD_NORMAL = "Normal";
+    
+    public static final String MORPHING_METHOD_MCKERNEY = "Mckerney";
+    
+    public static final String[] MORPHING_METHODS = {MORPHING_METHOD_NORMAL, MORPHING_METHOD_MCKERNEY};
     
     public static final String CHART_TYPE_LABEL_STRING = "Chart type:";
     

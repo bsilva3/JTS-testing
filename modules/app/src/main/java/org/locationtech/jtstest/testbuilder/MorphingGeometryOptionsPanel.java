@@ -47,6 +47,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         this.colinearThresholdLabel.setText(AppStrings.COLINEAR_THRESHOLD_STRING);
         this.triangulationLabel.setText(AppStrings.TRIANGULATION_LABEL_STRING);
         this.orientationLabel.setText(AppStrings.VERTICE_ORIENTATION_LABEL_STRING);
+        this.methodSelection.setText(AppStrings.METHOD_SELECTION_LABEL_STRING);
         
         this.initialTimeSpinner.setModel(new SpinnerNumberModel(1000, 1000, 2000, 10));//set default, min max and increment value
         this.endTimeSpinner.setModel(new SpinnerNumberModel(2000, 1000, 2000, 10));//set default, min max and increment value
@@ -75,8 +76,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         this.meshOrPolygonComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.MESH_OR_POLY_STRINGS));
         this.triangulationMethodComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.TRIANGULATION_METHOD_STRINGS));
         this.verticeOrientationComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.VERTICE_ORIENTATION_STRINGS));
-        String[] geometryDates = AppCorrGeometries.getInstance().getGeoDates().toArray(new String[AppCorrGeometries.getInstance().getGeoDates().size()]);
-        
+        this.methodSelectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.MORPHING_METHODS));
         this.instantOrPeriodComboBox.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
                 //if user wants to get the morphing at an instant, hide the spinner for the end time
@@ -128,14 +128,23 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         verticeOrientationComboBox = new javax.swing.JComboBox<>();
         orientationLabel = new javax.swing.JLabel();
         triangulationLabel = new javax.swing.JLabel();
+        methodSelection = new javax.swing.JLabel();
+        methodSelectionComboBox = new javax.swing.JComboBox<>();
 
         setFocusTraversalPolicyProvider(true);
         setLayout(new java.awt.GridBagLayout());
 
         playBtn.setText("Play");
+        playBtn.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+                playBtnCaretPositionChanged(evt);
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+            }
+        });
         playBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                none(evt);
+                startMorphing(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -200,7 +209,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         instantOrPeriodComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -210,7 +219,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         meshOrPolygonComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -232,7 +241,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         meshOrPolygonLabel.setText("jLabel1");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
@@ -241,7 +250,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         timeOrInstantLabel.setText("jLabel2");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
@@ -250,7 +259,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         triangulationMethodComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -260,14 +269,14 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         colinearThresholdLabel.setText("jLabel1");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(colinearThresholdLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -276,7 +285,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         verticeOrientationComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -286,7 +295,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         orientationLabel.setText("jLabel1");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
@@ -295,17 +304,35 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         triangulationLabel.setText("jLabel2");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(triangulationLabel, gridBagConstraints);
+
+        methodSelection.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(methodSelection, gridBagConstraints);
+
+        methodSelectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(methodSelectionComboBox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     /** Calls the c++ library that, given a time interval, a previous geometry and a target geometry,
     * predict the morphing of the geometry in a given time having these two geometries as a reference.
     */
-    private void none(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_none
+    private void startMorphing(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startMorphing
         // get wkt of the corr geometries in both panels.
         
         String[] wkts;//first element is source, second is target geometry
@@ -395,7 +422,11 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(new JFrame(), "An error occurred during morphing operation.",
             "Error on Morphing", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_none
+    }//GEN-LAST:event_startMorphing
+
+    private void playBtnCaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_playBtnCaretPositionChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_playBtnCaretPositionChanged
 
     //draw in the left panel (1st panel) the result of the morphing of a geometry
     public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod, boolean isPolygon){
@@ -485,6 +516,8 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox<String> meshOrPolygonComboBox;
     private javax.swing.JLabel meshOrPolygonLabel;
+    private javax.swing.JLabel methodSelection;
+    private javax.swing.JComboBox<String> methodSelectionComboBox;
     private javax.swing.JLabel orientationLabel;
     private javax.swing.JButton playBtn;
     private javax.swing.JLabel resultLabel;
