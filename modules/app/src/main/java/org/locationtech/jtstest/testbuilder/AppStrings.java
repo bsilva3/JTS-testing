@@ -13,6 +13,7 @@
 package org.locationtech.jtstest.testbuilder;
 
 import jni_st_mesh.ChartType;
+import org.locationtech.jtstest.testbuilder.morphing.MorphingMethod;
 import jni_st_mesh.Ststistics;
 import jni_st_mesh.TriangulationMethod;
 
@@ -118,11 +119,7 @@ public class AppStrings {
     
     public static final String[] CHART_TYPE_STRINGS = {ChartType.BAR_CHART.getValue(), ChartType.LINE_CHART.getValue(), ChartType.TABLE.getValue()};
     
-    public static final String MORPHING_METHOD_NORMAL = "Normal";
-    
-    public static final String MORPHING_METHOD_MCKERNEY = "Mckerney";
-    
-    public static final String[] MORPHING_METHODS = {MORPHING_METHOD_NORMAL, MORPHING_METHOD_MCKERNEY};
+    public static final String[] MORPHING_METHODS = {MorphingMethod.NORMAL_METHOD.toString(), MorphingMethod.MCKERNEY_METHOD.toString()};
     
     public static final String CHART_TYPE_LABEL_STRING = "Chart type:";
     

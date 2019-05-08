@@ -41,6 +41,7 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jtstest.testbuilder.model.GeometryEditModel;
 import org.locationtech.jtstest.testbuilder.model.GeometryType;
+import org.locationtech.jtstest.testbuilder.morphing.MorphingMethod;
 
 /**
  *
@@ -531,7 +532,7 @@ public class AppCorrGeometries {
     }
     
     //returns an array with the wkt of the corr geometries in both panels (with original coords from tht corr file, wihtout
-    //correction to fit the screen
+    //correction to fit the screen)
     //index 0 contains the wkt string of the corr geometry in the left (first) panel 
     //index 1 contains the wkt string of the corr geometry in the right (second) panel 
     public String[] getWKTextFromGeometriesInPanels(){
@@ -541,6 +542,21 @@ public class AppCorrGeometries {
         
         //get geometry in the right panel
         Geometry g2 = getCorrGeometry(true);
+        String wkt2 = GeometryEditModel.getText(g2, GeometryType.WELLKNOWNTEXT);
+        
+        return new String[] {wkt1, wkt2};
+    }
+    
+    //returns an array with the wkt of the corr geometries in both panels (with corrected coords to fit the screen)
+    //index 0 contains the wkt string of the corr geometry in the left (first) panel 
+    //index 1 contains the wkt string of the corr geometry in the right (second) panel 
+    public String[] getWKTextFromGeometriesInPanelsScreenCoordinates(){
+        //get geometry in the left panel
+        Geometry g1 = getPanelCorrGeometry(false);
+        String wkt1 = GeometryEditModel.getText(g1, GeometryType.WELLKNOWNTEXT);
+        
+        //get geometry in the right panel
+        Geometry g2 = getPanelCorrGeometry(true);
         String wkt2 = GeometryEditModel.getText(g2, GeometryType.WELLKNOWNTEXT);
         
         return new String[] {wkt1, wkt2};
@@ -558,13 +574,13 @@ public class AppCorrGeometries {
     }
     
     
-    public void animation(String[] wktGeometry, MultiPolygon multiPolygon, boolean isPolygon) {
-        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, multiPolygon);
+    public void animation(String[] wktGeometry, MultiPolygon multiPolygon, boolean isPolygon, MorphingMethod morphingMethod) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, morphingMethod, multiPolygon);
         openMorphingGeometryFrame(mframe);
     }
     
-    public void animation(String[] wktGeometry, List<?> geomList, boolean isPolygon) {
-        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, geomList);
+    public void animation(String[] wktGeometry, List<?> geomList, boolean isPolygon, MorphingMethod morphingMethod) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, morphingMethod, geomList);
         openMorphingGeometryFrame(mframe);
     }
     
@@ -594,7 +610,7 @@ public class AppCorrGeometries {
     public void showMorphingGeometryInPanel(Polygon p){
         morphingPolygon.clear(); //remove any previous coordinates
         //store this coordinates to be redrawn on the first panel when panel repaint occurs
-        this.morphingPolygon = Arrays.asList(p.getCoordinates());
+        this.morphingPolygon = new ArrayList<>(Arrays.asList(p.getCoordinates()));
         morphingPolygon = this.correctCoordinates(morphingPolygon, JTSTestBuilderFrame.getGeometryEditPanel());
         this.showMorphingGeometry = true;
         morphingMultiPolygon.clear();//avoid conflicts with previous types of morphing geometry
@@ -606,7 +622,7 @@ public class AppCorrGeometries {
         morphingMultiPolygon.clear(); //remove any previous coordinates
         //store this coordinates to be redrawn on the first panel when panel repaint occurs
         for (int i = 0; i < mp.getNumGeometries(); i++){
-            List <Coordinate> polygonCoords = Arrays.asList(mp.getGeometryN(i).getCoordinates());
+            List <Coordinate> polygonCoords = new ArrayList<>(Arrays.asList(mp.getGeometryN(i).getCoordinates()));
             this.morphingMultiPolygon.add(polygonCoords);
         }
         

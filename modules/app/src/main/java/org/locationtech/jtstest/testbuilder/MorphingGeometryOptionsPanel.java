@@ -18,10 +18,13 @@ import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
 import jni_st_mesh.Main;
 import jni_st_mesh.TriangulationMethod;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jtstest.testbuilder.morphing.Morphing;
+import org.locationtech.jtstest.testbuilder.morphing.MorphingMethod;
 
 /**
  *
@@ -334,12 +337,11 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
     */
     private void startMorphing(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startMorphing
         // get wkt of the corr geometries in both panels.
-        
         String[] wkts;//first element is source, second is target geometry
         wkts = AppCorrGeometries.getInstance().getWKTextFromGeometriesInPanels();
         /*System.out.println("wkt 1st geometry: "+wkts[0]);
         System.out.println("wkt 2nd geometry: "+wkts[1]);*/
-        
+                
         String[] result = new String[1];
         
         //load c++ libraries
@@ -347,8 +349,8 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         Main m = new Main();
         
         //find which method to call:
-        String selectedMethod = this.instantOrPeriodComboBox.getSelectedItem().toString();
-        String selectedType = this.meshOrPolygonComboBox.getSelectedItem().toString();
+        String selectedTime = this.instantOrPeriodComboBox.getSelectedItem().toString();
+        String selectedGeomType = this.meshOrPolygonComboBox.getSelectedItem().toString();
         boolean duringPeriod = false;
         boolean isPolygon = false;
         //"POLYGON((0 0, 0 8, 2 8, 2 2, 4 2, 4 8, 6 8, 6 0))", "POLYGON((6 8, 6 0, 4 0, 4 6, 2 6, 2 0, 0 0, 0 8))"
@@ -367,35 +369,43 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         
         double initialTime = Double.parseDouble(initialTimeSpinner.getValue().toString());
         double threshold = Double.parseDouble(colinearThresholdSpinner.getValue().toString());
-        //System.out.println("initialTime: "+initialTime + "; colinearThreshold: "+threshold+ "cw: "+cw);
+        MorphingMethod morphingMethod = MorphingMethod.valueOf(this.methodSelectionComboBox.getSelectedItem().toString());
+
+        //TEMPORARY begin and end time values
+        Morphing morphing = new Morphing(wkts[0], wkts[1], 1000.0, 2000.0, morphingMethod);
+
         //send the data as input to the corresponding c++ function
-        if (selectedMethod.equals(AppStrings.AT_INSTANT_METHOD_STRING)){
+        if (selectedTime.equals(AppStrings.AT_INSTANT_METHOD_STRING)){
             duringPeriod = false;
             //polygon, at instant
-            if(selectedType.equals(AppStrings.POLY_STRING)){
+            if(selectedGeomType.equals(AppStrings.POLY_STRING)){
                 isPolygon = true;
-                
-                result[0] = m.at_instant_poly(1000.0, 2000.0, wkts[0], wkts[1], 
-                        initialTime, triangulationMethod, cw, threshold);
+                if (morphingMethod.equals(MorphingMethod.NORMAL_METHOD)){
+                    result[0] = morphing.morphingAtInstantPoly(initialTime, triangulationMethod, cw, threshold);
+                }
+                else if (morphingMethod.equals(MorphingMethod.MCKERNEY_METHOD)){
+                    result[0] = morphing.morphingMckerney(initialTime);
+                }
             }
             //mesh, at instant
-            else if(selectedType.equals(AppStrings.MESH_STRING)){
+            else if(selectedGeomType.equals(AppStrings.MESH_STRING)){
                 isPolygon = false;
-                result[0] = m.at_instant_mesh(1000.0, 2000.0, wkts[0], wkts[1], 
-                        initialTime, triangulationMethod, cw, threshold);
+                if (morphingMethod.equals(MorphingMethod.NORMAL_METHOD)){
+                    result[0] = morphing.morphingAtInstantMesh(initialTime, triangulationMethod, cw, threshold);
+                }
             }
             
         }
-        else if (selectedMethod.equals(AppStrings.DURING_PERIOD_METHOD_STRING)){
+        else if (selectedTime.equals(AppStrings.DURING_PERIOD_METHOD_STRING)){
             duringPeriod = true;
             
             double endTime = Double.parseDouble(endTimeSpinner.getValue().toString());
-            if(selectedType.equals(AppStrings.POLY_STRING)){
+            if(selectedGeomType.equals(AppStrings.POLY_STRING)){
                 //polygon, during period
                 isPolygon = true;
                 result = m.during_period_poly(1000.0, 2000.0, wkts[0], wkts[1], initialTime, endTime, 1000, triangulationMethod, cw, threshold);
             }
-            else if(selectedType.equals(AppStrings.MESH_STRING)){
+            else if(selectedGeomType.equals(AppStrings.MESH_STRING)){
                 //mesh, during period
                 isPolygon = false;
                 result = m.during_period_mesh(1000.0, 2000.0, wkts[0], wkts[1], initialTime, endTime, 1000, triangulationMethod, cw, threshold);
@@ -411,7 +421,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             //resultTextArea.setText(res);
             //draw the result of the morphing geometry in the left panel (1st panel) if is at instant
             // open new window with animation of morphing if is 2nd 
-            drawAndShowMorphingGeometry(result, duringPeriod, isPolygon);
+            drawAndShowMorphingGeometry(result, duringPeriod, isPolygon, morphingMethod);
             
             //enable the show morphing geometry in panel checkbox and check it
             showMorphedGeometryCheckBox.setEnabled(true);
@@ -429,7 +439,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_playBtnCaretPositionChanged
 
     //draw in the left panel (1st panel) the result of the morphing of a geometry
-    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod, boolean isPolygon){
+    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod, boolean isPolygon, MorphingMethod morphingMethod){
         WKTReader reader = new WKTReader();
 
         //set of geometries for each instant, showed in a new window
@@ -442,10 +452,10 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
 
                 try {
                     //array has length 1, with the multipolygon
-                    mPolygon = (MultiPolygon) reader.read(wktGeometry[0]);        			
+                    mPolygon = (MultiPolygon) reader.read(wktGeometry[0]);        
                 }catch(Exception e) {   }
 
-                AppCorrGeometries.getInstance().animation(wktGeometry, mPolygon, isPolygon);
+                AppCorrGeometries.getInstance().animation(wktGeometry, mPolygon, isPolygon, morphingMethod);
             }
             else{
                 
@@ -461,7 +471,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
                         }
 
                     }
-                    AppCorrGeometries.getInstance().animation(wktGeometry, pList, isPolygon);
+                    AppCorrGeometries.getInstance().animation(wktGeometry, pList, isPolygon, morphingMethod);
                 }
                 else{
                     //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
@@ -475,7 +485,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
                         }
 
                     }
-                    AppCorrGeometries.getInstance().animation(wktGeometry, mpList, isPolygon);
+                    AppCorrGeometries.getInstance().animation(wktGeometry, mpList, isPolygon, morphingMethod);
                 }
             }
         }

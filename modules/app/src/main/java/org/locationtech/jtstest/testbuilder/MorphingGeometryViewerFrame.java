@@ -39,6 +39,7 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jtstest.testbuilder.morphing.MorphingMethod;
 
 /**
  *This frame shows an animation of a geometry throught a period of time. It is possible to pause and play the animation
@@ -56,13 +57,15 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     
     private ChartMaker chartMaker;
     
+    private MorphingMethod morphingMethod;
     //temporary
     private String mesh1 = "MULTIPOLYGON (((924 618.5, 925.0000000596046 604.9166668355465, 928 597, 924 618.5)), ((925.0000000596046 604.9166668355465, 926.0000001192093 591.333333671093, 928 597, 925.0000000596046 604.9166668355465)), ((924.0000000596046 585.6666668355465, 926.0000001192093 591.333333671093, 925.0000000596046 604.9166668355465, 924.0000000596046 585.6666668355465)), ((914 583, 922 580, 924.0000000596046 585.6666668355465, 914 583)), ((924 618.5, 924.0000000298023 602.0833334177732, 925.0000000596046 604.9166668355465, 924 618.5)), ((924.0000000298023 602.0833334177732, 924.0000000596046 585.6666668355465, 925.0000000596046 604.9166668355465, 924.0000000298023 602.0833334177732)), ((913.3454177996489 583.9879156479267, 914 583, 924.0000000596046 585.6666668355465, 913.3454177996489 583.9879156479267)), ((909 576, 914 583, 913.3454177996489 583.9879156479267, 909 576)), ((946 640, 990 655, 963.6666669249535 647.5, 946 640)), ((937.3333338499069 640, 946 640, 959.3333334624767 647.5, 937.3333338499069 640)), ((928.6666669249535 640, 937.3333338499069 640, 959.3333334624767 647.5, 928.6666669249535 640)), ((913.3454177996489 583.9879156479267, 924.0000000298023 602.0833334177732, 893.1999313191997 574.3000686808003, 913.3454177996489 583.9879156479267)), ((959.3333334624767 647.5, 963.6666669249535 647.5, 990 655, 959.3333334624767 647.5)), ((946 640, 963.6666669249535 647.5, 959.3333334624767 647.5, 946 640)), ((909 576, 913.3454177996489 583.9879156479267, 893.1999313191997 574.3000686808003, 909 576)), ((955 647.5, 959.3333334624767 647.5, 949 781, 955 647.5)), ((928.6666669249535 640, 959.3333334624767 647.5, 955 647.5, 928.6666669249535 640)), ((920 640, 928.6666669249535 640, 955 647.5, 920 640)), ((810 642, 881 555, 886.5 563.5, 810 642)), ((892 572, 909 576, 893.1999313191997 574.3000686808003, 892 572)), ((886.5 563.5, 892 572, 893.1999313191997 574.3000686808003, 886.5 563.5)), ((804 736, 810 642, 955 647.5, 804 736)), ((823 766, 949 781, 926 812, 823 766)), ((949 781, 959.3333334624767 647.5, 990 655, 949 781)), ((810 642, 886.5 563.5, 893.1999313191997 574.3000686808003, 810 642)), ((823 766, 955 647.5, 949 781, 823 766)), ((804 736, 955 647.5, 823 766, 804 736)), ((810 642, 893.1999313191997 574.3000686808003, 920 640, 810 642)), ((810 642, 920 640, 955 647.5, 810 642)), ((893.1999313191997 574.3000686808003, 924.0000000298023 602.0833334177732, 920 640, 893.1999313191997 574.3000686808003)), ((913.3454177996489 583.9879156479267, 924.0000000596046 585.6666668355465, 924.0000000298023 602.0833334177732, 913.3454177996489 583.9879156479267)), ((920 640, 924.0000000298023 602.0833334177732, 924 618.5, 920 640)))";
     private String mesh2 = "MULTIPOLYGON (((926 812, 949 781, 964.346 816.418, 926 812)), ((823 766, 926 812, 834.664 878.198, 823 766)), ((804 736, 823 766, 787.52 767.454, 804 736)), ((810 642, 804 736, 725.596 683.804, 810 642)), ((881 555, 810 642, 770.158 537.014, 881 555)), ((886.5 563.5, 881 555, 891.111 554.487, 886.5 563.5)), ((892 572, 886.5 563.5, 896.611 562.987, 892 572)), ((909 576, 892 572, 903.964 559.278, 909 576)), ((914 583, 909 576, 917.562 575.17, 914 583)), ((922 580, 914 583, 915.402 574.572, 922 580)), ((924.0000000596046 585.6666668355465, 922 580, 927.9073335093856 581.1013333661556, 924.0000000596046 585.6666668355465)), ((926.0000001192093 591.333333671093, 924.0000000596046 585.6666668355465, 929.9073335689902 586.7680002017021, 926.0000001192093 591.333333671093)), ((928 597, 926.0000001192093 591.333333671093, 931.9073331004381 592.4346669387818, 928 597)), ((924 618.5, 928 597, 944.619 611.214, 924 618.5)), ((920 640, 924 618.5, 940.619 632.714, 920 640)), ((928.6666669249535 640, 920 640, 924.3333334624767 632.4946664429903, 928.6666669249535 640)), ((937.3333338499069 640, 928.6666669249535 640, 933.0000003874302 632.4946664429903, 937.3333338499069 640)), ((946 640, 937.3333338499069 640, 941.6666669249535 632.4946671140194, 946 640)), ((990 655, 946 640, 980.99 609.396, 990 655)), ((949 781, 990 655, 1078.616 753.506, 949 781)))";
     
-    private MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon) {
+    private MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod) {
         this.wktGeometry = wktGeometry;
         this.isPolygon = isPolygon;
+        this.morphingMethod = morphingMethod;
         chartMaker = new ChartMaker();
         Ststistics[] stats = Ststistics.values();
         initComponents();
@@ -73,10 +76,11 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      * @param wktGeometry - array with wkt as string with the geometry on the first panel and the wkt of the geometry
      * in the second panel
      * @param isPolygon
+     * @param morphingMethod
      * @param mp - the result of the morphing of the geometries as a multipolygon, each polygon in an instant
      */
-    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MultiPolygon mp) {
-        this(wktGeometry, isPolygon);
+    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod, MultiPolygon mp) {
+        this(wktGeometry, isPolygon, morphingMethod);
         this.morphingGeoPanel = new MorphingGeometryPanel(mp);
         startComponents();
         initMorphingPanel();
@@ -88,12 +92,11 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     /**
      * @param wktGeometry - array with wkt as string with the geometry on the first panel and the wkt of the geometry
      * in the second panel
-     * @param isMesh - if the geometry is going to be drawn as a polygon or a mesh of triangules
      * @param geometryList - the result of the morphing of the geometries as a list of multipolygon, or polygon
      * each multipolygon being a mesh of triangles in an instant or a polygon in each instant of time
      */
-    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, List<?> geometryList) {
-        this(wktGeometry, isPolygon);
+    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod, List<?> geometryList) {
+        this(wktGeometry, isPolygon, morphingMethod);
         this.morphingGeoPanel = new MorphingGeometryPanel(geometryList);
         startComponents();
         initMorphingPanel();
@@ -101,7 +104,6 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         if (isPolygon)
             showStatisticsInChart(metricsComboBox.getSelectedItem().toString(), chartTypeComboBox.getSelectedItem().toString());
     }
-    
     
     /**
      * This method is called from within the constructor to initialize the form.
