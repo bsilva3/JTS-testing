@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $HOME/secondo/OptParser/OptTest
+make
+# StartTest sqltest.test
+startOptTest sqltest.test

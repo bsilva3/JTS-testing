@@ -1,0 +1,207 @@
+/*
+ * HL-Readme
+ *
+ * In dieser Datei werden Kommandos und Queries aufgeführt,
+ *  um die HubLabelingAlgebra zu benutzen und zu testen.
+ * Für die meisten Funktionen existiert ein eigener Operator,
+ *  um die Funktionen einzeln in Secondo testen zu können.
+ * Kapitel und Unterkapitel, die mit "Debug only" oder als "Testcase" 
+ *  gekennzeichnet sind, dienen der Testausführung und sind nicht
+ * für die eigentliche Funktionalität erforderlich.
+ * Alle anderen Befehle sind soweit unter Berücksichtigung der Kommentare
+ *  auszuführen.
+ * Bei stehende Queries dienen der Überprüfung von Zwischenergebnissen.
+ *
+ * Diese Kommandos setzen einen vorhandenen Graphen voraus,
+ *  wie er durch das OSM-Import-Script erzeugt wird.
+ *
+ * Bitte auch beiliegende HubLabelin.spec und HubLabeling.examples beachten.
+ *
+ */
+
+/*
+ ********************************
+ * 1 - Vorbereitungen
+ ********************************
+ */
+
+ /*
+ * 1.1 Kanten reduzieren
+ */
+delete hlEdgesReducedOrelSource;
+let hlEdgesReducedOrelSource = Edges feed filter[
+	(.RoadType = "motorway") or (.RoadType = "motorway_link")
+ or (.RoadType = "trunk") or (.RoadType = "trunk_link")
+ or (.RoadType = "primary") or (.RoadType = "primary_link")
+ or (.RoadType = "secondary") or (.RoadType = "secondary_link")
+ or (.RoadType = "tertiary") or (.RoadType = "tertiary_link")
+ or (.RoadType = "road") or (.RoadType = "unclassified")
+ or (.RoadType = "residential") or (.RoadType = "living_street")
+]
+oconsume[Source];
+ 
+// or (.RoadType = "track") or (.RoadType = "pedestrian")
+// or (.RoadType = "service") or (.RoadType = "bus_guideway")
+// or (.RoadType = "escape") or (.RoadType = "raceway")
+
+
+/*
+ * 1.2 zusätzliche Felder Parent und Costs hinzufügen
+ */
+delete hlEdgesExtendedOrelSource;
+let hlEdgesExtendedOrelSource = hlEdgesReducedOrelSource feed
+ extend[Costs : 0.0]
+ extend[HlShortcutViaParent : -1]
+ oconsume[Source];
+
+//delete hlEdgesReducedOrelSource;
+
+
+
+/*
+ * 1.3 Kosten ermitteln
+ */
+delete hlEdgesOrelSource;
+let hlEdgesOrelSource = hlEdgesExtendedOrelSource;
+
+query hlCalcWeightsOrel(hlEdgesOrelSource, 1);
+
+//delete hlEdgesExtendedOrelSource;
+
+
+/*
+ * 1.3 Knotenmenge ermitteln
+ */
+delete hlNodesSourceOnlyOrel;
+let hlNodesSourceOnlyOrel =
+hlEdgesOrelSource feed extend[NodeId: .Source] project[NodeId]
+hlEdgesOrelSource feed extend[NodeId: .Target] project[NodeId]
+concat
+sortby[NodeId]
+krdup[NodeId]
+oconsume[NodeId];
+ 
+
+
+/*
+ ********************************
+ * 2 - Contraction
+ ********************************
+ */
+delete hlGraphOrel;
+let hlGraphOrel =
+hlDoContractionOfHlGraph(hlEdgesOrelSource, hlNodesSourceOnlyOrel, 2, 100, 0)
+feed oconsume[Source];
+/* erwartetes Ergebnis: Eine Darstellung eines kontrahierten HLGraphen mit Kanten und Shortcuts*/
+
+
+/*
+ ********************************
+ * 3 - CH Search
+ ********************************
+ */
+/*Dreierwalde*/
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 102, 747) feed consume;
+
+/*Reelkirchen*/
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 2365, 777) feed consume;
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 2365, 3933) feed consume;
+
+/*Bad Driburg*/
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 668, 38382) feed consume;
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 668, 32294) feed consume;
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 32294, 668) feed consume;
+
+/*
+ * Arnsberg
+ *
+ * Soest Wohngebiet (Konrad-Koler-Weg): 10635354
+ * Fernuni Hagen (Universitätsstraße): 2612894
+ * Dortmund-Lanstrup (Hutererweg): 8264971
+ */
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 10635354, 8264971) feed consume;
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 10635354, 2612894) feed consume;
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 10635354, 8264971) feed consume;
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 2612894, 8264971) feed consume;
+
+
+/*
+ * NRW
+ *
+ * min: 1912
+ * max: 59595922
+ */
+query hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 1912, 59595922) feed consume;
+
+
+
+
+
+/*
+ * Germany
+ *
+ * Ilseweg Paderborn: 736735944
+ * Böcklingstraße München: 195503889
+ */
+let hlQueryResult =
+hlDoChSearchInHlGraph(hlNodesSourceOnlyOrel, hlEdgesOrelSource, hlGraphOrel, 736735944, 195503889) feed consume;
+
+
+
+
+/*
+ ********************************
+ * 4 - Create HubLabels
+ ********************************
+ */
+ 
+/* 4.1 NestedRelation erzeugen */
+delete hlAllLabelsNrel;
+let hlAllLabelsNrel =
+hlCreateLabelsFromHlGraph(hlNodesSourceOnlyOrel, hlGraphOrel) feed consume;
+
+/* 4.2 BTree über NestedRelation erzeugen */
+delete hlAllLabelsNrel_SourceNodeId;
+let hlAllLabelsNrel_SourceNodeId = hlAllLabelsNrel feed extend[TmpTid: tupleid(.)] createbtree[SourceNodeId];
+
+
+
+
+/*
+ ********************************
+ * 5 - Do HL Search
+ ********************************
+ */
+/*Dreierwalde*/
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 102, 747, 1) feed consume;
+
+/*Reelkirchen*/
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 2365, 777, 1) feed consume;
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 2365, 3933, 1) feed consume;
+
+/*Bad Driburg*/
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 668, 38382, 1) feed consume;
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 668, 32294, 1) feed consume;
+
+/*
+ * Arnsberg
+ *
+ * Soest Wohngebiet (Konrad-Koler-Weg): 10635354
+ * Fernuni Hagen (Universitätsstraße): 2612894
+ * Dortmund-Lanstrup (Hutererweg): 8264971
+*/
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 10635354, 2612894, 1) feed consume;
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 10635354, 8264971, 1) feed consume;
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 2612894, 8264971, 1) feed consume;
+
+
+/*
+ * NRW
+ *
+ * min: 1912
+ * max: 59595922
+ */
+query hlQuery(hlAllLabelsNrel, hlAllLabelsNrel_SourceNodeId, hlEdgesOrelSource, hlGraphOrel, 1912, 59595922, 1) feed consume;
+
+
+

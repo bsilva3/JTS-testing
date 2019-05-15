@@ -1,0 +1,10 @@
+*.o
+*.a
+*.dep
+*.fm
+*.class
+OpSpec
+OpSpecParser.output
+OpSpecParser.tab.c
+OpSpecParser.tab.h
+lex.opspec.c

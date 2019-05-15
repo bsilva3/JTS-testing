@@ -23,7 +23,7 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
-import org.locationtech.jtstest.testbuilder.morphing.Morphing;
+import org.locationtech.jtstest.testbuilder.morphing.MorphingMckerney;
 import org.locationtech.jtstest.testbuilder.morphing.MorphingMethod;
 
 /**
@@ -371,8 +371,6 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         double threshold = Double.parseDouble(colinearThresholdSpinner.getValue().toString());
         MorphingMethod morphingMethod = MorphingMethod.valueOf(this.methodSelectionComboBox.getSelectedItem().toString());
 
-        //TEMPORARY begin and end time values
-        Morphing morphing = new Morphing(wkts[0], wkts[1], 1000.0, 2000.0, morphingMethod);
 
         //send the data as input to the corresponding c++ function
         if (selectedTime.equals(AppStrings.AT_INSTANT_METHOD_STRING)){
@@ -381,29 +379,43 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             if(selectedGeomType.equals(AppStrings.POLY_STRING)){
                 isPolygon = true;
                 if (morphingMethod.equals(MorphingMethod.NORMAL_METHOD)){
-                    result[0] = morphing.morphingAtInstantPoly(initialTime, triangulationMethod, cw, threshold);
+                    result[0] = m.at_instant_mesh(1000.0, 2000.0, wkts[0], wkts[1], 
+                        initialTime, triangulationMethod, cw, threshold);
                 }
                 else if (morphingMethod.equals(MorphingMethod.MCKERNEY_METHOD)){
-                    result[0] = morphing.morphingMckerney(initialTime);
+                    //TEMPORARY begin and end time values
+                    MorphingMckerney morphing = new MorphingMckerney(wkts[0], wkts[1], 1000.0, 2000.0, morphingMethod);
+                    result[0] = morphing.morphingMckerneyAtInstant(initialTime);
                 }
             }
             //mesh, at instant
             else if(selectedGeomType.equals(AppStrings.MESH_STRING)){
                 isPolygon = false;
                 if (morphingMethod.equals(MorphingMethod.NORMAL_METHOD)){
-                    result[0] = morphing.morphingAtInstantMesh(initialTime, triangulationMethod, cw, threshold);
+                    result[0] = m.at_instant_mesh(1000.0, 2000.0, wkts[0], wkts[1], 
+                        initialTime, triangulationMethod, cw, threshold);
                 }
             }
             
         }
+        //during period
         else if (selectedTime.equals(AppStrings.DURING_PERIOD_METHOD_STRING)){
             duringPeriod = true;
             
             double endTime = Double.parseDouble(endTimeSpinner.getValue().toString());
             if(selectedGeomType.equals(AppStrings.POLY_STRING)){
-                //polygon, during period
-                isPolygon = true;
-                result = m.during_period_poly(1000.0, 2000.0, wkts[0], wkts[1], initialTime, endTime, 1000, triangulationMethod, cw, threshold);
+                if (morphingMethod.equals(MorphingMethod.NORMAL_METHOD)){
+                    //normal method, polygon, during period
+                    isPolygon = true;
+                    result = m.during_period_poly(1000.0, 2000.0, wkts[0], wkts[1], initialTime, endTime, 1000, triangulationMethod, cw, threshold);
+                }
+                else if (morphingMethod.equals(MorphingMethod.MCKERNEY_METHOD)){
+                    //mkerney, polygon, during period
+                    isPolygon = true;
+                    //TEMPORARY begin and end time values
+                    MorphingMckerney morphing = new MorphingMckerney(wkts[0], wkts[1], 1000.0, 2000.0, morphingMethod);
+                    result = morphing.morphingMckerneyDuringPeriod(initialTime, endTime);
+                }
             }
             else if(selectedGeomType.equals(AppStrings.MESH_STRING)){
                 //mesh, during period

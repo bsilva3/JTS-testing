@@ -1,0 +1,10 @@
+*.o
+*.a
+*.dep
+*.fm
+*.class
+*.test.log
+proglogt.csv
+relalgtest.db
+tmp
+ftexttest

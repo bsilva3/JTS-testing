@@ -1,0 +1,180 @@
+# delete database mytestdb;
+
+#setup Forall2Test StandardAlgebra RelationAlgebra Temporal2Algebra
+create database mytestdb;
+
+# Here come: The tests
+
+# ================
+# Real Tests
+# ================
+
+# ==============================================================================
+# TypeConstructor MPoint2
+# ==============================================================================
+
+# ----------------------
+# -- anonymous object --
+# ----------------------
+
+#testcase open_db_1st_time
+#yields success
+open database mytestdb;
+
+# --------------------------------
+# -- variable assignement - let --
+# --------------------------------
+
+#testcase mpoint2_variable_undef_1
+#yields success
+let mm_var_undef = [const mpoint2 value undef];
+
+#testcase mpoint2_variable_2000_1
+#yields success
+let mm_var_2000 = [const mpoint2 value ((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0)))];
+
+#testcase mpoint2_variable_2000_2100_1
+#yields success
+let mm_var_2000_2100 = [const mpoint2 value ((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))(("2100-01-01" "2100-01-01-00:01" TRUE FALSE)(1.0 1.0 0.0 0.0)))];
+
+# ---------------------------
+# -- attribute in relation --
+# ---------------------------
+
+#testcase mpoint2_relation_undef_1
+#yields success
+let mm_rel_undef = [const rel(tuple([MMP: mpoint2])) value ((undef))];
+
+#testcase mpoint2_relation_2000_1
+#yields success
+let mm_rel_2000 = [const rel(tuple([MMP: mpoint2])) value (( ((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))) ))];
+
+#testcase mpoint2_relation_2000_2100_1
+#yields success
+let mm_rel_2000_2100 = [const rel(tuple([MMP: mpoint2])) value ((((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))(("2100-01-01" "2100-01-01-00:01" TRUE FALSE)(1.0 1.0 0.0 0.0)))))];
+
+# ----------------------------------------
+# -- variable assignement - let - check --
+# ----------------------------------------
+
+#testcase mpoint2_variable_undef_2
+#yields (mpoint2 undefined)
+query mm_var_undef;
+
+#testcase mpoint2_variable_2000_2
+#yields (mpoint2((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))))
+query mm_var_2000;
+
+#testcase mpoint2_variable_2000_2100_2
+#yields (mpoint2((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))(("2100-01-01" "2100-01-01-00:01" TRUE FALSE)(1.0 1.0 0.0 0.0))))
+query mm_var_2000_2100;
+
+
+# -----------------------------------
+# -- attribute in relation - check --
+# -----------------------------------
+
+#testcase mpoint2_relation_undef_2
+#yields ((rel (tuple ((MMP mpoint2)))) ((undefined)))
+query mm_rel_undef;
+
+#testcase mpoint2_relation_2000_2
+#yields ((rel(tuple((MMP mpoint2))))((((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))))))
+query mm_rel_2000;
+
+#testcase mpoint2_relation_2000_2100_2
+#yields ((rel(tuple((MMP mpoint2))))((((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))(("2100-01-01" "2100-01-01-00:01" TRUE FALSE)(1.0 1.0 0.0 0.0))))))
+query mm_rel_2000_2100;
+
+
+# --------------------------------------------------
+# -- sync with other instances -- do checks there --
+# --------------------------------------------------
+
+#testcase signal_other_do_check
+#yields (int 3)
+query barrier('check1', 3);
+
+#testcase wait_other_check_done
+#yields (int 3)
+query barrier('finish1', 3);
+
+# ------------------------------------------------------
+# -- do some dummy updates and let others check again --
+# ------------------------------------------------------
+
+#testcase close_update_open_db_3
+#yields success
+let dummy1 = [const mpoint2 value ((("2011-01-01" "2011-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0)))];
+
+#testcase close_update_open_db_4
+#yields success
+let dummy2 = [const mpoint2 value ((("2012-01-01" "2012-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0)))];
+
+#testcase close_update_open_db_5
+#yields success
+let dummy3 = [const mpoint2 value ((("2013-01-01" "2013-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0)))];
+
+#testcase close_update_open_db_6
+#yields success
+let dummy4 = [const mpoint2 value ((("2014-01-01" "2014-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0)))];
+
+#testcase close_update_open_db_7
+#yields success
+let dummy5 = [const mpoint2 value ((("2015-01-01" "2015-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0)))];
+
+
+# ----------------------------------------
+# -- variable assignement - let - check --
+# ----------------------------------------
+
+#testcase mpoint2_variable_undef_3
+#yields (mpoint2 undefined)
+query mm_var_undef;
+
+#testcase mpoint2_variable_2000_3
+#yields (mpoint2((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))))
+query mm_var_2000;
+
+#testcase mpoint2_variable_2000_2100_3
+#yields (mpoint2((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))(("2100-01-01" "2100-01-01-00:01" TRUE FALSE)(1.0 1.0 0.0 0.0))))
+query mm_var_2000_2100;
+
+
+# -----------------------------------
+# -- attribute in relation - check --
+# -----------------------------------
+
+#testcase mpoint2_relation_undef_3
+#yields ((rel (tuple ((MMP mpoint2)))) ((undefined)))
+query mm_rel_undef;
+
+#testcase mpoint2_relation_2000_3
+#yields ((rel(tuple((MMP mpoint2))))((((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))))))
+query mm_rel_2000;
+
+#testcase mpoint2_relation_2000_2100_3
+#yields ((rel(tuple((MMP mpoint2))))((((("2000-01-01" "2000-01-01-00:01" TRUE FALSE)(0.0 0.0 1.0 1.0))(("2100-01-01" "2100-01-01-00:01" TRUE FALSE)(1.0 1.0 0.0 0.0))))))
+query mm_rel_2000_2100;
+
+#testcase mpoint2_relation_invalid
+#yields error
+let mm_rel_invalid = [const rel(tuple([MMP: mpoint2])) value (( 123 ))];
+
+
+# --------------------------------------------------
+# -- sync with other instances -- do checks there --
+# --------------------------------------------------
+
+#testcase signal_other_do_check
+#yields (int 3)
+query barrier('check2', 3);
+
+#testcase wait_other_check_done
+#yields (int 3)
+query barrier('finish2', 3);
+
+
+#teardown
+close database;
+delete database mytestdb;

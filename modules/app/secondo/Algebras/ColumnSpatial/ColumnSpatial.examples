@@ -1,0 +1,92 @@
+Database : coltest
+Restore  : NO
+
+Operator : inside
+Number   : 1
+Signature: apoint x aregion -> longints
+Example  : query cp1 inside cr1
+Result   : (longints(1 2 3))
+
+Operator : inside
+Number   : 2
+Signature: aline x aregion -> longints
+Example  : query cl1 inside cr1
+Result   : (longints(0))
+
+Operator : contains
+Number   : 1
+Signature: aregion x apoint -> longints
+Example  : query cr1 contains cp1
+Result   : (longints(0 1))
+
+Operator : mp
+Number   : 1
+Signature: (stream(tuple) attribute) -> apoint
+Example  : query p1 feed mp[Ort]
+Result   : (apoint((1.0 3.0)(4.0 5.0)))
+
+Operator : mp
+Number   : 2
+Signature: (stream(tuple) attribute) -> aline
+Example  : query l1 feed mp[Verlauf]
+Result   : (aline(((3.0 4.0 7.0 8.0)(6.0 10.0 7.0 8.0))))
+
+Operator : mp
+Number   : 3
+Signature: (stream(tuple) attribute) -> aregion
+Example  : query r1 feed filter[.Name="region1"] mp[Gebiet]
+Result   : (aregion(((((3.0 1.0)(4.0 2.0)(3.0 4.0))))))
+
+Operator : mp
+Number   : 4
+Signature: (apoint int) -> point
+Example  : query cp1 mp[1]
+Result   : (point(4.0 5.0))
+
+Operator : mp
+Number   : 5
+Signature: (aline int) -> line
+Example  : query cl1 mp[1]
+Result   : (line((10.0 3.5 11.0 3.5)(11.0 3.5 12.0 4.5)))
+
+Operator : mp
+Number   : 6
+Signature: (aregion int) -> region 
+Example  : query cr1 mp[0]
+Result   : (region())
+
+Operator : count
+Number   : 1
+Signature: apoint -> int 
+Example  : query cp1 count
+Result   : (int 7)
+
+Operator : count
+Number   : 2
+Signature: aline -> int 
+Example  : query cl1 count
+Result   : (int 2)
+
+Operator : count
+Number   : 3
+Signature: aregion -> int 
+Example  : query cr1 count
+Result   : (int 2)
+
+Operator : +
+Number   : 1
+Signature: (apoint apoint) -> apoint 
+Example  : query cp2 + cp3
+Result   : (apoint((1.0 2.0)(3.0 4.0)(5.0 6.0)))
+
+Operator : +
+Number   : 2
+Signature: (aline aline) -> aline 
+Example  : query (cl1 + cl2) count
+Result   : (int 3)
+
+Operator : showarray
+Number   : 1
+Signature: (apoint) -> array 
+Example  : query cp1 showarray
+Result   : (bool TRUE)

@@ -1,0 +1,10 @@
+*.o
+*.a
+*.dep
+*.fm
+*.class
+artpics2rel.log
+checkImage
+paintings
+www.ibiblio.org
+

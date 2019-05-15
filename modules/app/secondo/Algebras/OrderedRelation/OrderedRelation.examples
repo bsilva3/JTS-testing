@@ -1,0 +1,46 @@
+Database : berlintest
+Restore  : NO
+
+Operator : oleftrange
+Number   : 1
+Signature: (orel (tuple (a1:t1,a2:t2,...,an:tn)) (ai1 ai2 ... ain)) x (ti1 ti2) -> (stream (tuple X))
+Example  : query (Orte feed oconsume[BevT] oleftrange[100] count) = (Orte feed filter[.BevT <= 100] count)
+Result   : TRUE
+
+Operator : orightrange
+Number   : 1
+Signature: (orel (tuple (a1:t1,a2:t2,...,an:tn)) (ai1 ai2 ... ain)) x (ti1 ti2) -> (stream (tuple X))
+Example  : query (Orte feed oconsume[BevT] orightrange[1000] count) = (Orte feed filter[.BevT >= 1000] count)
+Result   : TRUE
+
+Operator : orange
+Number   : 1
+Signature: (orel (tuple (a1:t1,a2:t2,...,an:tn)) (ai1 ai2 ... ain)) x (ti1 ti2) -> (stream (tuple X))
+Example  : query (Orte feed oconsume[BevT] orange[500;800] count) = (Orte feed filter[.BevT>= 500] filter[.BevT <= 800] count)
+Result   : TRUE
+
+Operator : oshortestpathd
+Number   : 1
+Signature: (orel (tuple (a1:t1,a2:t2,...,an:tn)) (ai1)) x int x int x int x (tuple->real) -> stream(tuple(a1:t1,...an+1:tn+1))
+Example  : query otestrel oshortestpathd [1,3,0; distance(.GeoData_s1,.GeoData_s2)] consume;
+Result   : file
+
+Operator : oshortestpatha
+Number   : 1
+Signature: (orel (tuple (a1:t1,a2:t2,...,an:tn)) (ai1)) x int x int x int x (tuple->real) x (tuple->real)-> stream(tuple(a1:t1,...an+1:tn+1))
+Example  : query otestrel oshortestpatha [1,3, 0; distance(.GeoData_s1,.GeoData_s2),distance(.GeoData_s1,.GeoData_s2) * 0.0] consume;
+Result   : file
+
+Operator : getotuples
+Number   : 1
+Signature : stream(tuple) x orel(X) -> stream(X)
+Example   : query otestrel feed krduph[Id_s1,Id_s2] otestrel getotuples count = otestrel count 
+Result    : TRUE
+
+Operator  : getotuples2
+Number    : 1
+Signature : stream(tuple(A (TID tid) B ) x rel(C) x orel(D) -> stream(tuple(A@B@C\Keyset(D)@D))
+Example   : query otestrelAux_Box_rtree windowintersectsS[bbox(thecenter)]  extend[ID_s0 : 31] otestrelAux  otestrel getotuples2 count
+Result    : 44 
+
+

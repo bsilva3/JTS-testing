@@ -1,0 +1,117 @@
+Database : pregelexample
+Restore  : No
+
+Operator  : closePregelConnections
+Number    : 1
+Signature : -> int
+Example   : query closePregelConnections()
+Result    : 0
+
+Operator : messageDistribute
+Number   : 1
+Signature: stream(tuple) x int -> bool
+Example  : query ten messageDistribute;
+Result   : unpredictable
+Remark   : The operator requires the message type to be initialized
+
+Operator : messageFeed
+Number   : 1
+Signature: () -> bool
+Example  : query messageFeed();
+Result   : unpredictable
+Remark   : The operator requires the message type to be initialized
+
+Operator : startMessageClient
+Number   : 1
+Signature: int x string x int -> bool
+Example  : query startMessageClient(1, "localhost", 1445);
+Result   : FALSE
+
+Operator : startMessageServer
+Number   : 1
+Signature: int -> bool
+Example  : query startMessageServer(1446);
+Result   : TRUE
+
+Operator : setupPregel
+Number   : 1
+Signature: rel(tuple) -> bool;
+Example  : query setupPregel(Workers);
+Result   : FALSE
+
+Operator : initPregelMessages
+Number   : 1
+Signature: stream(tuple) -> bool
+Example  : query Messages feed  initPregelMessages;
+Result   : unpredictable
+Remark   : The operator requires the message type to be initialized
+
+Operator : expectPregelMessages
+Number   : 1
+Signature: () -> bool
+Example  : query expectPregelMessages();
+Result   : TRUE
+
+Operator : setPregelFunction
+Number   : 1
+Signature: map(stream(tuple), stream(tuple)) x symbol -> bool
+Example  : query setPregelFunction(fun (messages: stream(tuple([Id: int]))) (messages project[Id]), Id);
+Result   : FALSE
+
+Operator : setPregelFunctionWorker
+Number   : 1
+Signature: map(stream(tuple), stream(tuple)) x int -> bool
+Example  : query setPregelFunctionWorker(fun (messages: stream(tuple([Id: int]))) (messages project[Id]), Id);
+Result   : FALSE
+
+Operator : startPregel
+Number   : 1
+Signature: int -> bool
+Example  : query startPregel(15);
+Result   : FALSE
+
+Operator : resetPregel
+Number   : 1
+Signature: () -> bool
+Example  : query resetPregel();
+Result   : TRUE
+
+Operator : pregelStatus
+Number   : 1
+Signature: () -> text
+Example  : query pregelStatus() contains 'Messages';
+Result   : TRUE
+
+Operator : pregelStatus2
+Number   : 1
+Signature: () -> rel 
+Example  : query pregelStatus2() count > -1;
+Result   : TRUE
+
+Operator : startPregelWorker
+Number   : 1
+Signature: int -> bool
+Example  : query startPregelWorker(10);
+Result   : FALSE
+
+Operator : startLoopbackMessageClient
+Number   : 1
+Signature: int -> bool
+Example  : query startLoopbackMessageClient(-1);
+Result   : FALSE
+
+Operator : remotePregelCommand
+Number   : 1
+Signature: text -> bool
+Example  : query remotePregelCommand('list objects');
+Result   : unpredictable
+Remark   : The operator requires the pregel system to be initialized with setupPregel(...)
+
+
+Operator  : getPregelMessages
+Number    : 1
+Signature : -> stream(tuple)
+Example   : query getPregelMessages()
+Result    : unpredictable
+Remark    : The operator requires the pregel system to be initialized with setupPregel(...)
+

@@ -1,0 +1,32 @@
+# Parallel sorting for darrays
+#
+# Adapt name of darray: CityNodesB0
+# Adapt attribute: 	NodeId
+
+let Size = CityNodesB0 dmap["", . count] getValue tie[. + ..];
+
+# let NSlots = size(CityNodesB0);
+let Fraction = (Size div NSlots) div 500;
+
+query share("Fraction", TRUE, Workers);
+
+let Boundaries = CityNodesB0 dmap["", . feedNth[Fraction, FALSE] 
+  project[NodeId]] dsummarize sort nth[500, TRUE] addcounter[D, 1]
+  consume
+
+query share("Boundaries", TRUE, Workers)
+
+query CityNodesB0 dmap["", Boundaries feed letmconsume["Boundaries"] 
+  mcreateAVLtree[NodeId] ]
+
+query Boundaries feed letmconsume["Boundaries"] 
+  mcreateAVLtree[NodeId] 
+
+let CityNodesSortedNodeIdA = CityNodesB0
+  partition["", pwrap("Boundaries_NodeId") pwrap("Boundaries") 
+    matchbelow2[.NodeId, D, 0],  0] 
+
+let CityNodesSortedNodeId = CityNodesSortedNodeIdA
+  areduce["", . feed sortby[NodeId], 1238] 
+
+

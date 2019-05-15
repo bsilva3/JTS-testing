@@ -1,0 +1,9 @@
+*.o
+*.a
+*.dep
+*.fm
+*.class
+OpSigParser.output
+OpSigParser.tab.c
+OpSigParser.tab.h
+lex.opsig.c

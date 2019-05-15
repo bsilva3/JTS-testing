@@ -136,7 +136,7 @@ funções do morphing a chamar:
 Algebras\ColumnMoving\Sources\MRegions.h # AtInstant (ver os parametros de input e como chamar)
 inputs de tempo: temporal
 inputs das geometrias: spatial.
-
+------------------------------
 - bugs:
 	- show morphing geometry: se existir zoom a geometria nao fica corretamente alinhada na imagem
 	- ao editar um vertice, a geometria desloca-se e deixa de estar alinhada com a imagem de fundo!
