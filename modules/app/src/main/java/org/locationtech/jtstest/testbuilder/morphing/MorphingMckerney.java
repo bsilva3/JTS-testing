@@ -1,13 +1,16 @@
 package org.locationtech.jtstest.testbuilder.morphing;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jni_st_mesh.Main;
@@ -47,29 +50,58 @@ public class MorphingMckerney {
         //String p2 = "POLYGON ((257.568359375 224.9734375, 261.962890625 221.06510416666669, 269.53125 206.653125, 268.798828125 198.83645833333333, 270.01953125 193.70677083333334, 276.611328125 188.3328125, 281.25 177.09635416666669, 279.296875 171.47812499999998, 283.69140625 158.77604166666669, 285.15625 145.82968749999998, 276.611328125 139.96718750000002, 273.681640625 140.94427083333335, 267.578125 151.20364583333333, 267.08984375 155.84479166666665, 263.18359375 160.24166666666667, 260.986328125 159.753125, 251.46484375 167.56979166666667, 243.1640625 188.57708333333335, 235.83984375 198.83645833333333, 225.09765625 217.40104166666669, 213.623046875 244.51510416666667, 207.03125 269.43072916666665, 220.458984375 276.75885416666665, 225.5859375 274.5604166666667, 228.759765625 268.69791666666663, 239.013671875 261.85833333333335, 244.384765625 255.26302083333334, 257.568359375 224.9734375))";
         //System.out.println(this.geometry1);
         //System.out.println(this.geometry2);
+        List<Coordinate> coordinates = new ArrayList<>();
         StringBuilder output = new StringBuilder();
         String sep = System.getProperty("file.separator");
         //call python script
-        ProcessBuilder pb = new ProcessBuilder("python","pyspatiotemporalgeom" + sep + "mckerney.py", geometry1, geometry2, (int)beginTime+"", (int)endTime+"", (int)queryTime+"");
+        ProcessBuilder pb = new ProcessBuilder("python","pyspatiotemporalgeom" + sep + "mckerney2.py", geometry1, geometry2, (int)beginTime+"", (int)endTime+"", (int)queryTime+"");
         try {
             Process p = pb.start();
             BufferedReader reader =  new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-            String line;
+            /*String line;
             while ((line = reader.readLine())!= null) {
                 output.append(line).append("\n");
-            }
+            }*/
+            BufferedReader br = new BufferedReader(new FileReader("wkt.txt"));
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+            List<String> lines = new ArrayList<>();
+            while (line != null) {
+                    sb.append(line);
+                    lines.add(line);
+                    sb.append(System.lineSeparator());
+                    line = br.readLine();
+                }
+                String everything = sb.toString();
+                String [] wktLine = lines.get(0).split(" = ");
+                //for (String s : wktLine){//for each line
+                    String s = wktLine[1].replace("[", "");
+                    System.out.println("->"+s);
+                    s = s.replace(";];", "");
+                    String[] coordsList = s.split("; ");//get list of coordinates
+                    for (String c : coordsList){
+                        String[] point = c.split(", ");
+                        //convert to coordinate
+                        coordinates.add(new Coordinate(Double.parseDouble(point[0]), Double.parseDouble(point[1])));
+                    }
+                //}
         } catch (IOException ex) {
             Logger.getLogger(MorphingMckerney.class.getName()).log(Level.SEVERE, null, ex);
         }
+        Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
+        coordinates.toArray(coordinateArray); // fill the array
+        Polygon p = new GeometryFactory().createPolygon(coordinateArray);
+        System.out.println(p.toText());
+        return p.toText();
         //receive morphing result. It's a list of line segment format, so we must convert it to wkt
-        return parseMorphingResultInstant(output.toString());
+        //return parseMorphingResultInstant(output.toString());
     }
     
     public String parseMorphingResultInstant(String result){
-        /*System.out.println("-->"+result);
         String coords;
-        try{
+        System.out.println("result _> "+result);
+        /*try{
             String[] resultSplit = result.split("F: 1: ");
             coords = resultSplit[1].split(";")[0];
             if (resultSplit.length > 1){
@@ -90,7 +122,8 @@ public class MorphingMckerney {
             return null;
         }*/
         String coord = null;
-        String[] resultSplit = result.split("result");
+        //String[] resultSplit = result.split("result");
+        String[] resultSplit = result.split("segs:  ");
         coord = resultSplit[1];
         System.out.println("-> "+ coord);
         return listSegmentToWKT(coord);
@@ -107,10 +140,11 @@ public class MorphingMckerney {
         //String p2 = "POLYGON ((257.568359375 224.9734375, 261.962890625 221.06510416666669, 269.53125 206.653125, 268.798828125 198.83645833333333, 270.01953125 193.70677083333334, 276.611328125 188.3328125, 281.25 177.09635416666669, 279.296875 171.47812499999998, 283.69140625 158.77604166666669, 285.15625 145.82968749999998, 276.611328125 139.96718750000002, 273.681640625 140.94427083333335, 267.578125 151.20364583333333, 267.08984375 155.84479166666665, 263.18359375 160.24166666666667, 260.986328125 159.753125, 251.46484375 167.56979166666667, 243.1640625 188.57708333333335, 235.83984375 198.83645833333333, 225.09765625 217.40104166666669, 213.623046875 244.51510416666667, 207.03125 269.43072916666665, 220.458984375 276.75885416666665, 225.5859375 274.5604166666667, 228.759765625 268.69791666666663, 239.013671875 261.85833333333335, 244.384765625 255.26302083333334, 257.568359375 224.9734375))";
         //System.out.println(this.geometry1);
         //System.out.println(this.geometry2);
+        List<String> wkts = new ArrayList<>();
         StringBuilder output = new StringBuilder();
         String sep = System.getProperty("file.separator");
         //call python script
-        ProcessBuilder pb = new ProcessBuilder("python","pyspatiotemporalgeom" + sep + "mckerney.py", geometry1, geometry2, (int)beginTime+"", (int)endTime+"", (int)queryTimeBegin+"", (int)queryTimeEnd+"");
+        ProcessBuilder pb = new ProcessBuilder("python","pyspatiotemporalgeom" + sep + "mckerney2.py", geometry1, geometry2, (int)beginTime+"", (int)endTime+"", (int)queryTimeBegin+"", (int)queryTimeEnd+"");
         try {
             Process p = pb.start();
             BufferedReader reader =  new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -119,11 +153,69 @@ public class MorphingMckerney {
             while ((line = reader.readLine())!= null) {
                 output.append(line).append("\n");
             }
+            //System.out.println("output -> "+output);
+            BufferedReader br = new BufferedReader(new FileReader("wkt.txt"));
+            StringBuilder sb = new StringBuilder();
+            line = br.readLine();
+            List<String> lines = new ArrayList<>();
+            while (line != null) {
+                    sb.append(line);
+                    lines.add(line);
+                    sb.append(System.lineSeparator());
+                    line = br.readLine();
+                }
+            
+            for (int i = 0; i < lines.size(); i++){
+                List<Coordinate> coordinates = new ArrayList<>();
+                List<Coordinate> coordinatesEX = new ArrayList<>();
+                String [] wktLine = lines.get(i).split(" = ");
+                String s = wktLine[1].replace("[", "");
+                System.out.println("->"+s);
+                s = s.replace(";];", "");
+                String[] coordsList = s.split("; ");//get list of coordinates
+                for (String c : coordsList){
+                    String[] point = c.split(", ");
+                    //convert to coordinate
+                    coordinates.add(new Coordinate(Double.parseDouble(point[0]), Double.parseDouble(point[1])));
+                }
+                //remove collinear points
+                /*for (int j = 0; j < coordinates.size()-2; j++){
+                    double p1x = coordinates.get(j).x;
+                    double p1y = coordinates.get(j).y;
+
+                    double p2x = coordinates.get(j+1).x;
+                    double p2y = coordinates.get(j+1).y;
+
+                    double p3x = coordinates.get(j+2).x;
+                    double p3y = coordinates.get(j+2).y;
+                    
+                    if (p2x - p1x != 0 && p3x - p1x != 0){
+                        double s1 = (p2y - p1y) / (p2x - p1x);
+                        double s2 = (p3y - p1y) / (p3x - p1x);
+                        if (s1!= s2){
+                            coordinatesEX.add(coordinates.get(j+1));
+                        }
+                    }
+                    else if (!(p2x - p1x == 0 && p3x - p1x == 0)){
+                        coordinatesEX.add(coordinates.get(j+1));
+                    }
+                    
+                }*/
+                //convert to polygon and then wkt
+                Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
+                coordinates.toArray(coordinateArray); // fill the array
+                coordinateArray[coordinateArray.length-1] = coordinateArray[0];
+                Polygon pol = new GeometryFactory().createPolygon(coordinateArray);
+                System.out.println(pol.toText());
+                wkts.add(pol.toText());
+            }
         } catch (IOException ex) {
             Logger.getLogger(MorphingMckerney.class.getName()).log(Level.SEVERE, null, ex);
         }
         //receive morphing result. It's a list of line segment format, so we must convert it to wkt
-        return parseMorphingResultPeriod(output.toString());
+        String[] wktsArray = new String[wkts.size()];
+        wkts.toArray(wktsArray); // fill the array
+        return wktsArray;
     }
     
     
@@ -162,9 +254,9 @@ public class MorphingMckerney {
     public static Coordinate[] listSegmentToCoordinateList(String listSegment){
         listSegment = listSegment.split("\\[")[1].split("\\]")[0];
         String[] listOfSegments = listSegment.split(", ");
-        //System.out.println("list of segments: "+ Arrays.toString(listOfSegments));
-        //Map<Coordinate, Coordinate> coords = new HashMap<>();
-        /*for (int i = 3; i < listOfSegments.length; i+=4){
+        System.out.println("list of segments: "+ Arrays.toString(listOfSegments));
+        Map<Coordinate, Coordinate> coords = new HashMap<>();
+        for (int i = 3; i < listOfSegments.length; i+=4){
             //split to remove parenthesis and then get each number of the coordinate
             String xCoordPoint1 = listOfSegments[i-3].split("[\\)\\(]+")[1];
             String yCoordPoint1 = listOfSegments[i-2].split("[\\)\\(]+")[0];
@@ -173,12 +265,12 @@ public class MorphingMckerney {
             String yCoordPoint2 = listOfSegments[i].split("[\\)\\(]+")[0];
             
             Coordinate c1 = new Coordinate(Double.parseDouble(xCoordPoint1), Double.parseDouble(yCoordPoint1));
-            Coordinate c2 = new Coordinate(Double.parseDouble(xCoordPoint2), Double.parseDouble(yCoordPoint2));*/
+            Coordinate c2 = new Coordinate(Double.parseDouble(xCoordPoint2), Double.parseDouble(yCoordPoint2));
             //do not add colinear points
             /*if (c1.equals2D(c2)){
                 continue;
             }*/
-            /*coords.put(c1 , c2);
+            coords.put(c1 , c2);
         }
         Coordinate[] coordsOrdered = new Coordinate[coords.size()+1];
         coordsOrdered[0] = coords.keySet().stream().findFirst().get();
@@ -188,22 +280,26 @@ public class MorphingMckerney {
             System.out.println("point: "+c);
             coordsOrdered[nPointsProcessed] = coords.get(c);
             nPointsProcessed++;
-        }*/
+        }
         //close polygon:
-        //coordsOrdered[coords.size()] = coordsOrdered[0];
-        List<Coordinate> segments = new ArrayList<>();
+        coordsOrdered[coords.size()] = coordsOrdered[0];
+        return coordsOrdered;
+        /*//List<Coordinate> segments = new ArrayList<>();
+        Set<Coordinate> coordinates = new LinkedHashSet<>();
+        //ou usar List e manter os repetidos..
         for (int i = 1; i < listOfSegments.length; i+=2){
             String x = listOfSegments[i-1].split("[\\)\\(]+")[1];
             String y = listOfSegments[i].split("[\\)\\(]+")[0];
             
             Coordinate c1 = new Coordinate(Double.parseDouble(x), Double.parseDouble(y));
-            segments.add(c1);
+            coordinates.add(c1);
         }
+        
+        Coordinate[] coordsList = new Coordinate[coordinates.size()+1];//account that we have to close the polygon
+        coordsList = coordinates.toArray(coordsList);
         //close polygon:
-        segments.add(segments.get(0));
-        Coordinate[] coordsList = new Coordinate[segments.size()];
-        coordsList = segments.toArray(coordsList);
-        return coordsList;
+        coordsList[coordsList.length-1]=coordsList[0];
+        return coordsList;*/
     }
     
     public String listSegmentToWKT(String listSegment){

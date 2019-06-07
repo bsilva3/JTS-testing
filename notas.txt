@@ -143,3 +143,11 @@ inputs das geometrias: spatial.
 	-no 2º painel, por vezes o zoom deixa de funcionar
 	-streampolygon e polygon desaparecem apos uma ação qualquer
 
+
+Algebras-> region interpolation -> librip tem um readme 
+RegionInterpolation.. #interpolate2valmap
+cria interpolação dado intervalo e src e target (representado com RList) 
+depois converter RList para objeto MRgions e aí chamar instant (linhas 11-121)
+
+
+librip -> lib -> interpolate.cpp#regionInterpolate
