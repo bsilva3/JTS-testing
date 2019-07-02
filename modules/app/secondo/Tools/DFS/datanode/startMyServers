@@ -1,3 +1,0 @@
-for i in {4445..4448}; do startnode $i  ; done
-
-

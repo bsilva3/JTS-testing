@@ -15,6 +15,8 @@ https://pypi.org/project/pyspatiotemporalgeom/
 Download:
 https://bitbucket.org/marmcke/pyspatiotemporalgeom/downloads/
 
+pip install geomet (livraria que facilita a conversão do output do McKenney para wkt)
+
 
 - modulo jts-app contém a gui
 - modulo test contem o test runner (um programa que permite carregar fihceiros .wkt e apresentar a geometria neles definida
@@ -128,6 +130,13 @@ sobre um ponto da geometria, aparecerá no ponto correspondente a essa coordenada
 	- desenhar a geometria morphed com uma cor diferente
 	- problema na forma como se desenha as geometrias
 	- Nao desenhar graficos de area quando temos mesh!
+
+	-Multipolygon parece nao ser mais usado (apenas lista de polygon e lista de multipolygon)
+	-acabar reintegraçao estatisticas ( e algum refactoring) (para estatisticas usar compare_geometries e numerical_metric,
+	nao usar ststistics ou quality_measures
+	-estatisticas: metodo compare_geometries: primeiro colocar 2 geometrias no painel de 
+	morph com 2 algoritmos diferentes a fim de comparar.
+	- integreçao secondo (usar cdg rogerio ou jose, mas jose tem parsing (e usa jars) e faz de modo mais eficiente a chamada ao secondo (cria 1x o objeto)
 
  - area e perimetro ao selecionar 
 

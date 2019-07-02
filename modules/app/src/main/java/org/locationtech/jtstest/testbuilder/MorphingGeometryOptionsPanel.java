@@ -19,6 +19,7 @@ import javax.swing.SpinnerNumberModel;
 import jni_st_mesh.Main;
 import jni_st_mesh.TriangulationMethod;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
@@ -29,6 +30,8 @@ import org.locationtech.jtstest.testbuilder.morphing.MorphingMethod;
 /**
  *
  * @author Bruno Silva
+ * 
+ * 
  */
 public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
      
@@ -36,9 +39,8 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
      * Creates new form MorphingGeometryOptionsPanel
      */
     
-    private String mesh1 = "MULTIPOLYGON (((924 618.5, 925.0000000596046 604.9166668355465, 928 597, 924 618.5)), ((925.0000000596046 604.9166668355465, 926.0000001192093 591.333333671093, 928 597, 925.0000000596046 604.9166668355465)), ((924.0000000596046 585.6666668355465, 926.0000001192093 591.333333671093, 925.0000000596046 604.9166668355465, 924.0000000596046 585.6666668355465)), ((914 583, 922 580, 924.0000000596046 585.6666668355465, 914 583)), ((924 618.5, 924.0000000298023 602.0833334177732, 925.0000000596046 604.9166668355465, 924 618.5)), ((924.0000000298023 602.0833334177732, 924.0000000596046 585.6666668355465, 925.0000000596046 604.9166668355465, 924.0000000298023 602.0833334177732)), ((913.3454177996489 583.9879156479267, 914 583, 924.0000000596046 585.6666668355465, 913.3454177996489 583.9879156479267)), ((909 576, 914 583, 913.3454177996489 583.9879156479267, 909 576)), ((946 640, 990 655, 963.6666669249535 647.5, 946 640)), ((937.3333338499069 640, 946 640, 959.3333334624767 647.5, 937.3333338499069 640)), ((928.6666669249535 640, 937.3333338499069 640, 959.3333334624767 647.5, 928.6666669249535 640)), ((913.3454177996489 583.9879156479267, 924.0000000298023 602.0833334177732, 893.1999313191997 574.3000686808003, 913.3454177996489 583.9879156479267)), ((959.3333334624767 647.5, 963.6666669249535 647.5, 990 655, 959.3333334624767 647.5)), ((946 640, 963.6666669249535 647.5, 959.3333334624767 647.5, 946 640)), ((909 576, 913.3454177996489 583.9879156479267, 893.1999313191997 574.3000686808003, 909 576)), ((955 647.5, 959.3333334624767 647.5, 949 781, 955 647.5)), ((928.6666669249535 640, 959.3333334624767 647.5, 955 647.5, 928.6666669249535 640)), ((920 640, 928.6666669249535 640, 955 647.5, 920 640)), ((810 642, 881 555, 886.5 563.5, 810 642)), ((892 572, 909 576, 893.1999313191997 574.3000686808003, 892 572)), ((886.5 563.5, 892 572, 893.1999313191997 574.3000686808003, 886.5 563.5)), ((804 736, 810 642, 955 647.5, 804 736)), ((823 766, 949 781, 926 812, 823 766)), ((949 781, 959.3333334624767 647.5, 990 655, 949 781)), ((810 642, 886.5 563.5, 893.1999313191997 574.3000686808003, 810 642)), ((823 766, 955 647.5, 949 781, 823 766)), ((804 736, 955 647.5, 823 766, 804 736)), ((810 642, 893.1999313191997 574.3000686808003, 920 640, 810 642)), ((810 642, 920 640, 955 647.5, 810 642)), ((893.1999313191997 574.3000686808003, 924.0000000298023 602.0833334177732, 920 640, 893.1999313191997 574.3000686808003)), ((913.3454177996489 583.9879156479267, 924.0000000596046 585.6666668355465, 924.0000000298023 602.0833334177732, 913.3454177996489 583.9879156479267)), ((920 640, 924.0000000298023 602.0833334177732, 924 618.5, 920 640)))";
-    private String mesh2 = "MULTIPOLYGON (((926 812, 949 781, 964.346 816.418, 926 812)), ((823 766, 926 812, 834.664 878.198, 823 766)), ((804 736, 823 766, 787.52 767.454, 804 736)), ((810 642, 804 736, 725.596 683.804, 810 642)), ((881 555, 810 642, 770.158 537.014, 881 555)), ((886.5 563.5, 881 555, 891.111 554.487, 886.5 563.5)), ((892 572, 886.5 563.5, 896.611 562.987, 892 572)), ((909 576, 892 572, 903.964 559.278, 909 576)), ((914 583, 909 576, 917.562 575.17, 914 583)), ((922 580, 914 583, 915.402 574.572, 922 580)), ((924.0000000596046 585.6666668355465, 922 580, 927.9073335093856 581.1013333661556, 924.0000000596046 585.6666668355465)), ((926.0000001192093 591.333333671093, 924.0000000596046 585.6666668355465, 929.9073335689902 586.7680002017021, 926.0000001192093 591.333333671093)), ((928 597, 926.0000001192093 591.333333671093, 931.9073331004381 592.4346669387818, 928 597)), ((924 618.5, 928 597, 944.619 611.214, 924 618.5)), ((920 640, 924 618.5, 940.619 632.714, 920 640)), ((928.6666669249535 640, 920 640, 924.3333334624767 632.4946664429903, 928.6666669249535 640)), ((937.3333338499069 640, 928.6666669249535 640, 933.0000003874302 632.4946664429903, 937.3333338499069 640)), ((946 640, 937.3333338499069 640, 941.6666669249535 632.4946671140194, 946 640)), ((990 655, 946 640, 980.99 609.396, 990 655)), ((949 781, 990 655, 1078.616 753.506, 949 781)))";
-    
+    private int beginTime = 1000;
+    private int endTime = 2000;
     public MorphingGeometryOptionsPanel() {
         initComponents();
 
@@ -51,10 +53,13 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         this.triangulationLabel.setText(AppStrings.TRIANGULATION_LABEL_STRING);
         this.orientationLabel.setText(AppStrings.VERTICE_ORIENTATION_LABEL_STRING);
         this.methodSelection.setText(AppStrings.METHOD_SELECTION_LABEL_STRING);
+        this.numSamplesLabel.setText(AppStrings.NUM_SAMPLES_LABEL);
         
-        this.initialTimeSpinner.setModel(new SpinnerNumberModel(1000, 1000, 2000, 10));//set default, min max and increment value
-        this.endTimeSpinner.setModel(new SpinnerNumberModel(2000, 1000, 2000, 10));//set default, min max and increment value
-        this.remove(endTimeSpinner); //initially hidden
+        this.initialTimeSpinner.setModel(new SpinnerNumberModel(beginTime, beginTime, endTime, 10));//set default, min max and increment value
+        this.endTimeSpinner.setModel(new SpinnerNumberModel(endTime, beginTime, endTime, 10));//set default, min max and increment value
+        endTimeSpinner.setEnabled(false);//initially inactive
+        this.numSamplesSpinner.setModel(new SpinnerNumberModel(endTime-beginTime, 1, endTime-beginTime, 1));//set default, min max and increment value
+        numSamplesSpinner.setEnabled(false); //initially inactive
         
         this.colinearThresholdSpinner.setModel(new SpinnerNumberModel(0.5, 0, 1, 0.1));
         
@@ -82,21 +87,18 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         this.methodSelectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.MORPHING_METHODS));
         this.instantOrPeriodComboBox.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
-                //if user wants to get the morphing at an instant, hide the spinner for the end time
+                //if user wants to get the morphing at an instant, hide the spinner for the end time and num samples
                 if(instantOrPeriodComboBox.getSelectedItem().toString().equals(AppStrings.AT_INSTANT_METHOD_STRING)){
                     timeLabel.setText(AppStrings.INSTANT_LABEL_STRING);
-                    remove(endTimeSpinner);
+                    endTimeSpinner.setEnabled(false);
+                    numSamplesSpinner.setEnabled(false);
                 }
                 else{
                     //if user wants the morphing for period of time show the end time spinner in order for him to select the end period
                     timeLabel.setText(AppStrings.DURING_PERIOD_METHOD_STRING);
-                    //add the spinner for end period
-                    GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-                    gridBagConstraints.gridx = 2;
-                    gridBagConstraints.gridy = 1;
-                    gridBagConstraints.weightx = 1.0;
-                    gridBagConstraints.weighty = 1.0;
-                    add(endTimeSpinner, gridBagConstraints);
+                    //enable the spinners for end period and number of samples
+                    endTimeSpinner.setEnabled(true);
+                    numSamplesSpinner.setEnabled(true);
                 }
             }
         });
@@ -133,6 +135,8 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         triangulationLabel = new javax.swing.JLabel();
         methodSelection = new javax.swing.JLabel();
         methodSelectionComboBox = new javax.swing.JComboBox<>();
+        numSamplesLabel = new javax.swing.JLabel();
+        numSamplesSpinner = new javax.swing.JSpinner();
 
         setFocusTraversalPolicyProvider(true);
         setLayout(new java.awt.GridBagLayout());
@@ -271,18 +275,19 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
 
         colinearThresholdLabel.setText("jLabel1");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(colinearThresholdLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         add(colinearThresholdSpinner, gridBagConstraints);
 
         verticeOrientationComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -330,6 +335,20 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(methodSelectionComboBox, gridBagConstraints);
+
+        numSamplesLabel.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 5;
+        add(numSamplesLabel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        add(numSamplesSpinner, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     /** Calls the c++ library that, given a time interval, a previous geometry and a target geometry,
@@ -371,7 +390,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         double threshold = Double.parseDouble(colinearThresholdSpinner.getValue().toString());
         MorphingMethod morphingMethod = MorphingMethod.valueOf(this.methodSelectionComboBox.getSelectedItem().toString());
 
-
+        int numSamples = -1;
         //send the data as input to the corresponding c++ function
         if (selectedTime.equals(AppStrings.AT_INSTANT_METHOD_STRING)){
             duringPeriod = false;
@@ -392,7 +411,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             else if(selectedGeomType.equals(AppStrings.MESH_STRING)){
                 isPolygon = false;
                 if (morphingMethod.equals(MorphingMethod.NORMAL_METHOD)){
-                    result[0] = m.at_instant_mesh(1000.0, 2000.0, wkts[0], wkts[1], 
+                    result[0] = m.at_instant_mesh(beginTime, endTime, wkts[0], wkts[1], 
                         initialTime, triangulationMethod, cw, threshold);
                 }
             }
@@ -402,30 +421,29 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         else if (selectedTime.equals(AppStrings.DURING_PERIOD_METHOD_STRING)){
             duringPeriod = true;
             
-            double endTime = Double.parseDouble(endTimeSpinner.getValue().toString());
+            double endTimeQuery = Double.parseDouble(endTimeSpinner.getValue().toString());
+            numSamples = Integer.parseInt(numSamplesSpinner.getValue().toString());
             if(selectedGeomType.equals(AppStrings.POLY_STRING)){
                 if (morphingMethod.equals(MorphingMethod.NORMAL_METHOD)){
                     //normal method, polygon, during period
                     isPolygon = true;
-                    result = m.during_period_poly(1000.0, 2000.0, wkts[0], wkts[1], initialTime, endTime, 1000, triangulationMethod, cw, threshold);
+                    result = m.during_period_poly(beginTime, endTime, wkts[0], wkts[1], initialTime, endTimeQuery, numSamples, triangulationMethod, cw, threshold, 0.0);
                 }
                 else if (morphingMethod.equals(MorphingMethod.MCKERNEY_METHOD)){
-                    //mkerney, polygon, during period
+                    //mckerney, polygon, during period
                     isPolygon = true;
                     //TEMPORARY begin and end time values
-                    MorphingMckerney morphing = new MorphingMckerney(wkts[0], wkts[1], 1000.0, 2000.0, morphingMethod);
-                    result = morphing.morphingMckerneyDuringPeriod(initialTime, endTime);
+                    MorphingMckerney morphing = new MorphingMckerney(wkts[0], wkts[1], beginTime, endTime, morphingMethod);
+                    result = morphing.morphingMckerneyDuringPeriod(initialTime, endTimeQuery, numSamples);
                 }
             }
             else if(selectedGeomType.equals(AppStrings.MESH_STRING)){
                 //mesh, during period
                 isPolygon = false;
-                result = m.during_period_mesh(1000.0, 2000.0, wkts[0], wkts[1], initialTime, endTime, 1000, triangulationMethod, cw, threshold);
+                result = m.during_period_mesh(beginTime, endTime, wkts[0], wkts[1], initialTime, endTimeQuery, numSamples, triangulationMethod, cw, threshold);
             }
         }
 
-        //System.out.println("result --> "+result.length);
-        
         String res = Arrays.toString(result);
         if (!res.contains(AppStrings.MORPHING_ERR_STRING)){
             //morphing was succesfull
@@ -433,7 +451,7 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
             //resultTextArea.setText(res);
             //draw the result of the morphing geometry in the left panel (1st panel) if is at instant
             // open new window with animation of morphing if is 2nd 
-            drawAndShowMorphingGeometry(result, duringPeriod, isPolygon, morphingMethod);
+            drawAndShowMorphingGeometry(result, duringPeriod, isPolygon, numSamples, morphingMethod);
             
             //enable the show morphing geometry in panel checkbox and check it
             showMorphedGeometryCheckBox.setEnabled(true);
@@ -450,10 +468,12 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_playBtnCaretPositionChanged
 
-    //draw in the left panel (1st panel) the result of the morphing of a geometry
-    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod, boolean isPolygon, MorphingMethod morphingMethod){
+    //draw in the left panel (1st panel) the result of the morphing of a geometry if at instant
+    //or open a new window with full animation of the morphing during period
+    //This function receives the wkt of the resulting morph and costructs a geometry or list of geometries
+    //according to the options selected by the user
+    public void drawAndShowMorphingGeometry(String[] wktGeometry, boolean duringPeriod, boolean isPolygon, int numSamples, MorphingMethod morphingMethod){
         WKTReader reader = new WKTReader();
-
         //set of geometries for each instant, showed in a new window
         if (duringPeriod){
             //several polygons for a certain interval of time
@@ -466,38 +486,37 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
                     //array has length 1, with the multipolygon
                     mPolygon = (MultiPolygon) reader.read(wktGeometry[0]);        
                 }catch(Exception e) {   }
-
-                AppCorrGeometries.getInstance().animation(wktGeometry, mPolygon, isPolygon, morphingMethod);
+                AppCorrGeometries.getInstance().animation(wktGeometry, mPolygon, isPolygon, numSamples, morphingMethod);
             }
             else{
                 
                 if(isPolygon){
                     //a list of polygons, each representing one instant of time
-                    List<Polygon> pList = new ArrayList<>();
-                    for (String wkt : wktGeometry){
+                    Polygon[] pList = new Polygon[wktGeometry.length];
+                    for (int i = 0; i < wktGeometry.length; i++){
                         try { 
-                            Polygon p = (Polygon) reader.read(wkt);
-                            pList.add(p);
+                            Polygon p = (Polygon) reader.read(wktGeometry[i]);
+                            pList[i] = p;
                         } catch (ParseException ex) {
                             Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
                     }
-                    AppCorrGeometries.getInstance().animation(wktGeometry, pList, isPolygon, morphingMethod);
+                    AppCorrGeometries.getInstance().animation(wktGeometry, pList, isPolygon, numSamples, morphingMethod);
                 }
                 else{
                     //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
-                    List<MultiPolygon> mpList = new ArrayList<>();
-                    for (String wkt : wktGeometry){
+                    MultiPolygon[] mpList = new MultiPolygon[wktGeometry.length];
+                    for (int i = 0; i < wktGeometry.length; i++){
                         try { 
-                            MultiPolygon mp = (MultiPolygon) reader.read(wkt);
-                            mpList.add(mp);
+                            MultiPolygon mp = (MultiPolygon) reader.read(wktGeometry[i]);
+                            mpList[i] = mp;
                         } catch (ParseException ex) {
                             Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
                     }
-                    AppCorrGeometries.getInstance().animation(wktGeometry, mpList, isPolygon, morphingMethod);
+                    AppCorrGeometries.getInstance().animation(wktGeometry, mpList, isPolygon, numSamples, morphingMethod);
                 }
             }
         }
@@ -540,6 +559,8 @@ public class MorphingGeometryOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel meshOrPolygonLabel;
     private javax.swing.JLabel methodSelection;
     private javax.swing.JComboBox<String> methodSelectionComboBox;
+    private javax.swing.JLabel numSamplesLabel;
+    private javax.swing.JSpinner numSamplesSpinner;
     private javax.swing.JLabel orientationLabel;
     private javax.swing.JButton playBtn;
     private javax.swing.JLabel resultLabel;

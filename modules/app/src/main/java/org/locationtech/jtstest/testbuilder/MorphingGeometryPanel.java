@@ -40,43 +40,37 @@ public class MorphingGeometryPanel extends JPanel{
     private int currentGeometryNumber = 0;
     private int nGeometries = 0;
     private MultiPolygon multiPolygon = null;
-    private List<MultiPolygon> multiPolygonList;
-    private List<Polygon> polygonList;
+    private MultiPolygon[] multiPolygonList;
+    private Polygon[] polygonList;
     Timer timer = null;
 
     //for a multipolygon, each polygon in a certain instant
-    public MorphingGeometryPanel(MultiPolygon m_polygon) 
+    public MorphingGeometryPanel(MultiPolygon mPolygon) 
     {
-        multiPolygon = m_polygon;
+        multiPolygon = mPolygon;
         nGeometries = multiPolygon.getNumGeometries();
         super.setBackground(Color.white);
-
-        timer = new Timer(10, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                repaint();
-            }
-        });
-
-        timer.start();
+        startAnimation();
         
     }
      
-     //for a list of mesh of triangules or list of polygons
-     public MorphingGeometryPanel(List<?> geometryList){
-        if(geometryList.get(0) instanceof MultiPolygon){
-            multiPolygonList = (List<MultiPolygon>) geometryList;
-            //System.out.println("-->multiPolygon");
-            nGeometries = multiPolygonList.size();
-        }
-        else if(geometryList.get(0) instanceof Polygon){
-            polygonList = (List<Polygon>) geometryList;
-            //System.out.println("-->Polygon");
-            nGeometries = polygonList.size();
-        }
-        
+     //for a list of mesh of triangules
+     public MorphingGeometryPanel(MultiPolygon[] geometryList){
+        this.multiPolygonList = geometryList;
+        this.nGeometries = multiPolygonList.length;
         super.setBackground(Color.white);
-
+        startAnimation();
+    }
+     
+    //for a list of polygons
+    public MorphingGeometryPanel(Polygon[] geometryList){
+       this.polygonList = geometryList;
+       this.nGeometries = polygonList.length;
+       super.setBackground(Color.white);
+       startAnimation();
+    }
+     
+    private void startAnimation(){
         timer = new Timer(10, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -87,21 +81,21 @@ public class MorphingGeometryPanel extends JPanel{
         timer.start();
     }
     
-    public void changeToMultiPolygonList(List<MultiPolygon> mpList){
+    public void changeToMultiPolygonList(MultiPolygon[] mpList){
         timer.stop();
         this.multiPolygonList = mpList;
-        nGeometries = multiPolygonList.size();
+        nGeometries = multiPolygonList.length;
         this.polygonList = null;
         currentGeometryNumber = 0;
 
         timer.restart();
     }
     
-    public void changeToPolygonList(List<Polygon> pList){
+    public void changeToPolygonList(Polygon[] pList){
         timer.stop();
         this.multiPolygonList = null;
         this.polygonList = pList;
-        nGeometries = polygonList.size();
+        nGeometries = polygonList.length;
         currentGeometryNumber = 0;
 
         timer.restart();
@@ -156,9 +150,9 @@ public class MorphingGeometryPanel extends JPanel{
         //at.scale(20, -20);
         double panelHeight = this.getHeight();
         double panelWidth = this.getWidth();
-        if (multiPolygonList != null && currentGeometryNumber < multiPolygonList.size()){
+        if (multiPolygonList != null && currentGeometryNumber < multiPolygonList.length){
             //System.out.println("--> geo paint: " + currentGeometryNumber);
-            mGeometry = multiPolygonList.get(currentGeometryNumber);
+            mGeometry = multiPolygonList[currentGeometryNumber];
             Point p = mGeometry.getCentroid();
             at.translate(panelWidth/2 - p.getX(), panelHeight/2 - p.getY());//place center of the geometry in the midle of the panel
             
@@ -179,9 +173,9 @@ public class MorphingGeometryPanel extends JPanel{
             gr.draw(lt);
 
         }
-        else if (polygonList != null && currentGeometryNumber < polygonList.size()){
+        else if (polygonList != null && currentGeometryNumber < polygonList.length){
             //System.out.println("--> geo paint: " + currentGeometryNumber);
-            pGeometry = polygonList.get(currentGeometryNumber);
+            pGeometry = polygonList[currentGeometryNumber];
             //pGeometry = AppCorrGeometries.getInstance().makePolygonFitComponent(pGeometry, this);
             Point p = pGeometry.getCentroid();
             at.translate(panelWidth/2 - p.getX(), panelHeight/2 - p.getY());//place center of the geometry in the midle of the panel
@@ -288,13 +282,13 @@ public class MorphingGeometryPanel extends JPanel{
         MultiPolygon mGeometry = null;
         Polygon pGeometry = null;
         if (multiPolygonList != null){
-            for (int i = 0; i <multiPolygonList.size(); i++ ){
+            for (int i = 0; i <multiPolygonList.length; i++ ){
                 BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
                 Graphics2D gr = bImg.createGraphics();
                 
                 gr.setColor(Color.blue);
                 
-                mGeometry = multiPolygonList.get(i);
+                mGeometry = multiPolygonList[i];
                 mGeometry = AppCorrGeometries.getInstance().makePolygonFitComponent(mGeometry, this);
                 //gr.fill(new LiteShape(mGeometry, at, false));
                 gr.draw(new LiteShape(mGeometry, at, false));   
@@ -306,13 +300,13 @@ public class MorphingGeometryPanel extends JPanel{
             }
         }
         else if (polygonList != null){
-            for (int i = 0; i <polygonList.size(); i++ ){
+            for (int i = 0; i <polygonList.length; i++ ){
                 BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
                 Graphics2D gr = bImg.createGraphics();
                 
                 gr.setColor(Color.blue);
                 
-                pGeometry = polygonList.get(i);
+                pGeometry = polygonList[i];
                 pGeometry = AppCorrGeometries.getInstance().makePolygonFitComponent(pGeometry, this);
                 //gr.fill(new LiteShape(mGeometry, at, false));
                 gr.draw(new LiteShape(pGeometry, at, false));
@@ -351,26 +345,26 @@ public class MorphingGeometryPanel extends JPanel{
         }
         
         else if (multiPolygonList != null){
-            for (int i = 0; i <multiPolygonList.size(); i++ ){
+            for (int i = 0; i <multiPolygonList.length; i++ ){
                 BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
                 Graphics2D gr = bImg.createGraphics();
                 
                 gr.setColor(Color.blue);
                 
-                mGeometry = multiPolygonList.get(currentGeometryNumber);
+                mGeometry = multiPolygonList[currentGeometryNumber];
                 //gr.fill(new LiteShape(mGeometry, at, false));
                 gr.draw(new LiteShape(mGeometry, at, false));         
                 images.add(bImg);
             }
         }
         else if (polygonList != null){
-            for (int i = 0; i <polygonList.size(); i++ ){
+            for (int i = 0; i <polygonList.length; i++ ){
                 BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
                 Graphics2D gr = bImg.createGraphics();
                 
                 gr.setColor(Color.blue);
                 
-                pGeometry = polygonList.get(currentGeometryNumber);
+                pGeometry = polygonList[currentGeometryNumber];
                 //gr.fill(new LiteShape(mGeometry, at, false));
                 gr.draw(new LiteShape(mGeometry, at, false));         
                 images.add(bImg);

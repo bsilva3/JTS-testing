@@ -100,6 +100,7 @@ public class AppStrings {
     public static final String VERTICE_ORIENTATION_LABEL_STRING = "Vertice Orientation: ";
     
     public static final String METHOD_SELECTION_LABEL_STRING = "Morphing Method Selection: ";
+    public static final String NUM_SAMPLES_LABEL = "Number of Samples ";
     
     public static final String STARTER_GEOM_LABEL = "Source: ";
     

@@ -31,10 +31,12 @@ import jni_st_mesh.CSVUtils;
 import jni_st_mesh.ChartMaker;
 import jni_st_mesh.ChartType;
 import jni_st_mesh.Main;
+import jni_st_mesh.Metrics;
 import jni_st_mesh.ScreenImage;
 import jni_st_mesh.Ststistics;
 import jni_st_mesh.TriangulationMethod;
 import org.jfree.chart.ChartPanel;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
@@ -51,23 +53,25 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     private boolean userChangedSlider = true;
     private String[] wktGeometry;
     private boolean isPolygon;
-    private int beginTime = 1000; //<-----
+    private int beginTime = 1000; //<----- temporary
     private int endTime = 2000; //<-----
+    private int numSamples;
     HashMap<String, Double> statistics;
     
     private ChartMaker chartMaker;
     
     private MorphingMethod morphingMethod;
-    //temporary
-    private String mesh1 = "MULTIPOLYGON (((924 618.5, 925.0000000596046 604.9166668355465, 928 597, 924 618.5)), ((925.0000000596046 604.9166668355465, 926.0000001192093 591.333333671093, 928 597, 925.0000000596046 604.9166668355465)), ((924.0000000596046 585.6666668355465, 926.0000001192093 591.333333671093, 925.0000000596046 604.9166668355465, 924.0000000596046 585.6666668355465)), ((914 583, 922 580, 924.0000000596046 585.6666668355465, 914 583)), ((924 618.5, 924.0000000298023 602.0833334177732, 925.0000000596046 604.9166668355465, 924 618.5)), ((924.0000000298023 602.0833334177732, 924.0000000596046 585.6666668355465, 925.0000000596046 604.9166668355465, 924.0000000298023 602.0833334177732)), ((913.3454177996489 583.9879156479267, 914 583, 924.0000000596046 585.6666668355465, 913.3454177996489 583.9879156479267)), ((909 576, 914 583, 913.3454177996489 583.9879156479267, 909 576)), ((946 640, 990 655, 963.6666669249535 647.5, 946 640)), ((937.3333338499069 640, 946 640, 959.3333334624767 647.5, 937.3333338499069 640)), ((928.6666669249535 640, 937.3333338499069 640, 959.3333334624767 647.5, 928.6666669249535 640)), ((913.3454177996489 583.9879156479267, 924.0000000298023 602.0833334177732, 893.1999313191997 574.3000686808003, 913.3454177996489 583.9879156479267)), ((959.3333334624767 647.5, 963.6666669249535 647.5, 990 655, 959.3333334624767 647.5)), ((946 640, 963.6666669249535 647.5, 959.3333334624767 647.5, 946 640)), ((909 576, 913.3454177996489 583.9879156479267, 893.1999313191997 574.3000686808003, 909 576)), ((955 647.5, 959.3333334624767 647.5, 949 781, 955 647.5)), ((928.6666669249535 640, 959.3333334624767 647.5, 955 647.5, 928.6666669249535 640)), ((920 640, 928.6666669249535 640, 955 647.5, 920 640)), ((810 642, 881 555, 886.5 563.5, 810 642)), ((892 572, 909 576, 893.1999313191997 574.3000686808003, 892 572)), ((886.5 563.5, 892 572, 893.1999313191997 574.3000686808003, 886.5 563.5)), ((804 736, 810 642, 955 647.5, 804 736)), ((823 766, 949 781, 926 812, 823 766)), ((949 781, 959.3333334624767 647.5, 990 655, 949 781)), ((810 642, 886.5 563.5, 893.1999313191997 574.3000686808003, 810 642)), ((823 766, 955 647.5, 949 781, 823 766)), ((804 736, 955 647.5, 823 766, 804 736)), ((810 642, 893.1999313191997 574.3000686808003, 920 640, 810 642)), ((810 642, 920 640, 955 647.5, 810 642)), ((893.1999313191997 574.3000686808003, 924.0000000298023 602.0833334177732, 920 640, 893.1999313191997 574.3000686808003)), ((913.3454177996489 583.9879156479267, 924.0000000596046 585.6666668355465, 924.0000000298023 602.0833334177732, 913.3454177996489 583.9879156479267)), ((920 640, 924.0000000298023 602.0833334177732, 924 618.5, 920 640)))";
-    private String mesh2 = "MULTIPOLYGON (((926 812, 949 781, 964.346 816.418, 926 812)), ((823 766, 926 812, 834.664 878.198, 823 766)), ((804 736, 823 766, 787.52 767.454, 804 736)), ((810 642, 804 736, 725.596 683.804, 810 642)), ((881 555, 810 642, 770.158 537.014, 881 555)), ((886.5 563.5, 881 555, 891.111 554.487, 886.5 563.5)), ((892 572, 886.5 563.5, 896.611 562.987, 892 572)), ((909 576, 892 572, 903.964 559.278, 909 576)), ((914 583, 909 576, 917.562 575.17, 914 583)), ((922 580, 914 583, 915.402 574.572, 922 580)), ((924.0000000596046 585.6666668355465, 922 580, 927.9073335093856 581.1013333661556, 924.0000000596046 585.6666668355465)), ((926.0000001192093 591.333333671093, 924.0000000596046 585.6666668355465, 929.9073335689902 586.7680002017021, 926.0000001192093 591.333333671093)), ((928 597, 926.0000001192093 591.333333671093, 931.9073331004381 592.4346669387818, 928 597)), ((924 618.5, 928 597, 944.619 611.214, 924 618.5)), ((920 640, 924 618.5, 940.619 632.714, 920 640)), ((928.6666669249535 640, 920 640, 924.3333334624767 632.4946664429903, 928.6666669249535 640)), ((937.3333338499069 640, 928.6666669249535 640, 933.0000003874302 632.4946664429903, 937.3333338499069 640)), ((946 640, 937.3333338499069 640, 941.6666669249535 632.4946671140194, 946 640)), ((990 655, 946 640, 980.99 609.396, 990 655)), ((949 781, 990 655, 1078.616 753.506, 949 781)))";
     
-    private MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod) {
+    private MultiPolygon mp;
+    private MultiPolygon[] multiPolyList;
+    private Polygon[] polyList;
+    
+    private MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod, int numSamples) {
         this.wktGeometry = wktGeometry;
         this.isPolygon = isPolygon;
         this.morphingMethod = morphingMethod;
+        this.numSamples = numSamples;
         chartMaker = new ChartMaker();
-        Ststistics[] stats = Ststistics.values();
         initComponents();
     }
     
@@ -77,16 +81,18 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      * in the second panel
      * @param isPolygon
      * @param morphingMethod
+     * @param numSamples
      * @param mp - the result of the morphing of the geometries as a multipolygon, each polygon in an instant
      */
-    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod, MultiPolygon mp) {
-        this(wktGeometry, isPolygon, morphingMethod);
+    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod,
+            int numSamples, MultiPolygon mp) {
+        this(wktGeometry, isPolygon, morphingMethod, numSamples);
         this.morphingGeoPanel = new MorphingGeometryPanel(mp);
+        this.mp = mp;
         startComponents();
         initMorphingPanel();
         if (isPolygon)
             showStatisticsInChart(metricsComboBox.getSelectedItem().toString(), chartTypeComboBox.getSelectedItem().toString());
-    
     }
     
     /**
@@ -95,9 +101,23 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      * @param geometryList - the result of the morphing of the geometries as a list of multipolygon, or polygon
      * each multipolygon being a mesh of triangles in an instant or a polygon in each instant of time
      */
-    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod, List<?> geometryList) {
-        this(wktGeometry, isPolygon, morphingMethod);
+    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod, 
+            int numSamples, Polygon[] geometryList) {
+        this(wktGeometry, isPolygon, morphingMethod, numSamples);
         this.morphingGeoPanel = new MorphingGeometryPanel(geometryList);
+        this.polyList = geometryList;
+        startComponents();
+        initMorphingPanel();
+        //start by showing the area evolution chart
+        if (isPolygon)
+            showStatisticsInChart(metricsComboBox.getSelectedItem().toString(), chartTypeComboBox.getSelectedItem().toString());
+    }
+    
+    public MorphingGeometryViewerFrame(String[] wktGeometry, boolean isPolygon, MorphingMethod morphingMethod, 
+            int numSamples, MultiPolygon[] geometryList) {
+        this(wktGeometry, isPolygon, morphingMethod, numSamples);
+        this.morphingGeoPanel = new MorphingGeometryPanel(geometryList);
+        this.multiPolyList = geometryList;
         startComponents();
         initMorphingPanel();
         //start by showing the area evolution chart
@@ -424,14 +444,14 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         this.triangulationLabel.setText(AppStrings.TRIANGULATION_LABEL_STRING);
         this.cwLabel.setText(AppStrings.VERTICE_ORIENTATION_LABEL_STRING);
         this.colinearThresholdLabel.setText(AppStrings.COLINEAR_THRESHOLD_STRING);
-        this.minTimeLabel.setText(1000+"");//<-------------------- change this!
-        this.maxTimeLabel.setText(2000+"");//<-------------------- change this!
+        this.minTimeLabel.setText(beginTime+"");
+        this.maxTimeLabel.setText(endTime+"");
         this.geomTypeLabel.setText(AppStrings.GEOMETRY_TYPE_LABEL_STRING);
         
 
         
         //initialize combo box
-        this.metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(Ststistics.getStatStringList()));
+        this.metricsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(Metrics.getStatStringList()));
         this.chartTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(ChartType.getChartTypeList()));
         this.triangulationComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.TRIANGULATION_METHOD_STRINGS));
         this.cwComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(AppStrings.VERTICE_ORIENTATION_STRINGS));
@@ -445,11 +465,13 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     // new statistic selected
-                    //certain statistics should not be shown in chart, only im table.
+                    //certain statistics should not be shown in chart, only in table.
                     //if such statistic is selected, disable the combo box to choose the chart type,
                     //and force the table to be selected
                     int statisticSelected = Ststistics.stringToInt(metricsComboBox.getSelectedItem().toString());
-                    if (statisticSelected > 2){
+                    
+                    //AFTER UPDATE THIS MAY NOT BE NECESSARY... TO BE DECIDED
+                    /*if (statisticSelected > 2){
                         //statistics that can only be shown in tables
                         chartTypeComboBox.setSelectedItem(ChartType.TABLE.getValue());
                         chartTypeComboBox.setEnabled(false);
@@ -458,7 +480,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
                         //statistics that can be shown in any chart and table
                         //chartTypeComboBox.setSelectedIndex(0);
                         chartTypeComboBox.setEnabled(true);
-                    }
+                    }*/
                   }
             }
         });
@@ -511,11 +533,11 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
                 String[] result = new String[1];
                 if(selectedType.equals(AppStrings.POLY_STRING)){
                     //polygon, during period
-                    result = m.during_period_poly(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000, endTime, 1000, triangulationMethod, cw, threshold);
+                    result = m.during_period_poly(beginTime, endTime, wktGeometry[0], wktGeometry[1], beginTime, endTime, numSamples, triangulationMethod, cw, threshold, 0.0);
                 }
                 else if(selectedType.equals(AppStrings.MESH_STRING)){
                     //mesh, during period
-                    result = m.during_period_mesh(1000.0, 2000.0, mesh1, mesh2, 1000, endTime, 1000, triangulationMethod, cw, threshold);
+                    result = m.during_period_mesh(beginTime, endTime, wktGeometry[0], wktGeometry[1], beginTime, endTime, numSamples, triangulationMethod, cw, threshold);
                 }
                 
                 WKTReader reader = new WKTReader();
@@ -523,11 +545,11 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
                 if (!res.contains(AppStrings.MORPHING_ERR_STRING)){
                     if(selectedType.equals(AppStrings.POLY_STRING)){
                         //a list of polygons, each representing one instant of time
-                        List<Polygon> pList = new ArrayList<>();
-                        for (String wkt : result){
+                        Polygon[] pList = new Polygon[result.length];
+                        for (int i = 0; i < result.length; i++){
                             try { 
-                                Polygon p = (Polygon) reader.read(wkt);
-                                pList.add(p);
+                                Polygon p = (Polygon) reader.read(result[i]);
+                                pList[i] = p;
                             } catch (ParseException ex) {
                                 Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -537,11 +559,11 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
                     }
                     else{
                         //a list of multipolygons, each multypoligon representing a mesh of triangules in a period of time
-                        List<MultiPolygon> mpList = new ArrayList<>();
-                        for (String wkt : result){
+                        MultiPolygon[] mpList = new MultiPolygon[result.length];
+                        for (int i = 0; i < result.length; i++){
                             try { 
-                                MultiPolygon mp = (MultiPolygon) reader.read(wkt);
-                                mpList.add(mp);
+                                MultiPolygon mp = (MultiPolygon) reader.read(result[i]);
+                                mpList[i] = mp;
                             } catch (ParseException ex) {
                                 Logger.getLogger(AppCorrGeometries.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -550,9 +572,6 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
                         morphingGeoPanel.changeToMultiPolygonList(mpList);
                     }
                 }
-                //initMorphingPanel();
-                //timeSlider.setValue(convertValueToSliderValue(0));
-                //morphingGeoPanel.playFromGeometry(0);
             }
         });
         
@@ -628,19 +647,20 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
                 showStatisticsInChart(metricsComboBox.getSelectedItem().toString(), chartTypeComboBox.getSelectedItem().toString());
             }
         });
-        
-        timeSlider.setModel(new DefaultBoundedRangeModel(1000, 1, 1000, 2000));//<-- temporary values!
-        timeSlider.setMajorTickSpacing(2000/5);
-        timeSlider.setPaintTicks(true);
-        timeSlider.setPaintTicks(true);
-        timeSlider.setPaintLabels(true);
-        timeSlider.setLabelTable(timeSlider.createStandardLabels(2000/5));
+        int step = (endTime-beginTime)/numSamples;
+        //the slider's range will be from the begin time to begin time + number of samples
+        timeSlider.setModel(new DefaultBoundedRangeModel(beginTime, 1, beginTime, beginTime+numSamples));
+        //timeSlider.setMinorTickSpacing(step);
+        //timeSlider.setPaintTicks(true);
+        //timeSlider.setPaintLabels(true);
+        //timeSlider.setLabelTable(timeSlider.createStandardLabels(step));
         
         timeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (userChangedSlider)
+                if (userChangedSlider){
                     morphingGeoPanel.paintAtInstant(convertSliderValueToValue(timeSlider.getValue()));
+                }
             }
         });
         
@@ -648,26 +668,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
     }
     
     private void showStatisticsInChart(String statisticStr, String chart){
-        int statistic = Ststistics.stringToInt(statisticStr);
-        
-        boolean cw;
-        if (cwComboBox.getSelectedItem().toString().equals(AppStrings.CLOCK_WISE_STRING)){
-            cw = true;
-        }
-        else{
-            cw = false;
-        }
-        double threshold = Double.parseDouble(colinearThresholdSpinner.getValue().toString());
-        
-        int triangulationMethod;
-        if ( this.triangulationComboBox.getSelectedItem().toString().equals(TriangulationMethod.COMPATIBLE.toString()) ){
-            triangulationMethod = TriangulationMethod.COMPATIBLE.get_value();
-        }
-        else{
-            triangulationMethod = TriangulationMethod.EQUILATERAL.get_value();
-        }
-        
-        //clear any other element in the panel that show the charts
+        //clear any other element in the panel that shows the charts
         chartPanel.removeAll();
         
         System.loadLibrary(AppStrings.DLL_LIBRARY);
@@ -677,33 +678,61 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
         String headerLegend = "";
         String xAxisLegend = "";
         String yAxisLegend = "";
-        boolean keysAreNumbers; //flag to check if sort by key is needed to display data in the charts
-        if (statistic == Ststistics.QUALITY_MEASURES.get_value()){
-            statistics = m.quality_measures(wktGeometry[0], triangulationMethod, cw, threshold, 1);
-            headerLegend = "Quality Measures";
-            xAxisLegend = "Quality";
-            yAxisLegend = "Value";
-            keysAreNumbers = false;
+        boolean keysAreNumbers = false; //flag to check if sort by key is needed to display data in the charts
+        String[] geometries;
+        if (mp == null && multiPolyList == null && this.polyList.length > 0){
+            geometries = new String[polyList.length];
+            for (int i = 0; i < polyList.length; i++){
+                geometries[i] = polyList[i].toText();
+            }
+        }
+        else if (mp == null && polyList == null && this.multiPolyList.length > 0){
+            geometries = new String[multiPolyList.length];
+            for (int i = 0; i < multiPolyList.length; i++){
+                geometries[i] = multiPolyList[i].toText();
+            }
         }
         else{
-            statistics = m.ststistics(1000.0, 2000.0, wktGeometry[0], wktGeometry[1], 1000, 
-                triangulationMethod, cw, threshold, statistic);
-            keysAreNumbers = true;
-            if (statistic == Ststistics.AREA_EVOLUTION.get_value()){
-                headerLegend = "Area Evolution";
-                xAxisLegend = "Instant";
-                yAxisLegend = "Area";
+            geometries = new String[mp.getNumGeometries()];
+            for (int i = 0; i < mp.getNumGeometries(); i++){
+                geometries[i] = mp.getGeometryN(i).toText();
             }
-            else if (statistic == Ststistics.ROTATION_ANGLES.get_value()){
-                headerLegend = "Rotation Angles";
-                xAxisLegend = "Instant";
-                yAxisLegend = "Angle";
-            }
-            else if (statistic == Ststistics.COLLINEAR_POINTS_BY_METHOD.get_value()){
-                headerLegend = "Colinear points by Method";
-                xAxisLegend = "Method";
-                yAxisLegend = "Colinear points";
-            }
+        }
+        HashMap<String, Double> statisticValues = new HashMap<String, Double>();
+        switch(statisticStr)
+        {
+            case "Area":
+                for(int j = 0; j < geometries.length; j++)
+                    statisticValues.put(String.valueOf(j), m.numerical_metric(geometries[j], Metrics.AREA.get_value()));
+                
+                headerLegend = "Evolution of the Area";
+                xAxisLegend = "Observations";
+                yAxisLegend = "Area (Dimensionless)";
+                break;
+            case "Perimeter":
+                for(int j = 0; j < geometries.length; j++)
+                    statisticValues.put(String.valueOf(j), m.numerical_metric(geometries[j], Metrics.PERIMETER.get_value()));
+                
+                headerLegend = "Evolution of the Perimeter";
+                xAxisLegend = "Observations";
+                yAxisLegend = "Perimeter (Dimensionless)";
+                break;
+            /*case "Hausdorff Distance":
+                for(int j = 0; j < geometries.length; j++)
+                    statisticValues.put(String.valueOf(j), m.compare_geometries(ref_geom_wkt, geometries[j], SimilarityMetrics.GEOMETRIC_SIMILARITY.get_value()));
+                
+                headerLegend = "Evolution of the Hausdorff Distance";
+                xAxisLegend = "Observations";
+                yAxisLegend = "Hausdorff Distance (Dimensionless)";
+                break;
+            case "Jaccard Index":
+                for(int j = 0; j < geometries.length; j++)
+                    statisticValues.put(String.valueOf(j), m.compare_geometries(ref_geom_wkt, geometries[j], SimilarityMetrics.JACCARD_INDEX.get_value()));
+                
+                headerLegend = "Evolution of the Jaccard Index";
+                xAxisLegend = "Observations";
+                yAxisLegend = "%";
+                break;*/
         }
         
         /*for (Map.Entry<String, Double> entry : statistics.entrySet()) {
@@ -740,7 +769,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      * @return - the instant in time that the frame belongs to
      */
     private int convertValueToSliderValue(int v){
-        return 1000+v;
+        return beginTime+v;
     }
     
     /**
@@ -752,7 +781,7 @@ public class MorphingGeometryViewerFrame extends javax.swing.JFrame {
      * @return - the frame number to be shown in the animation
      */
     private int convertSliderValueToValue(int v){
-        return Math.abs(1000-v);
+        return Math.abs(beginTime-v);
     }
     
     private JDialog createWaitDialog(){

@@ -1,1 +1,0 @@
-g++ EMD.cpp -o EMD -std=c++11

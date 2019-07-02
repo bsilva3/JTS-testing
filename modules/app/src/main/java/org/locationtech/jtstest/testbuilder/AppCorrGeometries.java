@@ -574,13 +574,18 @@ public class AppCorrGeometries {
     }
     
     
-    public void animation(String[] wktGeometry, MultiPolygon multiPolygon, boolean isPolygon, MorphingMethod morphingMethod) {
-        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, morphingMethod, multiPolygon);
+    public void animation(String[] wktGeometry, MultiPolygon multiPolygon, boolean isPolygon, int numSamples, MorphingMethod morphingMethod) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, morphingMethod, numSamples, multiPolygon);
         openMorphingGeometryFrame(mframe);
     }
     
-    public void animation(String[] wktGeometry, List<?> geomList, boolean isPolygon, MorphingMethod morphingMethod) {
-        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, morphingMethod, geomList);
+    public void animation(String[] wktGeometry, Polygon[] polyList, boolean isPolygon, int numSamples, MorphingMethod morphingMethod) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, morphingMethod, numSamples, polyList);
+        openMorphingGeometryFrame(mframe);
+    }
+    
+    public void animation(String[] wktGeometry, MultiPolygon[] multiPolyList, boolean isPolygon, int numSamples, MorphingMethod morphingMethod) {
+        MorphingGeometryViewerFrame mframe = new MorphingGeometryViewerFrame(wktGeometry, isPolygon, morphingMethod, numSamples, multiPolyList);
         openMorphingGeometryFrame(mframe);
     }
     
